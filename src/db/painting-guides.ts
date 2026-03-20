@@ -6,6 +6,8 @@ export interface PaintingGuide {
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   timeEstimate: string;
   steps: GuideStep[];
+  videoUrl?: string;
+  creator?: string;
 }
 
 export interface GuideStep {
@@ -15,6 +17,7 @@ export interface GuideStep {
   paints: { name: string; hex: string }[];
   instructions: string;
   tip?: string;
+  videoTimestamp?: string;
 }
 
 export const PAINTING_GUIDES: PaintingGuide[] = [

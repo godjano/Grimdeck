@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import type { Paint } from '../types';
 
 type HarmonyType = 'complementary' | 'triadic' | 'analogous' | 'split-complementary' | 'tetradic';
 import { PAINTING_GUIDES, ADVANCED_GUIDES, MORE_GUIDES, type PaintingGuide } from '../db/painting-guides';
+import { CREATOR_RECIPES, CREATORS } from '../db/creator-recipes';
 
-type Tab = 'guides' | 'wheel' | 'builder' | 'auto' | 'inspiration';
+type Tab = 'creators' | 'guides' | 'paintalong' | 'wheel' | 'builder' | 'auto' | 'inspiration';
 
 // ─── Colour Math ───
 function hslToHex(h: number, s: number, l: number): string {
@@ -83,7 +84,7 @@ const INSTA_TAGS = [
 
 export default function PaintSuggestions() {
   const paints = useLiveQuery(() => db.paints.toArray()) ?? [];
-  const [tab, setTab] = useState<Tab>('guides');
+  const [tab, setTab] = useState<Tab>('creators');
   const [baseColor, setBaseColor] = useState('#c62828');
   const [harmony, setHarmony] = useState<HarmonyType>('triadic');
   const [customScheme, setCustomScheme] = useState<string[]>(['#c62828', '#f5c518', '#1a1a1a']);
@@ -112,10 +113,16 @@ export default function PaintSuggestions() {
       </div>
 
       <div className="game-tabs" style={{ marginBottom: 24 }}>
-        {([['guides', '📖 Guides'], ['wheel', '🎡 Colour Wheel'], ['builder', '🔧 Scheme Builder'], ['auto', '⚡ Auto Suggest'], ['inspiration', '📸 Inspiration']] as [Tab, string][]).map(([t, label]) => (
+        {([['creators', '⭐ Creator Recipes'], ['guides', '📖 Guides'], ['paintalong', '🎨 Paint Along'], ['wheel', '🎡 Colour Wheel'], ['builder', '🔧 Builder'], ['auto', '⚡ Auto'], ['inspiration', '📸 Inspiration']] as [Tab, string][]).map(([t, label]) => (
           <button key={t} className={`game-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>{label}</button>
         ))}
       </div>
+
+      {/* ─── Creator Recipes ─── */}
+      {tab === 'creators' && <CreatorRecipesTab paints={paints} />}
+
+      {/* ─── Paint Along Mode ─── */}
+      {tab === 'paintalong' && <PaintAlongTab />}
 
       {/* ─── Painting Guides ─── */}
       {tab === 'guides' && <GuidesTab paints={paints} />}
@@ -458,6 +465,156 @@ function GuidesTab({ paints }: { paints: Paint[] }) {
             );
           })}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function CreatorRecipesTab({ paints }: { paints: Paint[] }) {
+  const [expanded, setExpanded] = useState<number | null>(null);
+  const [creatorFilter, setCreatorFilter] = useState('');
+  const ownedNames = new Set(paints.map(p => p.name.toLowerCase()));
+
+  const filtered = creatorFilter ? CREATOR_RECIPES.filter(r => r.creator === creatorFilter) : CREATOR_RECIPES;
+
+  return (
+    <div>
+      <div className="settings-section">
+        <h3 className="settings-title">⭐ Creator-Approved Recipes</h3>
+        <p className="settings-desc">Paint recipes inspired by top YouTube creators. Click to see steps, then watch their video for the full tutorial.</p>
+
+        <div className="creator-chips">
+          <button className={`creator-chip ${!creatorFilter ? 'active' : ''}`} onClick={() => setCreatorFilter('')}>All ({CREATOR_RECIPES.length})</button>
+          {CREATORS.filter(c => CREATOR_RECIPES.some(r => r.creator === c.name)).map(c => (
+            <button key={c.name} className={`creator-chip ${creatorFilter === c.name ? 'active' : ''}`} onClick={() => setCreatorFilter(c.name)}>{c.name}</button>
+          ))}
+        </div>
+
+        {filtered.map((r, i) => (
+          <div key={i} className="creator-recipe-card" onClick={() => setExpanded(expanded === i ? null : i)}>
+            <div className="scheme-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 2 }}>
+                  {r.paints.map((p, j) => <div key={j} style={{ width: 20, height: 20, borderRadius: '50%', background: p.hex, border: '1px solid rgba(255,255,255,0.1)' }} />)}
+                </div>
+                <div>
+                  <div className="card-title">{r.name}</div>
+                  <div className="card-sub">
+                    <span className="creator-badge">✦ {r.creator} Approved</span> · {r.faction} · {r.difficulty}
+                  </div>
+                </div>
+              </div>
+              <span className="scheme-toggle">{expanded === i ? '▲' : '▼'}</span>
+            </div>
+            {expanded === i && (
+              <div className="ref-card-detail">
+                {r.paints.map((p, j) => (
+                  <div key={j} className="recipe-item" style={{ marginBottom: 4 }}>
+                    <div className="swatch" style={{ width: 24, height: 24, background: p.hex }} />
+                    <div className="recipe-item-info">
+                      <div className="recipe-paint-name">{p.name} {ownedNames.has(p.name.toLowerCase()) ? <span style={{ color: '#4ade80', fontSize: '0.65rem' }}>✓ OWNED</span> : <span style={{ color: '#ef4444', fontSize: '0.65rem' }}>✕</span>}</div>
+                      <div className="recipe-usage">{p.step}</div>
+                    </div>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                  <a href={r.videoUrl} target="_blank" rel="noreferrer" className="btn btn-sm btn-primary">▶ Watch on YouTube</a>
+                  <a href={r.creatorChannel} target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost">📺 {r.creator}'s Channel</a>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="settings-section">
+        <h3 className="settings-title">📺 Hobby Creators to Follow</h3>
+        <div className="creators-grid">
+          {CREATORS.map(c => (
+            <a key={c.name} href={c.channel} target="_blank" rel="noreferrer" className="creator-card">
+              <div className="creator-name">{c.name}</div>
+              <div className="creator-specialty">{c.specialty}</div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PaintAlongTab() {
+  const allGuides = [...PAINTING_GUIDES, ...ADVANCED_GUIDES, ...MORE_GUIDES];
+  const [selectedId, setSelectedId] = useState('');
+  const [activeStep, setActiveStep] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  const intervalRef = useRef<number | null>(null);
+
+  const guide = allGuides.find(g => g.id === selectedId);
+
+  useEffect(() => {
+    if (timerRunning) {
+      intervalRef.current = window.setInterval(() => setSeconds(s => s + 1), 1000);
+    } else if (intervalRef.current) clearInterval(intervalRef.current);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [timerRunning]);
+
+  const fmt = (s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
+
+  if (!guide) {
+    return (
+      <div className="settings-section">
+        <h3 className="settings-title">🎨 Paint Along Mode</h3>
+        <p className="settings-desc">Select a guide, prop your phone/tablet at your desk, and follow along step by step with a built-in timer.</p>
+        <select value={selectedId} onChange={e => setSelectedId(e.target.value)} className="tool-input" style={{ maxWidth: 400 }}>
+          <option value="">Choose a painting guide...</option>
+          {allGuides.map(g => <option key={g.id} value={g.id}>{g.title} ({g.difficulty})</option>)}
+        </select>
+      </div>
+    );
+  }
+
+  const step = guide.steps[activeStep];
+  const isLast = activeStep === guide.steps.length - 1;
+
+  return (
+    <div className="paintalong">
+      <div className="paintalong-header">
+        <button className="btn btn-sm btn-ghost" onClick={() => { setSelectedId(''); setActiveStep(0); setSeconds(0); setTimerRunning(false); }}>✕ Exit</button>
+        <div className="paintalong-timer">{fmt(seconds)}</div>
+        <button className={`btn btn-sm ${timerRunning ? 'btn-danger' : 'btn-primary'}`} onClick={() => setTimerRunning(!timerRunning)}>{timerRunning ? '⏸' : '▶'}</button>
+      </div>
+
+      <div className="paintalong-progress">
+        <div className="guide-progress-bar"><div className="guide-progress-fill" style={{ width: `${((activeStep + 1) / guide.steps.length) * 100}%` }} /></div>
+        <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginTop: 4 }}>Step {activeStep + 1} / {guide.steps.length} · {guide.title}</div>
+      </div>
+
+      <div className="paintalong-step">
+        <div className="paintalong-technique">{step.technique}</div>
+        <h2 className="paintalong-step-title">{step.title}</h2>
+        <div className="paintalong-area">📍 {step.area}</div>
+
+        <div className="paintalong-paints">
+          {step.paints.map((p, i) => (
+            <div key={i} className="paintalong-paint">
+              <div style={{ width: 48, height: 48, borderRadius: '50%', background: p.hex, border: '3px solid var(--border)', flexShrink: 0 }} />
+              <div className="paintalong-paint-name">{p.name}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="paintalong-instructions">{step.instructions}</div>
+        {step.tip && <div className="guide-step-tip">💡 <strong>Tip:</strong> {step.tip}</div>}
+      </div>
+
+      <div className="paintalong-nav">
+        <button className="btn btn-ghost btn-lg" onClick={() => setActiveStep(Math.max(0, activeStep - 1))} disabled={activeStep === 0}>← Prev</button>
+        {!isLast ? (
+          <button className="btn btn-primary btn-lg" onClick={() => setActiveStep(activeStep + 1)}>Next →</button>
+        ) : (
+          <button className="btn btn-primary btn-lg" onClick={() => { setSelectedId(''); setActiveStep(0); setTimerRunning(false); }}>🏆 Done! ({fmt(seconds)})</button>
+        )}
       </div>
     </div>
   );
