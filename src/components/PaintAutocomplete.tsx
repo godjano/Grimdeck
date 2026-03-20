@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../db';
 import { ALL_PAINT_PRESETS, type PaintPreset } from '../db/paint-presets';
 
 interface Props {
@@ -10,6 +12,8 @@ interface Props {
 export default function PaintAutocomplete({ value, onChange, onSelect }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const ownedPaints = useLiveQuery(() => db.paints.toArray()) ?? [];
+  const ownedNames = new Set(ownedPaints.map(p => p.name.toLowerCase()));
 
   const results = value.length >= 2
     ? ALL_PAINT_PRESETS.filter(p =>
@@ -58,7 +62,10 @@ export default function PaintAutocomplete({ value, onChange, onSelect }: Props) 
                 background: p.hex, border: '2px solid var(--border)', flexShrink: 0,
               }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: '0.9rem', fontWeight: 500 }}>{p.name}</div>
+                <div style={{ fontSize: '0.9rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {p.name}
+                  {ownedNames.has(p.name.toLowerCase()) && <span style={{ fontSize: '0.6rem', color: '#4ade80', fontWeight: 600 }}>OWNED</span>}
+                </div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
                   {p.brand} · {p.range} · {p.type}
                 </div>

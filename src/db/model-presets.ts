@@ -3,41 +3,43 @@ export interface ModelPreset {
   faction: string;
   unitType: string;
   defaultQty: number;
+  points?: number;
+  forceOrg?: string;
 }
 
 const imperium: ModelPreset[] = [
-  { name: 'Intercessors', faction: 'Space Marines', unitType: 'Troops', defaultQty: 10 },
-  { name: 'Assault Intercessors', faction: 'Space Marines', unitType: 'Troops', defaultQty: 10 },
-  { name: 'Heavy Intercessors', faction: 'Space Marines', unitType: 'Troops', defaultQty: 5 },
-  { name: 'Tactical Squad', faction: 'Space Marines', unitType: 'Troops', defaultQty: 10 },
-  { name: 'Infiltrators', faction: 'Space Marines', unitType: 'Troops', defaultQty: 10 },
-  { name: 'Hellblasters', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 5 },
-  { name: 'Bladeguard Veterans', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 3 },
-  { name: 'Terminators', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 5 },
-  { name: 'Sternguard Veterans', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 5 },
-  { name: 'Eradicators', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 3 },
-  { name: 'Aggressors', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 3 },
-  { name: 'Eliminators', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 3 },
-  { name: 'Scouts', faction: 'Space Marines', unitType: 'Troops', defaultQty: 5 },
-  { name: 'Redemptor Dreadnought', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1 },
-  { name: 'Ballistus Dreadnought', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1 },
-  { name: 'Brutalis Dreadnought', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1 },
-  { name: 'Repulsor', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1 },
-  { name: 'Repulsor Executioner', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1 },
-  { name: 'Impulsor', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1 },
-  { name: 'Gladiator Lancer', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1 },
-  { name: 'Land Raider', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1 },
-  { name: 'Stormraven Gunship', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1 },
-  { name: 'Captain', faction: 'Space Marines', unitType: 'Character', defaultQty: 1 },
-  { name: 'Captain in Terminator Armour', faction: 'Space Marines', unitType: 'Character', defaultQty: 1 },
-  { name: 'Librarian', faction: 'Space Marines', unitType: 'Character', defaultQty: 1 },
-  { name: 'Chaplain', faction: 'Space Marines', unitType: 'Character', defaultQty: 1 },
-  { name: 'Lieutenant', faction: 'Space Marines', unitType: 'Character', defaultQty: 1 },
-  { name: 'Apothecary', faction: 'Space Marines', unitType: 'Character', defaultQty: 1 },
-  { name: 'Ancient', faction: 'Space Marines', unitType: 'Character', defaultQty: 1 },
-  { name: 'Outriders', faction: 'Space Marines', unitType: 'Mounted', defaultQty: 3 },
-  { name: 'Inceptors', faction: 'Space Marines', unitType: 'Jump Infantry', defaultQty: 3 },
-  { name: 'Suppressors', faction: 'Space Marines', unitType: 'Jump Infantry', defaultQty: 3 },
+  { name: 'Intercessors', faction: 'Space Marines', unitType: 'Battleline', defaultQty: 10, points: 160, forceOrg: 'Troops' },
+  { name: 'Assault Intercessors', faction: 'Space Marines', unitType: 'Battleline', defaultQty: 10, points: 160, forceOrg: 'Troops' },
+  { name: 'Heavy Intercessors', faction: 'Space Marines', unitType: 'Battleline', defaultQty: 5, points: 100, forceOrg: 'Troops' },
+  { name: 'Tactical Squad', faction: 'Space Marines', unitType: 'Battleline', defaultQty: 10, points: 150, forceOrg: 'Troops' },
+  { name: 'Infiltrators', faction: 'Space Marines', unitType: 'Battleline', defaultQty: 10, points: 180, forceOrg: 'Troops' },
+  { name: 'Hellblasters', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 5, points: 125, forceOrg: 'Elites' },
+  { name: 'Bladeguard Veterans', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 3, points: 90, forceOrg: 'Elites' },
+  { name: 'Terminators', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 5, points: 200, forceOrg: 'Elites' },
+  { name: 'Sternguard Veterans', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 5, points: 115, forceOrg: 'Elites' },
+  { name: 'Eradicators', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 3, points: 95, forceOrg: 'Heavy Support' },
+  { name: 'Aggressors', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 3, points: 110, forceOrg: 'Elites' },
+  { name: 'Eliminators', faction: 'Space Marines', unitType: 'Infantry', defaultQty: 3, points: 75, forceOrg: 'Heavy Support' },
+  { name: 'Scouts', faction: 'Space Marines', unitType: 'Battleline', defaultQty: 5, points: 65, forceOrg: 'Troops' },
+  { name: 'Redemptor Dreadnought', faction: 'Space Marines', unitType: 'Walker', defaultQty: 1, points: 210, forceOrg: 'Elites' },
+  { name: 'Ballistus Dreadnought', faction: 'Space Marines', unitType: 'Walker', defaultQty: 1, points: 140, forceOrg: 'Elites' },
+  { name: 'Brutalis Dreadnought', faction: 'Space Marines', unitType: 'Walker', defaultQty: 1, points: 160, forceOrg: 'Elites' },
+  { name: 'Repulsor', faction: 'Space Marines', unitType: 'Transport', defaultQty: 1, points: 195, forceOrg: 'Dedicated Transport' },
+  { name: 'Repulsor Executioner', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1, points: 230, forceOrg: 'Heavy Support' },
+  { name: 'Impulsor', faction: 'Space Marines', unitType: 'Transport', defaultQty: 1, points: 105, forceOrg: 'Dedicated Transport' },
+  { name: 'Gladiator Lancer', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1, points: 160, forceOrg: 'Heavy Support' },
+  { name: 'Land Raider', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1, points: 260, forceOrg: 'Heavy Support' },
+  { name: 'Stormraven Gunship', faction: 'Space Marines', unitType: 'Vehicle', defaultQty: 1, points: 260, forceOrg: 'Flyer' },
+  { name: 'Captain', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 80, forceOrg: 'HQ' },
+  { name: 'Captain in Terminator Armour', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 95, forceOrg: 'HQ' },
+  { name: 'Librarian', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 75, forceOrg: 'HQ' },
+  { name: 'Chaplain', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 65, forceOrg: 'HQ' },
+  { name: 'Lieutenant', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 75, forceOrg: 'HQ' },
+  { name: 'Apothecary', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 55, forceOrg: 'Elites' },
+  { name: 'Ancient', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 55, forceOrg: 'Elites' },
+  { name: 'Outriders', faction: 'Space Marines', unitType: 'Mounted', defaultQty: 3, points: 80, forceOrg: 'Fast Attack' },
+  { name: 'Inceptors', faction: 'Space Marines', unitType: 'Jump Infantry', defaultQty: 3, points: 115, forceOrg: 'Fast Attack' },
+  { name: 'Suppressors', faction: 'Space Marines', unitType: 'Jump Infantry', defaultQty: 3, points: 85, forceOrg: 'Fast Attack' },
   { name: 'Cadian Shock Troops', faction: 'Astra Militarum', unitType: 'Troops', defaultQty: 10 },
   { name: 'Kasrkin', faction: 'Astra Militarum', unitType: 'Infantry', defaultQty: 10 },
   { name: 'Leman Russ Battle Tank', faction: 'Astra Militarum', unitType: 'Vehicle', defaultQty: 1 },
@@ -347,4 +349,9 @@ const xenos: ModelPreset[] = [
   { name: 'Patriarch', faction: 'Genestealer Cults', unitType: 'Character', defaultQty: 1 },
 ];
 
-export const ALL_MODEL_PRESETS: ModelPreset[] = [...imperium, ...chaos, ...xenos];
+import { KILLTEAM_PRESETS } from './model-presets-extra';
+import { MORE_MODELS } from './model-presets-more';
+import { KILLTEAM_OPERATIVES } from './model-presets-killteam-ops';
+import { COMBAT_PATROLS } from './model-presets-combat-patrol';
+
+export const ALL_MODEL_PRESETS: ModelPreset[] = [...imperium, ...chaos, ...xenos, ...KILLTEAM_PRESETS, ...MORE_MODELS, ...KILLTEAM_OPERATIVES, ...COMBAT_PATROLS];

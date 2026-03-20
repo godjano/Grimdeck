@@ -293,7 +293,17 @@ export default function GamePlay({ playerFaction, enemyFaction, onGameEnd }: Pro
         )}
 
         {game.phase === 'initiative' && (
-          <button className="btn btn-primary" onClick={startTurn}>Roll Initiative for TP {game.turningPoint} →</button>
+          <div>
+            <div className="turn-recap">
+              <div className="turn-recap-title">Turn {game.turningPoint - 1} Recap</div>
+              <div className="turn-recap-stats">
+                <span>Your team: {game.operatives.filter(o => o.team === 'player' && o.status !== 'incapacitated').length} alive</span>
+                <span>Enemy: {game.operatives.filter(o => o.team === 'enemy' && o.status !== 'incapacitated').length} alive</span>
+                <span>Score: {game.playerScore} - {game.enemyScore}</span>
+              </div>
+            </div>
+            <button className="btn btn-primary" onClick={startTurn}>Roll Initiative for TP {game.turningPoint} →</button>
+          </div>
         )}
 
         {game.phase === 'firefight' && game.activeTeam === 'enemy' && (

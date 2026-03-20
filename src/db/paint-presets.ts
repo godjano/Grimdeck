@@ -4,6 +4,7 @@ import { CITADEL_LAYER } from './paints-citadel-layer';
 import { CITADEL_SHADE, CITADEL_CONTRAST, CITADEL_DRY, CITADEL_TECHNICAL } from './paints-citadel-other';
 import { VALLEJO_GAME, VALLEJO_MODEL } from './paints-vallejo';
 import { ARMY_PAINTER, SPEED_PAINTS } from './paints-army-painter';
+import { CITADEL_AIR, PROACRYL, SCALE75 } from './paints-extra';
 
 export const ALL_PAINT_PRESETS = [
   ...CITADEL_BASE,
@@ -12,8 +13,11 @@ export const ALL_PAINT_PRESETS = [
   ...CITADEL_CONTRAST,
   ...CITADEL_DRY,
   ...CITADEL_TECHNICAL,
+  ...CITADEL_AIR,
   ...VALLEJO_GAME,
   ...VALLEJO_MODEL,
   ...ARMY_PAINTER,
   ...SPEED_PAINTS,
+  ...PROACRYL,
+  ...SCALE75,
 ];

@@ -163,6 +163,47 @@ export default function Progress() {
           </div>
         ))}
       </div>
+
+      {/* Painting Timeline */}
+      <PaintingTimeline />
     </div>
+  );
+}
+
+function PaintingTimeline() {
+  const logs = useLiveQuery(() => db.paintingLogs.orderBy('timestamp').reverse().toArray()) ?? [];
+  const models = useLiveQuery(() => db.models.toArray()) ?? [];
+
+  if (logs.length === 0) return null;
+
+  const getModelName = (id: number) => models.find(m => m.id === id)?.name || 'Unknown';
+
+  // Group by date
+  const byDate: Record<string, typeof logs> = {};
+  for (const log of logs.slice(0, 20)) {
+    const date = new Date(log.timestamp).toLocaleDateString();
+    (byDate[date] ??= []).push(log);
+  }
+
+  return (
+    <>
+      <h3 className="section-title">📅 Painting Timeline</h3>
+      <div className="timeline">
+        {Object.entries(byDate).map(([date, entries]) => (
+          <div key={date} className="timeline-day">
+            <div className="timeline-date">{date}</div>
+            {entries.map(log => (
+              <div key={log.id} className="timeline-entry">
+                <div className="timeline-dot" />
+                <div className="timeline-content">
+                  <div className="timeline-model">{getModelName(log.modelId)}</div>
+                  {log.text && <div className="timeline-text">{log.text}</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

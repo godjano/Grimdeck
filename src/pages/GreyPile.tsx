@@ -1,4 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
+import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
 import type { ModelStatus } from '../types';
 
@@ -6,6 +7,7 @@ const GREY_STATUSES: ModelStatus[] = ['unbuilt', 'built', 'primed'];
 
 export default function GreyPile() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
+  const nav = useNavigate();
   const greyModels = models.filter(m => GREY_STATUSES.includes(m.status));
   const totalGrey = greyModels.reduce((s, m) => s + m.quantity, 0);
   const byStatus = GREY_STATUSES.map(s => ({
@@ -55,7 +57,8 @@ export default function GreyPile() {
                     {(m.status === 'unbuilt' || m.status === 'built') && (
                       <button className="btn btn-sm btn-ghost" onClick={() => updateStatus(m.id!, 'primed')}>🫧 Primed</button>
                     )}
-                    <button className="btn btn-sm btn-ghost" onClick={() => updateStatus(m.id!, 'wip')}>🎨 Start Painting</button>
+                    <button className="btn btn-sm btn-ghost" onClick={() => updateStatus(m.id!, 'wip')}>🎨 Paint</button>
+                    <button className="btn btn-sm btn-ghost" onClick={() => nav(`/model/${m.id}`)}>→</button>
                   </div>
                 </div>
               ))}
