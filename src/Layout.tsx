@@ -18,6 +18,7 @@ export default function Layout() {
             <NavLink to="/grey-pile">Grey Pile</NavLink>
             <NavLink to="/progress">Progress</NavLink>
             <NavLink to="/campaigns">Campaigns</NavLink>
+            <NavLink to="/settings">Settings</NavLink>
           </nav>
         </div>
       </header>

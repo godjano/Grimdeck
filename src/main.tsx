@@ -9,6 +9,7 @@ import GreyPile from './pages/GreyPile';
 import Progress from './pages/Progress';
 import Campaigns from './pages/Campaigns';
 import CampaignPlay from './pages/CampaignPlayNew';
+import Settings from './pages/Settings';
 
 const router = createHashRouter([
   {
@@ -22,6 +23,7 @@ const router = createHashRouter([
       { path: 'progress', element: <Progress /> },
       { path: 'campaigns', element: <Campaigns /> },
       { path: 'campaign/:id', element: <CampaignPlay /> },
+      { path: 'settings', element: <Settings /> },
     ],
   },
 ]);
