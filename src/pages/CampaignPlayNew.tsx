@@ -5,13 +5,19 @@ import { db } from '../db';
 import { getMission, fillNarrative, CAMPAIGN_MISSIONS } from '../db/campaign-engine';
 import GamePlay from './GamePlay';
 
-type Mode = 'campaign' | 'playing';
+import { AI_CONFIGS, type AIDifficulty } from '../db/killteam-ai-v2';
+import OperativeSelection from '../components/OperativeSelection';
+import type { KTOperative } from '../db/killteam-data';
+
+type Mode = 'campaign' | 'difficulty' | 'selecting' | 'playing';
 
 export default function CampaignPlay() {
   const { id } = useParams();
   const nav = useNavigate();
   const campaignId = Number(id);
   const [mode, setMode] = useState<Mode>('campaign');
+  const [difficulty, setDifficulty] = useState<AIDifficulty>('normal');
+  const [selectedOps, setSelectedOps] = useState<KTOperative[]>([]); void selectedOps;
 
   const campaign = useLiveQuery(() => db.campaigns.get(campaignId), [campaignId]);
   const operatives = useLiveQuery(() => db.operatives.where('campaignId').equals(campaignId).toArray(), [campaignId]);
@@ -25,6 +31,7 @@ export default function CampaignPlay() {
       <GamePlay
         playerFaction={campaign.playerFaction}
         enemyFaction={campaign.enemyFaction}
+        difficulty={difficulty}
         onGameEnd={async (result, pCasualties, eCasualties) => {
           const outcome = result === 'draw' ? 'loss' : result;
           const narrative = fillNarrative(
@@ -65,6 +72,49 @@ export default function CampaignPlay() {
           setMode('campaign');
         }}
       />
+    );
+  }
+
+  // Operative selection
+  if (mode === 'selecting' && campaign.status === 'active') {
+    return (
+      <OperativeSelection
+        faction={campaign.playerFaction}
+        onConfirm={(ops) => { setSelectedOps(ops); setMode('playing'); }}
+        onBack={() => setMode('difficulty')}
+      />
+    );
+  }
+
+  // Difficulty selection
+  if (mode === 'difficulty' && campaign.status === 'active') {
+    return (
+      <div>
+        <div className="page-header" style={{ paddingTop: 48 }}><h2>Select Difficulty</h2></div>
+        <div className="difficulty-grid">
+          {(['easy', 'normal', 'hard'] as AIDifficulty[]).map(d => {
+            const cfg = AI_CONFIGS[d];
+            return (
+              <div key={d} className={`difficulty-card ${difficulty === d ? 'selected' : ''}`} onClick={() => setDifficulty(d)}>
+                <div className="difficulty-icon">{cfg.icon}</div>
+                <div className="difficulty-name">{cfg.name}</div>
+                <div className="difficulty-desc">{cfg.desc}</div>
+                <div className="difficulty-features">
+                  {cfg.rerolls > 0 && <span>🎲 {cfg.rerolls} reroll{cfg.rerolls > 1 ? 's' : ''}</span>}
+                  {cfg.playsObjectives && <span>🎯 Plays objectives</span>}
+                  {cfg.seeksCover && <span>🛡️ Uses cover</span>}
+                  {cfg.focusFire && <span>🔥 Focus fire</span>}
+                  {cfg.leaderBonus > 0 && <span>💀 +{cfg.leaderBonus} leader wounds</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20 }}>
+          <button className="btn btn-ghost" onClick={() => setMode('campaign')}>← Back</button>
+          <button className="btn btn-primary btn-lg" onClick={() => setMode('selecting')}>⚔️ Select Operatives ({AI_CONFIGS[difficulty].name})</button>
+        </div>
+      </div>
     );
   }
 
@@ -140,7 +190,7 @@ export default function CampaignPlay() {
           <h3 className="mission-title">{mission.title}</h3>
           <p className="mission-briefing">{fill(mission.briefing)}</p>
           <div className="mission-objective"><strong>Objective:</strong> {mission.objectiveText}</div>
-          <button className="btn btn-primary" onClick={() => setMode('playing')}>⚔️ Launch Game on Board →</button>
+          <button className="btn btn-primary" onClick={() => setMode('difficulty')}>⚔️ Launch Game on Board →</button>
         </div>
       )}
 

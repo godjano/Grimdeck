@@ -3,23 +3,27 @@ import { getRoster } from '../db/killteam-data';
 import type { Weapon } from '../db/killteam-data';
 import { generateMap, CELL_LEGEND } from '../db/map-generator';
 import { createGameState, rollInitiative, resolveShoot, resolveFight, applyDamage, checkTurnEnd, rollDice, type GameState, type OpState } from '../db/killteam-game';
-import { aiActivation } from '../db/killteam-ai';
+import { aiActivationV2, AI_CONFIGS, type AIDifficulty } from '../db/killteam-ai-v2';
+import { formatProbability, expectedHits, expectedDamage } from '../db/dice-math';
+import { rollRandomEvent, type RandomEvent } from '../db/random-events';
 import { getOpColor } from '../db/operative-icons';
 import { RoleIcon, BoardToken, getFactionEmoji, ROLE_INFO } from '../db/operative-icons.tsx';
 
 interface Props {
   playerFaction: string;
   enemyFaction: string;
+  difficulty?: AIDifficulty;
   onGameEnd: (result: 'win' | 'loss' | 'draw', pCasualties: number, eCasualties: number) => void;
 }
 
-export default function GamePlay({ playerFaction, enemyFaction, onGameEnd }: Props) {
+export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'normal', onGameEnd }: Props) {
   const [game, setGame] = useState<GameState | null>(null);
   const [selectedOp, setSelectedOp] = useState<number | null>(null);
   const [selectedTarget, setSelectedTarget] = useState<number | null>(null);
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [diceInput, setDiceInput] = useState('');
   const [actionMode, setActionMode] = useState<'none' | 'move' | 'shoot' | 'fight'>('none');
+  const [currentEvent, setCurrentEvent] = useState<RandomEvent | null>(null);
   const [tab, setTab] = useState<'board' | 'your' | 'enemy' | 'rules'>('board');
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
@@ -41,12 +45,20 @@ export default function GamePlay({ playerFaction, enemyFaction, onGameEnd }: Pro
   const enemyOps = game.operatives.filter(o => o.team === 'enemy');
   const activeOp = selectedOp !== null ? game.operatives[selectedOp] : null;
 
-  const startTurn = () => setGame(rollInitiative(game));
+  const startTurn = () => {
+    const event = rollRandomEvent();
+    setCurrentEvent(event);
+    const s = rollInitiative(game);
+    if (event.id !== 'none') {
+      s.log = [...s.log, `\n⚡ EVENT: ${event.icon} ${event.name} — ${event.apply}`];
+    }
+    setGame(s);
+  };
 
   const doAiTurn = () => {
     let s = game;
     // AI activates one operative
-    s = aiActivation(s);
+    s = aiActivationV2(s, difficulty);
     setGame(s);
   };
 
@@ -132,6 +144,7 @@ export default function GamePlay({ playerFaction, enemyFaction, onGameEnd }: Pro
       {/* Header */}
       <div className="game-header">
         <div>TP {game.turningPoint}/{game.maxTurningPoints}</div>
+        <div>{AI_CONFIGS[difficulty].icon} {AI_CONFIGS[difficulty].name}</div>
         <div>Score: You {game.playerScore} - {game.enemyScore} Enemy</div>
         <div className={`status status-${game.activeTeam === 'player' ? 'painted' : 'unbuilt'}`}>
           {game.phase === 'setup' ? 'SETUP' : game.phase === 'end' ? 'GAME OVER' : `${game.activeTeam === 'player' ? 'YOUR' : 'ENEMY'} TURN`}
@@ -302,6 +315,16 @@ export default function GamePlay({ playerFaction, enemyFaction, onGameEnd }: Pro
                 <span>Score: {game.playerScore} - {game.enemyScore}</span>
               </div>
             </div>
+            {currentEvent && currentEvent.id !== 'none' && (
+              <div className={`event-card event-${currentEvent.effect}`}>
+                <div className="event-icon">{currentEvent.icon}</div>
+                <div className="event-info">
+                  <div className="event-name">{currentEvent.name}</div>
+                  <div className="event-desc">{currentEvent.desc}</div>
+                  <div className="event-apply">{currentEvent.apply}</div>
+                </div>
+              </div>
+            )}
             <button className="btn btn-primary" onClick={startTurn}>Roll Initiative for TP {game.turningPoint} →</button>
           </div>
         )}
@@ -344,6 +367,9 @@ export default function GamePlay({ playerFaction, enemyFaction, onGameEnd }: Pro
                     </div>
                     {selectedWeapon && (
                       <>
+                        <div className="dice-helper">
+                          🎲 Hit chance: {formatProbability(selectedWeapon.skill)} per die · Expected: {expectedHits(selectedWeapon.attacks, selectedWeapon.skill).toFixed(1)} hits · ~{expectedDamage(selectedWeapon.attacks, selectedWeapon.skill, selectedWeapon.normalDmg, selectedWeapon.critDmg).toFixed(1)} dmg
+                        </div>
                         <label>Select target (switch to Enemy tab), then enter your {selectedWeapon.attacks} dice rolls:</label>
                         <input value={diceInput} onChange={e => setDiceInput(e.target.value)} placeholder={`e.g. 3, 5, 2, 6`} />
                         <button className="btn btn-sm btn-primary" onClick={doPlayerShoot} disabled={selectedTarget === null}>
@@ -456,33 +482,56 @@ function RulesReference() {
 
       <h4>Actions (cost in AP)</h4>
       <ul>
-        <li><strong>Move (1AP)</strong> — Move up to M inches. Can't move through enemy operatives or heavy terrain.</li>
-        <li><strong>Shoot (1AP)</strong> — Pick a ranged weapon and a visible target. Roll attack dice. Each roll ≥ weapon skill = hit. 6 = crit.</li>
-        <li><strong>Fight (2AP)</strong> — Must be within 1" of enemy. Both roll attack dice simultaneously. Crits cancel crits, then hits cancel hits. Remaining deal damage.</li>
-        <li><strong>Dash (1AP)</strong> — Move up to M inches (like a second move).</li>
-        <li><strong>Charge (1AP)</strong> — Move up to M inches, must end within 1" of enemy. Allows Fight action after.</li>
+        <li><strong>Move (1AP)</strong> — Move up to M inches. Can't move through enemies or heavy terrain.</li>
+        <li><strong>Shoot (1AP)</strong> — Pick a ranged weapon and a visible target. Roll attack dice.</li>
+        <li><strong>Fight (2AP)</strong> — Must be within 1" of enemy. Both players roll simultaneously.</li>
+        <li><strong>Dash (1AP)</strong> — Move up to M inches (second move).</li>
+        <li><strong>Charge (1AP)</strong> — Move up to M, must end within 1" of enemy. Enables Fight.</li>
         <li><strong>Pick Up (1AP)</strong> — Pick up an objective within 1".</li>
       </ul>
 
       <h4>Shooting Sequence</h4>
       <ol>
-        <li>Roll attack dice (number = weapon's A stat)</li>
-        <li>Each die ≥ weapon's skill = normal hit. Die = 6 = critical hit.</li>
-        <li>Defender rolls defense dice (number = DF stat). Each ≥ Save stat = one save.</li>
-        <li>Saves cancel hits (crits first). Remaining hits deal damage (crit dmg for 6s, normal dmg for others).</li>
+        <li><strong>Roll attack dice</strong> — number of dice = weapon's A (Attacks) stat.</li>
+        <li><strong>Check hits</strong> — each die ≥ weapon's BS/WS skill = normal hit. Die = 6 = critical hit.</li>
+        <li><strong>Defender rolls saves</strong> — rolls DF (Defence) dice. Each ≥ Save stat = one save.</li>
+        <li><strong>Resolve damage</strong> — saves cancel hits (crits cancel crits first, then normal). Remaining hits deal damage.</li>
+        <li>Normal hits deal normal damage. Critical hits deal crit damage.</li>
       </ol>
+
+      <h4>⚔️ Fighting Sequence (Melee Combat)</h4>
+      <ol>
+        <li><strong>Both players roll simultaneously</strong> — attacker rolls their melee weapon's A dice, defender rolls their melee weapon's A dice.</li>
+        <li><strong>Check successes</strong> — each die ≥ weapon's WS = success. Die = 6 = critical success.</li>
+        <li><strong>Resolve strikes</strong> — starting with the attacker:
+          <ul>
+            <li>A <strong>critical</strong> can: deal crit damage to the enemy, OR cancel one of the enemy's crits.</li>
+            <li>A <strong>normal hit</strong> can: deal normal damage to the enemy, OR cancel one of the enemy's normal hits.</li>
+          </ul>
+        </li>
+        <li><strong>Alternate</strong> — attacker resolves one die, then defender resolves one die, back and forth until all dice are resolved.</li>
+        <li><strong>Strategy</strong> — you choose whether to deal damage or cancel enemy hits. Cancel their crits first to survive!</li>
+      </ol>
+      <div className="rules-example">
+        <strong>Example:</strong> Your operative (4A, 3+, 3/5dmg) fights an Ork (4A, 3+, 4/5dmg).<br/>
+        You roll: 3, 5, 6, 2 → 2 normal hits + 1 crit.<br/>
+        Ork rolls: 4, 3, 6, 1 → 2 normal hits + 1 crit.<br/>
+        You go first: Use your crit to cancel the Ork's crit (smart!). Then deal 3 dmg with a normal hit. Then deal 3 dmg with your other normal hit.<br/>
+        Ork responds: Deals 4 dmg with a normal hit. Deals 4 dmg with the other normal hit.<br/>
+        Result: You dealt 6 damage, Ork dealt 8 damage. Both take wounds.
+      </div>
 
       <h4>Cover</h4>
       <ul>
-        <li><strong>Light Cover</strong> — Defender retains one normal save as a crit (upgrade one die).</li>
-        <li><strong>Heavy Cover</strong> — Blocks line of sight entirely. Can't shoot through it.</li>
-        <li><strong>Vantage Point</strong> — Elevated position. Ignores light cover when shooting down.</li>
+        <li><strong>Light Cover</strong> — Defender retains one normal save as a crit.</li>
+        <li><strong>Heavy Cover</strong> — Blocks line of sight. Can't shoot through it.</li>
+        <li><strong>Vantage Point</strong> — Ignores light cover when shooting down.</li>
       </ul>
 
       <h4>Injury</h4>
       <ul>
-        <li>When wounds reach 0, operative is <strong>incapacitated</strong> (removed from play).</li>
-        <li>Damage carries over — excess damage is lost.</li>
+        <li>When wounds reach 0, operative is <strong>incapacitated</strong> (removed).</li>
+        <li>Excess damage is lost — no overkill carry-over.</li>
       </ul>
 
       <h4>Scoring</h4>

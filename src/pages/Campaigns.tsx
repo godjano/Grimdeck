@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { generateRoster } from '../db/campaign-engine';
+import { getRoster, ALL_KT_FACTIONS } from '../db/killteam-data';
+import { FACTION_ART } from '../db/faction-art';
 
-const FACTIONS = ['Space Marines','Astra Militarum','Adepta Sororitas','Adeptus Mechanicus','Adeptus Custodes','Grey Knights',
-  'Chaos Space Marines','Death Guard','Thousand Sons','World Eaters','Chaos Daemons',
-  'Orks','Tau Empire','Tyranids','Necrons','Aeldari','Drukhari','Genestealer Cults','Leagues of Votann'];
+const KT_FACTIONS = ALL_KT_FACTIONS;
+const OTHER_FACTIONS = ['Adepta Sororitas','Adeptus Custodes','Grey Knights','Thousand Sons','World Eaters','Chaos Daemons','Aeldari','Drukhari','Genestealer Cults','Leagues of Votann']
+  .filter(f => !KT_FACTIONS.includes(f));
 
 export default function Campaigns() {
   const [showCreate, setShowCreate] = useState(false);
@@ -32,6 +33,7 @@ export default function Campaigns() {
       ) : (
         campaigns.map(c => (
           <div className="card" key={c.id} style={{ cursor: 'pointer' }} onClick={() => nav(`/campaign/${c.id}`)}>
+            {FACTION_ART[c.playerFaction] && <img src={FACTION_ART[c.playerFaction]} alt="" className="card-photo" />}
             <div className="card-body">
               <div className="card-title">{c.name}</div>
               <div className="card-sub">
@@ -50,8 +52,12 @@ export default function Campaigns() {
 
 function CreateCampaign({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState('');
-  const [playerFaction, setPlayerFaction] = useState('Space Marines');
-  const [enemyFaction, setEnemyFaction] = useState('Orks');
+  const [playerFaction, setPlayerFaction] = useState(KT_FACTIONS[0] || 'Space Marines');
+  const [enemyFaction, setEnemyFaction] = useState(() => {
+    // Random enemy that's different from player
+    const options = KT_FACTIONS.filter(f => f !== (KT_FACTIONS[0] || 'Space Marines'));
+    return options[Math.floor(Math.random() * options.length)] || 'Orks';
+  });
   const nav = useNavigate();
 
   const start = async () => {
@@ -61,9 +67,18 @@ function CreateCampaign({ onDone }: { onDone: () => void }) {
       currentNodeId: 'a1_m1', status: 'active', turn: 1,
       wins: 0, losses: 0, createdAt: Date.now(),
     });
-    const roster = generateRoster(playerFaction);
-    for (const op of roster) {
-      await db.operatives.add({ ...op, campaignId: id as number });
+    const ktRoster = getRoster(playerFaction);
+    for (const op of ktRoster) {
+      await db.operatives.add({
+        campaignId: id as number,
+        name: op.name,
+        role: op.role,
+        xp: 0,
+        wounds: 0,
+        maxWounds: op.wounds,
+        status: 'ready',
+        kills: 0,
+      });
     }
     onDone();
     nav(`/campaign/${id}`);
@@ -79,14 +94,26 @@ function CreateCampaign({ onDone }: { onDone: () => void }) {
         </div>
         <div className="field">
           <label>Your Faction</label>
+          {FACTION_ART[playerFaction] && <img src={FACTION_ART[playerFaction]} alt={playerFaction} className="faction-preview" />}
           <select value={playerFaction} onChange={e => setPlayerFaction(e.target.value)}>
-            {FACTIONS.map(f => <option key={f} value={f}>{f}</option>)}
+            <optgroup label="Kill Team Rosters (full datacards)">
+              {KT_FACTIONS.map(f => <option key={f} value={f}>{f}</option>)}
+            </optgroup>
+            <optgroup label="Other Factions (generic stats)">
+              {OTHER_FACTIONS.map(f => <option key={f} value={f}>{f}</option>)}
+            </optgroup>
           </select>
         </div>
         <div className="field">
           <label>Enemy Faction</label>
+          {FACTION_ART[enemyFaction] && <img src={FACTION_ART[enemyFaction]} alt={enemyFaction} className="faction-preview" />}
           <select value={enemyFaction} onChange={e => setEnemyFaction(e.target.value)}>
-            {FACTIONS.map(f => <option key={f} value={f}>{f}</option>)}
+            <optgroup label="Kill Team Rosters (full datacards)">
+              {KT_FACTIONS.map(f => <option key={f} value={f}>{f}</option>)}
+            </optgroup>
+            <optgroup label="Other Factions (generic stats)">
+              {OTHER_FACTIONS.map(f => <option key={f} value={f}>{f}</option>)}
+            </optgroup>
           </select>
         </div>
         <div className="field full-width form-actions" style={{ justifyContent: 'flex-end', flexDirection: 'row' }}>

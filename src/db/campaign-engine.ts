@@ -17,6 +17,22 @@ export interface MissionNode {
 const PLAYER = '{PLAYER_FACTION}';
 const ENEMY = '{ENEMY_FACTION}';
 
+// Randomized briefing variants for each mission
+const BRIEFING_VARIANTS: Record<string, string[]> = {
+  'a1_m1': [
+    `Your ${PLAYER} kill team has been deployed to investigate reports of ${ENEMY} activity in the sector. Auspex readings are inconclusive — move in and confirm.`,
+    `Command has detected unusual ${ENEMY} movement patterns in the sector. Your ${PLAYER} team is tasked with a forward reconnaissance. Expect resistance.`,
+    `A distress signal from a forward outpost has gone silent. ${ENEMY} forces are suspected. Your ${PLAYER} kill team must investigate and report.`,
+    `Intelligence suggests a ${ENEMY} scouting party has entered the sector. Your ${PLAYER} team must intercept before they report back to their command.`,
+  ],
+};
+
+export function getRandomBriefing(missionId: string, fallback: string): string {
+  const variants = BRIEFING_VARIANTS[missionId];
+  if (variants && variants.length > 0) return variants[Math.floor(Math.random() * variants.length)];
+  return fallback;
+}
+
 export const CAMPAIGN_MISSIONS: MissionNode[] = [
   // ACT 1
   {

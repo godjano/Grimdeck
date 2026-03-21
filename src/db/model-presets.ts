@@ -353,5 +353,6 @@ import { KILLTEAM_PRESETS } from './model-presets-extra';
 import { MORE_MODELS } from './model-presets-more';
 import { KILLTEAM_OPERATIVES } from './model-presets-killteam-ops';
 import { COMBAT_PATROLS } from './model-presets-combat-patrol';
+import { MORE_40K } from './model-presets-40k-more';
 
-export const ALL_MODEL_PRESETS: ModelPreset[] = [...imperium, ...chaos, ...xenos, ...KILLTEAM_PRESETS, ...MORE_MODELS, ...KILLTEAM_OPERATIVES, ...COMBAT_PATROLS];
+export const ALL_MODEL_PRESETS: ModelPreset[] = [...imperium, ...chaos, ...xenos, ...KILLTEAM_PRESETS, ...MORE_MODELS, ...KILLTEAM_OPERATIVES, ...COMBAT_PATROLS, ...MORE_40K];

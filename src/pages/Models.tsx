@@ -21,11 +21,30 @@ export default function Models() {
   const [filterSystem, setFilterSystem] = useState('');
   const [showWishlist, setShowWishlist] = useState(false);
   const [view, setView] = useState<ViewMode>('grouped');
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set(['__ALL_COLLAPSED__']));
+  
   const nav = useNavigate();
 
   const models = useLiveQuery(() => db.models.orderBy('createdAt').reverse().toArray()) ?? [];
   const factions = [...new Set(models.map(m => m.faction))].sort();
+
+  // Initialize collapsed with all factions on first render
+  const allCollapsed = collapsed.has('__ALL_COLLAPSED__');
+
+  const toggleGroup = (key: string) => {
+    const next = new Set(collapsed);
+    next.delete('__ALL_COLLAPSED__');
+    next.has(key) ? next.delete(key) : next.add(key);
+    setCollapsed(next);
+  };
+
+  const collapseAll = () => {
+    setCollapsed(new Set([...factions, '__ALL_COLLAPSED__']));
+  };
+
+  const expandAll = () => {
+    setCollapsed(new Set());
+  };
 
   const filtered = models.filter(m =>
     (!filterFaction || m.faction === filterFaction) &&
@@ -47,12 +66,6 @@ export default function Models() {
 
   const updateStatus = async (id: number, status: ModelStatus) => {
     await db.models.update(id, { status });
-  };
-
-  const toggleGroup = (key: string) => {
-    const next = new Set(collapsed);
-    next.has(key) ? next.delete(key) : next.add(key);
-    setCollapsed(next);
   };
 
   // Group by faction
@@ -106,7 +119,15 @@ export default function Models() {
         </div>
       </div>
 
-      <div className="results-count">{filtered.length} {showWishlist ? 'wishlisted' : 'owned'} models · {filtered.reduce((s, m) => s + m.quantity, 0)} minis · {filtered.reduce((s, m) => s + (m.points || 0), 0)}pts</div>
+      <div className="results-bar">
+        <div className="results-count">{filtered.length} {showWishlist ? 'wishlisted' : 'owned'} models · {filtered.reduce((s, m) => s + m.quantity, 0)} minis · {filtered.reduce((s, m) => s + (m.points || 0), 0)}pts</div>
+        {view === 'grouped' && (
+          <div style={{ display: 'flex', gap: 4 }}>
+            <button className="btn btn-sm btn-ghost" onClick={expandAll}>Expand all</button>
+            <button className="btn btn-sm btn-ghost" onClick={collapseAll}>Collapse all</button>
+          </div>
+        )}
+      </div>
 
       {filtered.length === 0 ? (
         <div className="empty">
@@ -131,14 +152,16 @@ export default function Models() {
           ))}
         </div>
       ) : view === 'grouped' ? (
-        Object.entries(groups).sort(([a], [b]) => a.localeCompare(b)).map(([faction, items]) => (
+        Object.entries(groups).sort(([a], [b]) => a.localeCompare(b)).map(([faction, items]) => {
+          const isCollapsed = allCollapsed || collapsed.has(faction);
+          return (
           <div key={faction} className="paint-group">
             <div className="paint-group-header" onClick={() => toggleGroup(faction)}>
-              <span className="paint-group-toggle">{collapsed.has(faction) ? '▸' : '▾'}</span>
+              <span className="paint-group-toggle">{isCollapsed ? '▸' : '▾'}</span>
               <span className="paint-group-title">{faction}</span>
               <span className="paint-group-count">{items.length} units · {items.reduce((s, m) => s + m.quantity, 0)} minis</span>
             </div>
-            {!collapsed.has(faction) && items.map(m => (
+            {!isCollapsed && items.map(m => (
               <div className="card" key={m.id} onClick={() => nav(`/model/${m.id}`)} style={{ cursor: "pointer" }}>
                 {m.photoUrl && <img src={m.photoUrl} alt={m.name} className="card-photo" />}
                 <div className="card-body">
@@ -155,7 +178,7 @@ export default function Models() {
               </div>
             ))}
           </div>
-        ))
+        );})
       ) : (
         filtered.map(m => (
           <div className="card" key={m.id} onClick={() => nav(`/model/${m.id}`)} style={{ cursor: "pointer" }}>
