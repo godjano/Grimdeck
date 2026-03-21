@@ -1091,3 +1091,15 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 .paintalong-paint-name { font-size:0.72rem; color:var(--text-secondary); margin-top:6px; max-width:80px; }
 .paintalong-instructions { font-size:1rem; line-height:1.8; color:var(--text-secondary); font-weight:300; text-align:left; margin-bottom:16px; }
 .paintalong-nav { display:flex; justify-content:space-between; }
+
+/* ═══════════════════════════════════════
+   DATA MANAGER
+   ═══════════════════════════════════════ */
+.dm-table { margin-bottom:8px; }
+.dm-header { display:grid; grid-template-columns:1fr 1fr 0.8fr 50px 60px 80px; gap:6px; padding:6px 0; font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; font-weight:600; }
+.dm-row { display:grid; grid-template-columns:1fr 1fr 0.8fr 50px 60px 80px; gap:6px; margin-bottom:4px; }
+.dm-row input, .dm-row select { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:8px 10px; color:var(--text); font-size:0.82rem; font-family:inherit; }
+.dm-row input:focus, .dm-row select:focus { outline:none; border-color:rgba(212,160,23,0.3); }
+.dm-code { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-top:12px; position:relative; }
+.dm-code pre { font-size:0.72rem; color:var(--text-secondary); overflow-x:auto; white-space:pre; line-height:1.6; }
+.dm-code .btn { position:absolute; top:8px; right:8px; }

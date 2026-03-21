@@ -17,6 +17,7 @@ import Inspiration from './pages/Inspiration';
 import ArmyList from './pages/ArmyList';
 import GettingStarted from './pages/GettingStarted';
 import Tools from './pages/Tools';
+import DataManager from './pages/DataManager';
 
 const router = createHashRouter([
   {
@@ -37,6 +38,7 @@ const router = createHashRouter([
       { path: 'army-list', element: <ArmyList /> },
       { path: 'start', element: <GettingStarted /> },
       { path: 'tools', element: <Tools /> },
+      { path: 'data-manager', element: <DataManager /> },
     ],
   },
 ]);

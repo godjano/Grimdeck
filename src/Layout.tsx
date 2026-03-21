@@ -37,6 +37,7 @@ export default function Layout() {
                 <NavLink to="/inspiration">🖌️ Reference</NavLink>
                 <NavLink to="/tools">🧰 Tools</NavLink>
                 <NavLink to="/start">🎉 Getting Started</NavLink>
+                <NavLink to="/data-manager">🔧 Data Manager</NavLink>
                 <NavLink to="/settings">⚙️ Settings</NavLink>
               </div>
             </div>
