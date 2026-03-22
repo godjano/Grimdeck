@@ -1419,3 +1419,8 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 .project-list-bar { height:6px; background:var(--surface3); border-radius:3px; overflow:hidden; }
 .project-list-fill { height:100%; background:linear-gradient(90deg, var(--red), var(--gold)); border-radius:3px; }
 .project-list-pct { font-size:0.65rem; color:var(--text-dim); }
+
+/* Nav user indicator */
+.nav-user { text-decoration:none; font-size:1rem; padding:4px 8px; border-radius:8px; transition:var(--transition); }
+.nav-user:hover { background:var(--surface2); }
+.nav-user::after { display:none !important; }

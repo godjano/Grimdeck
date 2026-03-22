@@ -1,12 +1,21 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from './components/ThemeProvider';
 import FloatingTimer from './components/FloatingTimer';
+import { getUser, onAuthChange } from './db/cloud-sync';
+import type { User } from '@supabase/supabase-js';
 import './app.css';
 
 export default function Layout() {
   const { pathname } = useLocation();
   const { theme, toggle } = useTheme();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    getUser().then(u => setUser(u));
+    const { data } = onAuthChange(session => setUser(session?.user || null));
+    return () => data.subscription.unsubscribe();
+  }, []);
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [pathname]);
 
   // Keyboard shortcuts
@@ -44,6 +53,9 @@ export default function Layout() {
               </div>
             </div>
             <button className="theme-toggle" onClick={toggle} title="Toggle theme">{theme === 'dark' ? '☀️' : '🌙'}</button>
+            <NavLink to="/account" className="nav-user" title={user ? user.email || 'Account' : 'Sign in'}>
+              {user ? '👤' : '🔒'}
+            </NavLink>
           </nav>
         </div>
       </header>
