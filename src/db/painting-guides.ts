@@ -23,7 +23,7 @@ export interface GuideStep {
 export const PAINTING_GUIDES: PaintingGuide[] = [
   {
     id: 'sm-ultramarine', title: 'Ultramarines Intercessor', faction: 'Space Marines', model: 'Intercessor',
-    difficulty: 'beginner', timeEstimate: '2-3 hours',
+    difficulty: 'beginner', timeEstimate: '2-3 hours', videoUrl: 'https://youtube.com/results?search_query=how+to+paint+ultramarines+intercessor',
     steps: [
       { title: 'Prime', area: 'Whole model', technique: 'Spray/brush prime', paints: [{ name: 'Chaos Black Spray', hex: '#1a1a1a' }],
         instructions: 'Apply a thin, even coat of black primer. Hold the can 20-30cm away and spray in short bursts. Let dry completely (15-20 min).', tip: 'Rotate the model while spraying to avoid pooling.' },
@@ -51,7 +51,7 @@ export const PAINTING_GUIDES: PaintingGuide[] = [
   },
   {
     id: 'dg-plague-marine', title: 'Death Guard Plague Marine', faction: 'Death Guard', model: 'Plague Marine',
-    difficulty: 'beginner', timeEstimate: '2-3 hours',
+    difficulty: 'beginner', timeEstimate: '2-3 hours', videoUrl: 'https://youtube.com/results?search_query=how+to+paint+death+guard+plague+marine',
     steps: [
       { title: 'Prime', area: 'Whole model', technique: 'Spray prime', paints: [{ name: 'Death Guard Green Spray', hex: '#6d6e48' }],
         instructions: 'Spray prime with Death Guard Green. This saves a lot of time as it covers the majority of the model.' },
@@ -75,7 +75,7 @@ export const PAINTING_GUIDES: PaintingGuide[] = [
   },
   {
     id: 'necron-warrior', title: 'Necron Warrior (Quick)', faction: 'Necrons', model: 'Necron Warrior',
-    difficulty: 'beginner', timeEstimate: '45 min',
+    difficulty: 'beginner', timeEstimate: '45 min', videoUrl: 'https://youtube.com/results?search_query=how+to+paint+necron+warrior+fast',
     steps: [
       { title: 'Prime', area: 'Whole model', technique: 'Spray prime', paints: [{ name: 'Leadbelcher Spray', hex: '#888d91' }],
         instructions: 'Spray prime with Leadbelcher. The entire model is metallic so this does 80% of the work.' },
@@ -91,7 +91,7 @@ export const PAINTING_GUIDES: PaintingGuide[] = [
   },
   {
     id: 'ork-boy', title: 'Ork Boy (Battle Ready)', faction: 'Orks', model: 'Ork Boy',
-    difficulty: 'beginner', timeEstimate: '1-2 hours',
+    difficulty: 'beginner', timeEstimate: '1-2 hours', videoUrl: 'https://youtube.com/results?search_query=how+to+paint+ork+boyz',
     steps: [
       { title: 'Prime', area: 'Whole model', technique: 'Spray prime', paints: [{ name: 'Chaos Black Spray', hex: '#1a1a1a' }],
         instructions: 'Black prime. Orks have lots of different materials so black is a good neutral start.' },
@@ -115,7 +115,7 @@ export const PAINTING_GUIDES: PaintingGuide[] = [
   },
   {
     id: 'tyranid-termagant', title: 'Tyranid Termagant (Speed Paint)', faction: 'Tyranids', model: 'Termagant',
-    difficulty: 'beginner', timeEstimate: '30 min',
+    difficulty: 'beginner', timeEstimate: '30 min', videoUrl: 'https://youtube.com/results?search_query=how+to+paint+tyranid+termagant+contrast',
     steps: [
       { title: 'Prime', area: 'Whole model', technique: 'Spray prime', paints: [{ name: 'Wraithbone Spray', hex: '#dbd1b2' }],
         instructions: 'Spray with Wraithbone. Light primer is essential for contrast/speed paints.' },
@@ -134,7 +134,7 @@ export const PAINTING_GUIDES: PaintingGuide[] = [
 export const ADVANCED_GUIDES: PaintingGuide[] = [
   {
     id: 'nmm-gold', title: 'NMM Gold (Non-Metallic Metal)', faction: 'Any', model: 'Any Character',
-    difficulty: 'advanced', timeEstimate: '4-6 hours',
+    difficulty: 'advanced', timeEstimate: '4-6 hours', videoUrl: 'https://youtube.com/results?search_query=nmm+gold+miniature+tutorial',
     steps: [
       { title: 'Base Shadow', area: 'All gold areas', technique: 'Base coating', paints: [{ name: 'Rhinox Hide', hex: '#462f30' }],
         instructions: 'Start with a dark brown base. NMM works by painting the illusion of reflections using regular paints instead of metallics.' },
@@ -152,7 +152,7 @@ export const ADVANCED_GUIDES: PaintingGuide[] = [
   },
   {
     id: 'osl-plasma', title: 'OSL Plasma Glow Effect', faction: 'Any', model: 'Any with Plasma Weapon',
-    difficulty: 'advanced', timeEstimate: '2-3 hours',
+    difficulty: 'advanced', timeEstimate: '2-3 hours', videoUrl: 'https://youtube.com/results?search_query=osl+plasma+glow+miniature+tutorial',
     steps: [
       { title: 'Paint Model Normally', area: 'Whole model', technique: 'Standard painting', paints: [{ name: 'Your base colours', hex: '#555555' }],
         instructions: 'Paint the entire model to completion first. OSL is applied last as it overlays everything.' },
@@ -172,7 +172,7 @@ export const ADVANCED_GUIDES: PaintingGuide[] = [
   },
   {
     id: 'wet-blend-cloak', title: 'Wet Blending a Cloak', faction: 'Any', model: 'Any Cloaked Model',
-    difficulty: 'intermediate', timeEstimate: '1-2 hours',
+    difficulty: 'intermediate', timeEstimate: '1-2 hours', videoUrl: 'https://youtube.com/results?search_query=wet+blending+cloak+miniature',
     steps: [
       { title: 'Prepare Palette', area: 'N/A', technique: 'Preparation', paints: [{ name: 'Kantor Blue', hex: '#02134e' }, { name: 'Caledor Sky', hex: '#366699' }, { name: 'Lothern Blue', hex: '#2c9bcc' }],
         instructions: 'Put all three colours on your wet palette. You need them ready because wet blending requires working quickly while paint is still wet.', tip: 'A wet palette is essential for this technique. DIY: tupperware + wet paper towel + baking paper.' },
@@ -188,7 +188,7 @@ export const ADVANCED_GUIDES: PaintingGuide[] = [
   },
   {
     id: 'zenithal-contrast', title: 'Zenithal + Contrast Speed Method', faction: 'Any', model: 'Any Infantry',
-    difficulty: 'intermediate', timeEstimate: '1 hour',
+    difficulty: 'intermediate', timeEstimate: '1 hour', videoUrl: 'https://youtube.com/results?search_query=zenithal+contrast+paint+tutorial',
     steps: [
       { title: 'Black Prime', area: 'Whole model', technique: 'Spray prime', paints: [{ name: 'Chaos Black Spray', hex: '#1a1a1a' }],
         instructions: 'Spray the entire model black from all angles. Full coverage.' },
@@ -206,7 +206,7 @@ export const ADVANCED_GUIDES: PaintingGuide[] = [
   },
   {
     id: 'batch-guardsmen', title: 'Batch Painting 10 Guardsmen', faction: 'Astra Militarum', model: 'Cadian Shock Troops',
-    difficulty: 'intermediate', timeEstimate: '3-4 hours for 10',
+    difficulty: 'intermediate', timeEstimate: '3-4 hours for 10', videoUrl: 'https://youtube.com/results?search_query=batch+painting+guardsmen+fast',
     steps: [
       { title: 'Prime All', area: 'All 10 models', technique: 'Spray prime', paints: [{ name: 'Wraithbone Spray', hex: '#dbd1b2' }],
         instructions: 'Line up all 10 on a stick or holder. Spray Wraithbone. Assembly line from here — do each step on ALL models before moving to the next.' },
@@ -280,7 +280,7 @@ export const MORE_GUIDES: PaintingGuide[] = [
   },
   {
     id: 'vehicle-weathering', title: 'Vehicle Weathering Masterclass', faction: 'Any', model: 'Any Vehicle',
-    difficulty: 'advanced', timeEstimate: '2-3 hours',
+    difficulty: 'advanced', timeEstimate: '2-3 hours', videoUrl: 'https://youtube.com/results?search_query=vehicle+weathering+miniature+tutorial',
     steps: [
       { title: 'Sponge Chips', area: 'Edges, corners', technique: 'Sponge weathering', paints: [{ name: 'Rhinox Hide', hex: '#462f30' }], instructions: 'Sponge dab on edges where paint would chip.' },
       { title: 'Metal Chips', area: 'Inside chips', technique: 'Detail work', paints: [{ name: 'Leadbelcher', hex: '#888d91' }], instructions: 'Small silver dots inside ~30% of brown chips.' },

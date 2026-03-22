@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import type { ModelStatus } from '../types';
+import MonthlyStats from '../components/MonthlyStats';
 
 // ─── RPG RANK SYSTEM ───
 const RANKS = [
@@ -202,6 +203,8 @@ export default function Progress() {
               </div>
             ))}
           </div>
+
+          <MonthlyStats />
 
           <h3 className="section-title">🎖️ Rank Progression</h3>
           <div className="ranks-list">

@@ -420,6 +420,13 @@ function GuidesTab({ paints }: { paints: Paint[] }) {
           )}
         </div>
 
+        {/* Video link */}
+        {selectedGuide.videoUrl && (
+          <a href={selectedGuide.videoUrl} target="_blank" rel="noreferrer" className="guide-video-link">
+            ▶ Watch tutorial on YouTube
+          </a>
+        )}
+
         {/* Navigation */}
         <div className="guide-nav">
           <button className="btn btn-ghost" onClick={() => setActiveStep(Math.max(0, activeStep - 1))} disabled={activeStep === 0}>← Previous</button>

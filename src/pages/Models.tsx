@@ -38,6 +38,22 @@ export default function Models() {
     setCollapsed(next);
   };
 
+  const [bulkMode, setBulkMode] = useState(false);
+  const [bulkSelected, setBulkSelected] = useState<Set<number>>(new Set());
+
+  const _toggleBulkSelect = (id: number) => {
+  void _toggleBulkSelect;
+    const next = new Set(bulkSelected);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setBulkSelected(next);
+  };
+
+  const bulkUpdateStatus = async (status: ModelStatus) => {
+    for (const id of bulkSelected) await db.models.update(id, { status });
+    setBulkSelected(new Set());
+    setBulkMode(false);
+  };
+
   const collapseAll = () => {
     setCollapsed(new Set([...factions, '__ALL_COLLAPSED__']));
   };
@@ -121,12 +137,22 @@ export default function Models() {
 
       <div className="results-bar">
         <div className="results-count">{filtered.length} {showWishlist ? 'wishlisted' : 'owned'} models · {filtered.reduce((s, m) => s + m.quantity, 0)} minis · {filtered.reduce((s, m) => s + (m.points || 0), 0)}pts</div>
-        {view === 'grouped' && (
-          <div style={{ display: 'flex', gap: 4 }}>
-            <button className="btn btn-sm btn-ghost" onClick={expandAll}>Expand all</button>
-            <button className="btn btn-sm btn-ghost" onClick={collapseAll}>Collapse all</button>
-          </div>
-        )}
+        <div style={{ display: 'flex', gap: 4 }}>
+          <button className={`btn btn-sm ${bulkMode ? 'btn-primary' : 'btn-ghost'}`} onClick={() => { setBulkMode(!bulkMode); setBulkSelected(new Set()); }}>
+            {bulkMode ? `✓ ${bulkSelected.size} selected` : '☑ Bulk edit'}
+          </button>
+          {bulkMode && bulkSelected.size > 0 && (
+            <>
+              {MODEL_STATUSES.map(s => <button key={s} className="btn btn-sm btn-ghost" onClick={() => bulkUpdateStatus(s)}>{s}</button>)}
+            </>
+          )}
+          {view === 'grouped' && !bulkMode && (
+            <>
+              <button className="btn btn-sm btn-ghost" onClick={expandAll}>Expand</button>
+              <button className="btn btn-sm btn-ghost" onClick={collapseAll}>Collapse</button>
+            </>
+          )}
+        </div>
       </div>
 
       {filtered.length === 0 ? (
