@@ -23,7 +23,7 @@ export default function Home() {
       <section className="hero">
         <p className="hero-eyebrow">Your Hobby Companion</p>
         <h1 className="hero-title">Track. Paint.<br /><span>Conquer.</span></h1>
-        <p className="hero-sub">Manage your miniature collection, track your painting progress, and play solo narrative campaigns — all in one place.</p>
+        <p className="hero-sub">Forge your legacy in miniature — manage your collection, master your craft, and wage war solo.</p>
         <div className="hero-actions">
           <button className="btn btn-primary btn-lg" onClick={() => nav('/models')}>My Collection</button>
           <button className="btn btn-outline btn-lg" onClick={() => nav('/start')}>I'm New — Start Here</button>

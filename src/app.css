@@ -1622,3 +1622,181 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 .feature-card:hover .feature-icon { color: var(--gold-bright); }
 .mobile-nav a svg { stroke-width: 1.5; }
 .mobile-nav a.active svg { color: var(--gold); }
+
+/* ═══════════════════════════════════════
+   CINEMATIC HERO STYLE (Throne of Fortune inspired)
+   ═══════════════════════════════════════ */
+
+/* Warm cinematic background */
+.site {
+  background-image:
+    radial-gradient(ellipse at 50% 30%, rgba(196,100,20,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 80%, rgba(138,8,8,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 60%, rgba(196,149,42,0.04) 0%, transparent 50%),
+    url('/bg-pattern.webp') !important;
+  background-color: var(--bg) !important;
+  background-size: 100%, 100%, 100%, 300px !important;
+}
+
+/* Cinematic hero overhaul */
+.hero {
+  padding: 120px 0 100px !important;
+  position: relative;
+  text-align: center;
+}
+.hero::before {
+  content: ''; position: absolute; inset: -60px -200px;
+  background: radial-gradient(ellipse at 50% 60%, rgba(196,100,20,0.12) 0%, rgba(138,8,8,0.06) 40%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+.hero::after {
+  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 200px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
+.hero > * { position: relative; z-index: 1; }
+
+.hero-eyebrow {
+  font-size: 0.55rem !important; letter-spacing: 8px !important;
+  color: var(--gold) !important; margin-bottom: 20px !important;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 4.5rem !important;
+  line-height: 1 !important;
+  margin-bottom: 20px !important;
+  color: var(--text) !important;
+  text-shadow: 0 4px 30px rgba(196,149,42,0.15);
+}
+.hero-title span {
+  display: block;
+  font-size: 6rem !important;
+  color: var(--gold-bright) !important;
+  text-shadow: 0 0 60px rgba(196,149,42,0.2), 0 4px 20px rgba(0,0,0,0.5);
+  line-height: 1.1;
+}
+
+.hero-sub {
+  font-size: 0.95rem !important;
+  color: rgba(232,228,220,0.6) !important;
+  font-weight: 300 !important;
+  max-width: 480px;
+  margin: 0 auto 36px !important;
+  font-style: italic;
+}
+
+/* Cinematic buttons */
+.hero-actions { gap: 16px !important; }
+.btn-primary {
+  background: linear-gradient(135deg, #a03010, #c04818) !important;
+  border: 1px solid rgba(196,100,20,0.4) !important;
+  clip-path: none !important;
+  border-radius: 30px !important;
+  padding: 14px 32px !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase;
+  box-shadow: 0 4px 20px rgba(160,48,16,0.3);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #c04818, #d05828) !important;
+  box-shadow: 0 8px 30px rgba(160,48,16,0.4) !important;
+  transform: translateY(-2px);
+}
+.btn-outline {
+  border: 1px solid rgba(196,149,42,0.3) !important;
+  clip-path: none !important;
+  border-radius: 30px !important;
+  padding: 14px 32px !important;
+  color: var(--gold) !important;
+  backdrop-filter: blur(8px);
+  background: rgba(196,149,42,0.06) !important;
+}
+.btn-outline:hover {
+  background: rgba(196,149,42,0.12) !important;
+  border-color: rgba(196,149,42,0.5) !important;
+}
+
+/* Glassmorphism header */
+.site-header {
+  background: rgba(10,10,14,0.7) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(196,149,42,0.1) !important;
+}
+
+/* Warm stats band */
+.stats-band {
+  border-color: rgba(196,149,42,0.1) !important;
+  background: rgba(20,22,28,0.5);
+  backdrop-filter: blur(10px);
+}
+
+/* Cinematic feature cards */
+.feature-card, .home-card {
+  clip-path: none !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(196,149,42,0.08) !important;
+  border-top: 1px solid rgba(196,149,42,0.15) !important;
+  background: linear-gradient(135deg, rgba(20,22,28,0.9), rgba(14,14,18,0.95)) !important;
+  backdrop-filter: blur(10px);
+}
+.feature-card:hover, .home-card:hover {
+  border-color: rgba(196,149,42,0.2) !important;
+  box-shadow: 0 8px 40px rgba(196,100,20,0.08), 0 0 0 1px rgba(196,149,42,0.1);
+}
+.feature-card::before, .home-card::before { display: none !important; }
+.feature-card::after, .home-card::after {
+  content: '' !important; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(196,149,42,0.2), transparent) !important;
+  width: 100% !important; border: none !important;
+}
+
+/* Warm card style */
+.card {
+  clip-path: none !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(196,149,42,0.06) !important;
+  border-top: 1px solid rgba(196,149,42,0.1) !important;
+}
+.card::after { display: none !important; }
+.card:hover { border-color: rgba(196,149,42,0.15) !important; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+/* Warm footer */
+.site-footer { border-color: rgba(196,149,42,0.08) !important; }
+
+/* Warm glow on key elements */
+.rank-card { border-radius: 16px !important; clip-path: none !important; box-shadow: 0 0 40px rgba(196,100,20,0.06); }
+.player-card { border-radius: 16px !important; overflow: hidden; }
+.player-card-bg { background: linear-gradient(135deg, #0a0810 0%, #1a1018 40%, #0a0a10 100%) !important; }
+
+/* Warm mobile nav */
+.mobile-nav { background: rgba(10,10,14,0.9) !important; backdrop-filter: blur(20px) !important; border-top: 1px solid rgba(196,149,42,0.1) !important; }
+
+/* Warm floating timer */
+.floating-timer-btn { border-radius: 24px !important; clip-path: none !important; border: 1px solid rgba(196,149,42,0.15) !important; backdrop-filter: blur(10px); background: rgba(20,22,28,0.9) !important; }
+.floating-timer-panel { border-radius: 16px !important; clip-path: none !important; border: 1px solid rgba(196,149,42,0.15) !important; }
+
+/* Warm settings/tool cards */
+.settings-section, .tool-card, .form-overlay, .mission-panel, .detail-section {
+  clip-path: none !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(196,149,42,0.08) !important;
+  border-top: 1px solid rgba(196,149,42,0.15) !important;
+}
+
+/* Warm stat cards */
+.stat { clip-path: none !important; border-radius: 12px !important; border: 1px solid rgba(196,149,42,0.08) !important; border-top: 1px solid rgba(196,149,42,0.12) !important; }
+
+/* Warm buttons */
+.btn-ghost { clip-path: none !important; border-radius: 8px !important; }
+.btn-sm { border-radius: 6px !important; }
+.game-tab { clip-path: none !important; border-radius: 8px !important; }
+.status { border-radius: 6px !important; clip-path: none !important; }
+
+@media (max-width: 768px) {
+  .hero-title { font-size: 2.8rem !important; }
+  .hero-title span { font-size: 3.5rem !important; }
+}
