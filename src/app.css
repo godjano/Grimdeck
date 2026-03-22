@@ -1829,3 +1829,180 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 
 /* Wings on footer */
 .site-footer::before { content: ''; display: block; width: 200px; height: 40px; margin: 0 auto 12px; background: url('/decor/wings.png') no-repeat center; background-size: contain; opacity: 0.08; }
+
+/* ═══════════════════════════════════════
+   BOLD GRIMDARK VISUAL OVERHAUL
+   Using skull, frame, daemon crest, metal textures
+   ═══════════════════════════════════════ */
+
+/* Metal texture on site background */
+.site {
+  background-image:
+    radial-gradient(ellipse at 50% 20%, rgba(196,100,20,0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 80%, rgba(138,8,8,0.08) 0%, transparent 50%),
+    url('/decor/metal-dark.jpg') !important;
+  background-color: #060608 !important;
+  background-size: 100%, 100%, 400px !important;
+  background-blend-mode: normal, normal, overlay !important;
+}
+
+/* Daemon crest as hero background */
+.hero::before {
+  background-image: url('/decor/skull2.jpg') !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
+  background-size: 350px !important;
+  opacity: 0.05 !important;
+  filter: invert(1);
+  inset: -20px !important;
+}
+
+/* Ornate frame around the stats band */
+.stats-band {
+  position: relative;
+  background: rgba(14,14,18,0.8) !important;
+  border: none !important;
+}
+.stats-band::before {
+  content: ''; position: absolute; inset: -20px; 
+  background: url('/decor/frame.jpg') no-repeat center;
+  background-size: contain;
+  opacity: 0.04; filter: invert(1);
+  pointer-events: none;
+}
+
+/* Skull watermark on Grey Pile */
+.shame-dashboard::before {
+  background: url('/decor/skull.jpg') no-repeat center !important;
+  background-size: 180px !important;
+  opacity: 0.04 !important;
+  filter: invert(1);
+}
+
+/* Daemon crest on campaign mission panels */
+.mission-panel::before {
+  background: url('/decor/skull2.jpg') no-repeat center !important;
+  background-size: 120px !important;
+  opacity: 0.04 !important;
+  filter: invert(1);
+  top: 50% !important; right: 20px !important;
+  transform: translateY(-50%);
+  width: 120px !important; height: 120px !important;
+}
+
+/* Frame on rank/player card */
+.rank-card::before {
+  background: url('/decor/frame.jpg') no-repeat center !important;
+  background-size: contain !important;
+  opacity: 0.04 !important; filter: invert(1);
+  inset: -10px !important; width: auto !important; height: auto !important;
+}
+.player-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: url('/decor/frame.jpg') no-repeat center;
+  background-size: cover;
+  opacity: 0.03; filter: invert(1);
+  pointer-events: none; z-index: 0;
+}
+
+/* Red metal texture on primary buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #6a0808, #8a1010, #6a0808) !important;
+  border: 1px solid rgba(196,100,20,0.3) !important;
+  position: relative; overflow: hidden;
+}
+.btn-primary::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('/decor/metal-red.jpg') no-repeat center;
+  background-size: cover; opacity: 0.15;
+  pointer-events: none;
+}
+
+/* Skull on empty states */
+.empty-icon { display: none !important; }
+.empty::before {
+  content: ''; display: block; width: 80px; height: 80px; margin: 0 auto 16px;
+  background: url('/decor/skull.jpg') no-repeat center;
+  background-size: contain; opacity: 0.1; filter: invert(1);
+}
+
+/* Ornate frame on feature cards hover */
+.feature-card:hover::before, .home-card:hover::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('/decor/frame.jpg') no-repeat center;
+  background-size: cover; opacity: 0.03; filter: invert(1);
+  pointer-events: none; display: block !important;
+}
+
+/* Metal texture on header */
+.site-header::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('/decor/metal-dark.jpg') no-repeat center;
+  background-size: cover; opacity: 0.08;
+  pointer-events: none;
+}
+.site-header { position: relative; }
+
+/* Daemon crest on footer */
+.site-footer::before {
+  background: url('/decor/skull2.jpg') no-repeat center !important;
+  background-size: 60px !important;
+  opacity: 0.06 !important; filter: invert(1);
+  height: 60px !important; width: 60px !important;
+}
+
+/* Metal texture on cards */
+.card::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('/decor/metal-dark.jpg');
+  background-size: 300px; opacity: 0.03;
+  pointer-events: none; border-radius: inherit;
+}
+.card { position: relative; overflow: hidden; }
+
+/* Ornate dividers */
+.section-heading::after {
+  background-image: url('/decor/wings.png') !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 80px !important;
+  width: 100px !important; height: 20px !important;
+  opacity: 0.1; filter: invert(1);
+}
+
+/* Trophy cards with metal texture */
+.trophy-card.earned::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('/decor/metal-red.jpg');
+  background-size: 200px; opacity: 0.05;
+  pointer-events: none;
+}
+
+/* Achievement unlocked glow with skull */
+.achievement.unlocked::before {
+  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 40px; height: 40px;
+  background: url('/decor/skull.jpg') no-repeat center;
+  background-size: contain; opacity: 0.04; filter: invert(1);
+  pointer-events: none;
+}
+
+/* Project generator with daemon crest */
+.project-gen::before {
+  content: ''; position: absolute; top: 10px; right: 10px;
+  width: 80px; height: 80px;
+  background: url('/decor/skull2.jpg') no-repeat center;
+  background-size: contain; opacity: 0.04; filter: invert(1);
+  pointer-events: none;
+}
+.project-gen { position: relative; overflow: hidden; }
+
+/* Gallery cards with frame */
+.gallery-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: url('/decor/metal-dark.jpg');
+  background-size: 300px; opacity: 0.04;
+  pointer-events: none; z-index: 0;
+}
+.gallery-card { position: relative; }
+.gallery-info { position: relative; z-index: 1; }
