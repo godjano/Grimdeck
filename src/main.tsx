@@ -12,6 +12,7 @@ import Campaigns from './pages/Campaigns';
 import CampaignPlay from './pages/CampaignPlayNew';
 import Settings from './pages/Settings';
 import Account from './pages/Account';
+import Community from './pages/Community';
 import PaintSuggestions from './pages/PaintSuggestions';
 import ModelDetail from './pages/ModelDetail';
 import Inspiration from './pages/Inspiration';
@@ -35,6 +36,7 @@ const router = createHashRouter([
       { path: 'campaign/:id', element: <CampaignPlay /> },
       { path: 'settings', element: <Settings /> },
       { path: 'account', element: <Account /> },
+      { path: 'community', element: <Community /> },
       { path: 'suggestions', element: <PaintSuggestions /> },
       { path: 'inspiration', element: <Inspiration /> },
       { path: 'army-list', element: <ArmyList /> },

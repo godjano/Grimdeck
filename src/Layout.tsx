@@ -39,6 +39,7 @@ export default function Layout() {
             <NavLink to="/grey-pile">Grey Pile</NavLink>
             <NavLink to="/progress">Progress</NavLink>
             <NavLink to="/campaigns">Campaigns</NavLink>
+            <NavLink to="/community">Community</NavLink>
             <div className="nav-more">
               <button className="nav-more-btn">More ▾</button>
               <div className="nav-dropdown">
