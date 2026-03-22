@@ -40,6 +40,7 @@ export default function Layout() {
                 <NavLink to="/start">🎉 Getting Started</NavLink>
                 <NavLink to="/data-manager">🔧 Data Manager</NavLink>
                 <NavLink to="/settings">⚙️ Settings</NavLink>
+                <NavLink to="/account">☁️ Account</NavLink>
               </div>
             </div>
             <button className="theme-toggle" onClick={toggle} title="Toggle theme">{theme === 'dark' ? '☀️' : '🌙'}</button>
