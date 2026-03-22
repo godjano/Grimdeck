@@ -7,6 +7,7 @@ import { ARMY_PAINTER, SPEED_PAINTS } from './paints-army-painter';
 import { CITADEL_AIR, PROACRYL, SCALE75 } from './paints-extra';
 import { CITADEL_SPRAY, VALLEJO_METAL, AK_INTERACTIVE } from './paints-more';
 import { VALLEJO_XPRESS, CITADEL_MISSING } from './paints-latest';
+import { SPEED_PAINT_V1 } from './primarchs-and-sp1';
 
 export const ALL_PAINT_PRESETS = [
   ...CITADEL_BASE,
@@ -24,6 +25,7 @@ export const ALL_PAINT_PRESETS = [
   ...VALLEJO_XPRESS,
   ...ARMY_PAINTER,
   ...SPEED_PAINTS,
+  ...SPEED_PAINT_V1,
   ...PROACRYL,
   ...SCALE75,
   ...AK_INTERACTIVE,
