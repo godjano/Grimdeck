@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
+import { Shield, Palette, Skull, TrendingUp, Swords, BookOpen, Brush, Cloud} from 'lucide-react';
 
 import PaintingStreak from '../components/PaintingStreak';
 import SessionPlanner from '../components/SessionPlanner';
@@ -104,42 +105,42 @@ export default function Home() {
         <h2 className="section-heading">Everything you need</h2>
         <div className="feature-grid">
           <div className="feature-card" onClick={() => nav('/models')}>
-            <div className="feature-icon">🛡️</div>
+            <div className="feature-icon"><Shield size={32} /></div>
             <h3>Model Collection</h3>
             <p>Track every miniature by faction, unit type, and painting status.</p>
           </div>
           <div className="feature-card" onClick={() => nav('/paints')}>
-            <div className="feature-icon">🎨</div>
+            <div className="feature-icon"><Palette size={32} /></div>
             <h3>Paint Inventory</h3>
             <p>Catalog 500+ paints across Citadel, Vallejo, and Army Painter.</p>
           </div>
           <div className="feature-card" onClick={() => nav('/grey-pile')}>
-            <div className="feature-icon">🪦</div>
+            <div className="feature-icon"><Skull size={32} /></div>
             <h3>Pile of Grey</h3>
             <p>Face your shame and promote models through the pipeline.</p>
           </div>
           <div className="feature-card" onClick={() => nav('/progress')}>
-            <div className="feature-icon">📊</div>
+            <div className="feature-icon"><TrendingUp size={32} /></div>
             <h3>Progress & Ranks</h3>
             <p>Gamified stats, achievements, and ranks to stay motivated.</p>
           </div>
           <div className="feature-card" onClick={() => nav('/campaigns')}>
-            <div className="feature-icon">⚔️</div>
+            <div className="feature-icon"><Swords size={32} /></div>
             <h3>Solo Campaigns</h3>
             <p>Narrative Kill Team campaigns with AI opponents.</p>
           </div>
           <div className="feature-card" onClick={() => nav('/suggestions')}>
-            <div className="feature-icon">💡</div>
+            <div className="feature-icon"><BookOpen size={32} /></div>
             <h3>Paint Guides</h3>
             <p>Step-by-step tutorials and colour scheme tools.</p>
           </div>
           <div className="feature-card" onClick={() => nav('/inspiration')}>
-            <div className="feature-icon">🖌️</div>
+            <div className="feature-icon"><Brush size={32} /></div>
             <h3>Inspiration</h3>
             <p>Techniques, recipes, and pro tips library.</p>
           </div>
           <div className="feature-card" onClick={() => nav('/settings')}>
-            <div className="feature-icon">☁️</div>
+            <div className="feature-icon"><Cloud size={32} /></div>
             <h3>Cloud Sync</h3>
             <p>Back up and sync across devices via GitHub.</p>
           </div>

@@ -1616,3 +1616,9 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
   --gold-dim: #6a5010;
   --gold-bright: #a07820;
 }
+
+/* Lucide icon styling */
+.feature-icon { color: var(--gold); margin-bottom: 16px; }
+.feature-card:hover .feature-icon { color: var(--gold-bright); }
+.mobile-nav a svg { stroke-width: 1.5; }
+.mobile-nav a.active svg { color: var(--gold); }
