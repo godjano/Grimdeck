@@ -1,4 +1,5 @@
 import { PaintTimer, RandomPicker, ShoppingList, CsvImport, ShareCollection, Glossary } from '../components/Tools';
+import PaintMatcher from '../components/PaintMatcher';
 import { addHachetteCollection } from '../db/hachette-collection';
 import { db } from '../db';
 import { useState } from 'react';
@@ -38,6 +39,7 @@ export default function Tools() {
       </div>
 
       <div className="tools-grid">
+        <PaintMatcher />
         <PaintTimer />
         <RandomPicker />
         <ShoppingList />

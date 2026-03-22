@@ -2,10 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 
+import PaintingStreak from '../components/PaintingStreak';
+import SessionPlanner from '../components/SessionPlanner';
+
 export default function Home() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
   const paintCount = useLiveQuery(() => db.paints.count()) ?? 0;
   const nav = useNavigate();
+  const isNew = models.length === 0 && paintCount === 0;
 
   const total = models.reduce((s, m) => s + m.quantity, 0);
   const painted = models.filter(m => m.status === 'painted' || m.status === 'based').reduce((s, m) => s + m.quantity, 0);
@@ -36,6 +40,26 @@ export default function Home() {
           <div className="band-stat"><div className="band-num">{pct}<span className="band-unit">%</span></div><div className="band-label">Complete</div></div>
         </div>
       </section>
+
+      {/* New user banner */}
+      {isNew && (
+        <div className="onboarding-banner" onClick={() => nav('/start')}>
+          <div className="onboarding-icon">🎉</div>
+          <div>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>New here? Let's get you set up!</div>
+            <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>We'll help you add your first models and paints in under a minute.</div>
+          </div>
+          <span style={{ color: 'var(--gold)' }}>Start →</span>
+        </div>
+      )}
+
+      {/* Streak + Session Planner */}
+      {total > 0 && (
+        <section className="section">
+          <PaintingStreak />
+          <SessionPlanner />
+        </section>
+      )}
 
       {/* Currently Painting */}
       {wip.length > 0 && (

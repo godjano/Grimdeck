@@ -1424,3 +1424,35 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 .nav-user { text-decoration:none; font-size:1rem; padding:4px 8px; border-radius:8px; transition:var(--transition); }
 .nav-user:hover { background:var(--surface2); }
 .nav-user::after { display:none !important; }
+
+/* ═══════════════════════════════════════
+   PAINTING STREAK
+   ═══════════════════════════════════════ */
+.streak-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; margin-bottom:16px; }
+.streak-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.streak-fire { font-size:1.1rem; font-weight:700; }
+.streak-best { font-size:0.72rem; color:var(--text-dim); margin-top:2px; }
+.streak-done { color:var(--success); font-weight:600; font-size:0.85rem; }
+.streak-calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:14px; }
+.streak-day { width:100%; aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:4px; font-size:0.65rem; color:var(--text-dim); background:var(--surface2); }
+.streak-day.painted { background:var(--success); color:#fff; font-weight:600; }
+.streak-day.today { border:2px solid var(--gold); }
+.streak-challenge { background:var(--gold-glow); border:1px solid rgba(240,180,41,0.1); border-radius:8px; padding:10px 14px; }
+.streak-challenge-label { font-size:0.68rem; color:var(--gold); font-weight:700; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:4px; }
+.streak-challenge-text { font-size:0.85rem; font-weight:300; }
+
+/* Session Planner */
+.session-planner { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; margin-bottom:16px; }
+.session-planner h3 { font-size:1rem; font-weight:600; margin-bottom:6px; }
+.session-time-picker { display:flex; gap:6px; }
+.session-plan { margin-top:14px; display:flex; flex-direction:column; gap:6px; }
+.session-task { display:flex; gap:10px; padding:10px 12px; background:var(--surface2); border-radius:8px; }
+.session-task-num { width:24px; height:24px; border-radius:50%; background:var(--gold-glow); color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; flex-shrink:0; }
+.session-task-info { flex:1; }
+.session-task-name { font-weight:600; font-size:0.85rem; }
+.session-task-desc { font-size:0.72rem; color:var(--text-dim); font-weight:300; }
+
+/* Onboarding banner */
+.onboarding-banner { display:flex; align-items:center; gap:16px; background:linear-gradient(135deg, var(--surface), var(--gold-glow)); border:1px solid rgba(240,180,41,0.15); border-radius:var(--radius-lg); padding:20px; margin-bottom:24px; cursor:pointer; transition:var(--transition); }
+.onboarding-banner:hover { transform:translateY(-2px); box-shadow:var(--shadow); }
+.onboarding-icon { font-size:2rem; }
