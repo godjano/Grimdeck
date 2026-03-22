@@ -57,9 +57,25 @@ function getMotivation(): string {
 export default function ProjectGenerator() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
   const nav = useNavigate();
-  const [project, setProject] = useState<Project | null>(null);
-  const [size, setSize] = useState<ProjectSize>('small');
-  const [checkedSteps, setCheckedSteps] = useState<Set<string>>(new Set());
+  const [project, setProject] = useState<Project | null>(() => {
+    try { const s = localStorage.getItem('grimdeck_project'); return s ? JSON.parse(s) : null; } catch { return null; }
+  });
+  const [size, setSize] = useState<ProjectSize>(() => (localStorage.getItem('grimdeck_project_size') as ProjectSize) || 'small');
+  const [checkedSteps, setCheckedSteps] = useState<Set<string>>(() => {
+    try { const s = localStorage.getItem('grimdeck_project_steps'); return s ? new Set(JSON.parse(s)) : new Set(); } catch { return new Set(); }
+  });
+
+  // Persist project state
+  const saveProject = (p: Project | null) => {
+    setProject(p);
+    if (p) localStorage.setItem('grimdeck_project', JSON.stringify(p));
+    else localStorage.removeItem('grimdeck_project');
+  };
+
+  const saveSteps = (steps: Set<string>) => {
+    setCheckedSteps(steps);
+    localStorage.setItem('grimdeck_project_steps', JSON.stringify([...steps]));
+  };
 
   const unpainted = models.filter(m => !m.wishlist && ['unbuilt', 'built', 'primed'].includes(m.status));
 
@@ -76,14 +92,14 @@ export default function ProjectGenerator() {
       'Put on a podcast or YouTube video while you paint. Time flies!',
     ];
 
-    setProject({ model, size, steps, tips });
-    setCheckedSteps(new Set(steps.filter(s => s.done).map(s => s.id)));
+    saveProject({ model, size, steps, tips });
+    saveSteps(new Set(steps.filter(s => s.done).map(s => s.id)));
   };
 
   const toggleStep = (stepId: string) => {
     const next = new Set(checkedSteps);
     next.has(stepId) ? next.delete(stepId) : next.add(stepId);
-    setCheckedSteps(next);
+    saveSteps(next);
 
     // Auto-update model status based on progress
     if (project) {
@@ -117,7 +133,7 @@ export default function ProjectGenerator() {
           <p className="settings-desc">Pick a project size and we'll choose a random model from your pile with a step-by-step plan.</p>
           <div className="project-sizes">
             {(['small', 'medium', 'big'] as ProjectSize[]).map(s => (
-              <button key={s} className={`project-size-btn ${size === s ? 'active' : ''}`} onClick={() => setSize(s)}>
+              <button key={s} className={`project-size-btn ${size === s ? 'active' : ''}`} onClick={() => { setSize(s); localStorage.setItem('grimdeck_project_size', s); }}>
                 <span className="project-size-icon">{SIZE_CONFIG[s].icon}</span>
                 <span className="project-size-label">{SIZE_CONFIG[s].label}</span>
                 <span className="project-size-desc">{SIZE_CONFIG[s].desc}</span>
@@ -166,7 +182,7 @@ export default function ProjectGenerator() {
           </div>
 
           <div className="project-actions">
-            <button className="btn btn-ghost" onClick={() => setProject(null)}>← New Project</button>
+            <button className="btn btn-ghost" onClick={() => saveProject(null)}>← New Project</button>
             <button className="btn btn-ghost" onClick={() => nav(`/model/${project.model.id}`)}>View Model →</button>
             <button className="btn btn-ghost" onClick={() => nav('/suggestions')}>Paint Recipes →</button>
           </div>
