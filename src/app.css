@@ -1800,3 +1800,32 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
   .hero-title { font-size: 2.8rem !important; }
   .hero-title span { font-size: 3.5rem !important; }
 }
+
+/* ═══════════════════════════════════════
+   STEAMPUNK DECORATIVE ELEMENTS
+   ═══════════════════════════════════════ */
+
+/* Wings behind hero title */
+.hero::before {
+  background-image: url('/decor/wings.png') !important;
+  background-repeat: no-repeat !important;
+  background-position: center 60% !important;
+  background-size: 500px auto !important;
+  opacity: 0.04 !important;
+  inset: -40px -100px !important;
+}
+
+/* Gear on progress/rank card */
+.rank-card::before { content: ''; position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: url('/decor/gear.png') no-repeat center; background-size: contain; opacity: 0.04; pointer-events: none; z-index: 0; }
+
+/* Heart on Grey Pile shame banner */
+.shame-dashboard::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; background: url('/decor/heart.png') no-repeat center; background-size: contain; opacity: 0.03; pointer-events: none; }
+
+/* Clock on floating timer */
+.floating-timer-panel::before { content: ''; position: absolute; top: -10px; right: -10px; width: 80px; height: 80px; background: url('/decor/clock.png') no-repeat center; background-size: contain; opacity: 0.06; pointer-events: none; }
+
+/* Key on campaign cards */
+.mission-panel::before { content: ''; position: absolute; top: 10px; right: 10px; width: 60px; height: 100px; background: url('/decor/key.png') no-repeat center; background-size: contain; opacity: 0.04; pointer-events: none; }
+
+/* Wings on footer */
+.site-footer::before { content: ''; display: block; width: 200px; height: 40px; margin: 0 auto 12px; background: url('/decor/wings.png') no-repeat center; background-size: contain; opacity: 0.08; }
