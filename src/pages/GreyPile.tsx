@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
 import type { ModelStatus } from '../types';
+import ProjectGenerator from '../components/ProjectGenerator';
 
 const GREY_STATUSES: ModelStatus[] = ['unbuilt', 'built', 'primed'];
 
@@ -123,6 +124,9 @@ export default function GreyPile() {
               </div>
             </div>
           )}
+
+          {/* Project Generator */}
+          <ProjectGenerator />
 
           {/* Sort & View controls */}
           <div className="grey-controls">

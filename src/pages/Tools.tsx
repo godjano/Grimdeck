@@ -1,14 +1,23 @@
 import { PaintTimer, RandomPicker, ShoppingList, CsvImport, ShareCollection, Glossary } from '../components/Tools';
 import { addHachetteCollection } from '../db/hachette-collection';
+import { db } from '../db';
 import { useState } from 'react';
 
 export default function Tools() {
   const [hachetteStatus, setHachetteStatus] = useState('');
 
+  const clearHachette = async () => {
+    const all = await db.models.toArray();
+    const hachette = all.filter(m => m.notes?.includes('Hachette') || m.manufacturer === 'Games Workshop (Hachette)');
+    for (const m of hachette) await db.models.delete(m.id!);
+    setHachetteStatus(`🗑 Removed ${hachette.length} Hachette models`);
+  };
+
   const importHachette = async () => {
-    setHachetteStatus('⏳ Adding...');
+    await clearHachette();
+    setHachetteStatus('⏳ Adding fresh...');
     const count = await addHachetteCollection();
-    setHachetteStatus(`✅ Added ${count} models from Hachette Combat Patrol Issues 1-72!`);
+    setHachetteStatus(`✅ Added ${count} models (old duplicates cleared)`);
   };
 
   return (
@@ -20,8 +29,11 @@ export default function Tools() {
       {/* Hachette Import */}
       <div className="tool-card" style={{ marginBottom: 16 }}>
         <h3>📰 Hachette Combat Patrol Collection</h3>
-        <p className="settings-desc">Import all models from Hachette Combat Patrol magazine Issues 1-72. Adds Space Marines, Tyranids, Aeldari, Chaos, Orks, Votann, GSC, and Guard models as "unbuilt".</p>
-        <button className="btn btn-primary" onClick={importHachette}>Import Issues 1-72</button>
+        <p className="settings-desc">Import all models from Hachette Combat Patrol magazine Issues 1-72. Clears old imports first to avoid duplicates.</p>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-primary" onClick={importHachette}>Import Issues 1-72 (clean)</button>
+          <button className="btn btn-danger btn-sm" onClick={clearHachette}>Remove Hachette models</button>
+        </div>
         {hachetteStatus && <p style={{ marginTop: 8, fontSize: '0.85rem' }}>{hachetteStatus}</p>}
       </div>
 

@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useTheme } from './components/ThemeProvider';
+import FloatingTimer from './components/FloatingTimer';
 import './app.css';
 
 export default function Layout() {
@@ -64,6 +65,7 @@ export default function Layout() {
         <NavLink to="/campaigns">⚔️</NavLink>
         <NavLink to="/settings">⚙️</NavLink>
       </nav>
+      <FloatingTimer />
     </div>
   );
 }
