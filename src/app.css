@@ -1406,3 +1406,16 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 .project-recipe-paint-info { display:flex; flex-direction:column; }
 .project-recipe-paint-name { font-size:0.78rem; font-weight:500; }
 .project-recipe-paint-step { font-size:0.65rem; color:var(--text-dim); }
+
+/* Project list */
+.project-list-section { margin-bottom:16px; }
+.project-list { display:flex; flex-direction:column; gap:6px; }
+.project-list-item { display:flex; align-items:center; gap:12px; padding:12px 14px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; cursor:pointer; transition:var(--transition); }
+.project-list-item:hover { border-color:var(--border-hover); }
+.project-list-info { flex:1; min-width:0; }
+.project-list-name { font-weight:600; font-size:0.88rem; }
+.project-list-meta { font-size:0.68rem; color:var(--text-dim); font-weight:300; }
+.project-list-progress { width:80px; flex-shrink:0; }
+.project-list-bar { height:6px; background:var(--surface3); border-radius:3px; overflow:hidden; }
+.project-list-fill { height:100%; background:linear-gradient(90deg, var(--red), var(--gold)); border-radius:3px; }
+.project-list-pct { font-size:0.65rem; color:var(--text-dim); }

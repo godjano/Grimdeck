@@ -101,17 +101,53 @@ export default function ProjectGenerator() {
   const [checkedSteps, setCheckedSteps] = useState<Set<string>>(() => {
     try { const s = localStorage.getItem('grimdeck_project_steps'); return s ? new Set(JSON.parse(s)) : new Set(); } catch { return new Set(); }
   });
+  const [showList, setShowList] = useState(false);
 
-  // Persist project state
+  // Multiple projects stored
+  const [allProjects, setAllProjects] = useState<{ project: Project; steps: string[] }[]>(() => {
+    try { return JSON.parse(localStorage.getItem('grimdeck_all_projects') || '[]'); } catch { return []; }
+  });
+
+  const saveAllProjects = (projects: typeof allProjects) => {
+    setAllProjects(projects);
+    localStorage.setItem('grimdeck_all_projects', JSON.stringify(projects));
+  };
+
   const saveProject = (p: Project | null) => {
     setProject(p);
-    if (p) localStorage.setItem('grimdeck_project', JSON.stringify(p));
-    else localStorage.removeItem('grimdeck_project');
+    if (p) {
+      localStorage.setItem('grimdeck_project', JSON.stringify(p));
+      // Also save to all projects list if new
+      const exists = allProjects.some(ap => ap.project.model.id === p.model.id);
+      if (!exists) saveAllProjects([...allProjects, { project: p, steps: [] }]);
+    } else {
+      localStorage.removeItem('grimdeck_project');
+    }
   };
 
   const saveSteps = (steps: Set<string>) => {
     setCheckedSteps(steps);
-    localStorage.setItem('grimdeck_project_steps', JSON.stringify([...steps]));
+    const arr = [...steps];
+    localStorage.setItem('grimdeck_project_steps', JSON.stringify(arr));
+    // Update in all projects list
+    if (project) {
+      saveAllProjects(allProjects.map(ap =>
+        ap.project.model.id === project.model.id ? { ...ap, steps: arr } : ap
+      ));
+    }
+  };
+
+  const loadProject = (saved: typeof allProjects[0]) => {
+    saveProject(saved.project);
+    const s = new Set(saved.steps);
+    setCheckedSteps(s);
+    localStorage.setItem('grimdeck_project_steps', JSON.stringify(saved.steps));
+    setShowList(false);
+  };
+
+  const removeProject = (modelId: number | undefined) => {
+    saveAllProjects(allProjects.filter(ap => ap.project.model.id !== modelId));
+    if (project?.model.id === modelId) saveProject(null);
   };
 
   const unpainted = models.filter(m => !m.wishlist && ['unbuilt', 'built', 'primed'].includes(m.status));
@@ -164,6 +200,38 @@ export default function ProjectGenerator() {
 
   return (
     <div className="project-gen">
+      {/* Project List */}
+      {allProjects.length > 0 && !project && (
+        <div className="project-list-section">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h3>📋 My Projects ({allProjects.length})</h3>
+            <button className="btn btn-sm btn-ghost" onClick={() => setShowList(!showList)}>{showList ? 'Hide' : 'Show'}</button>
+          </div>
+          {showList && (
+            <div className="project-list">
+              {allProjects.map((ap, i) => {
+                const done = ap.steps.length;
+                const total = ap.project.steps.length;
+                const pctDone = Math.round((done / total) * 100);
+                return (
+                  <div key={i} className="project-list-item" onClick={() => loadProject(ap)}>
+                    <div className="project-list-info">
+                      <div className="project-list-name">{ap.project.model.name}</div>
+                      <div className="project-list-meta">{ap.project.model.faction} · ×{ap.project.model.quantity} · {SIZE_CONFIG[ap.project.size].icon} {SIZE_CONFIG[ap.project.size].label}</div>
+                    </div>
+                    <div className="project-list-progress">
+                      <div className="project-list-bar"><div className="project-list-fill" style={{ width: `${pctDone}%` }} /></div>
+                      <span className="project-list-pct">{pctDone}%</span>
+                    </div>
+                    <button className="btn btn-danger btn-sm" onClick={e => { e.stopPropagation(); removeProject(ap.project.model.id); }}>✕</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {!project ? (
         <div className="project-picker">
           <h3>🎲 Project Generator</h3>
