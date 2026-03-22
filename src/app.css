@@ -1395,3 +1395,14 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 .project-tips p { font-size:0.78rem; color:var(--text-secondary); font-weight:300; margin-bottom:4px; }
 
 .project-actions { display:flex; gap:8px; flex-wrap:wrap; }
+
+/* Project recipes */
+.project-recipes { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+.project-recipe { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:12px; }
+.project-recipe-name { font-weight:600; font-size:0.85rem; margin-bottom:8px; }
+.project-recipe-paints { display:flex; flex-wrap:wrap; gap:8px; }
+.project-recipe-paint { display:flex; align-items:center; gap:6px; }
+.project-recipe-swatch { width:22px; height:22px; border-radius:50%; border:2px solid var(--border); flex-shrink:0; }
+.project-recipe-paint-info { display:flex; flex-direction:column; }
+.project-recipe-paint-name { font-size:0.78rem; font-weight:500; }
+.project-recipe-paint-step { font-size:0.65rem; color:var(--text-dim); }

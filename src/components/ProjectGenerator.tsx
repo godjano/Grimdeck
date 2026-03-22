@@ -4,6 +4,43 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
 import type { MiniatureModel } from '../types';
 
+const FACTION_RECIPES: Record<string, { name: string; paints: { name: string; hex: string; step: string }[] }[]> = {
+  'Space Marines': [
+    { name: 'Ultramarine Blue', paints: [{ name: 'Macragge Blue', hex: '#0d407f', step: 'Base coat armour' }, { name: 'Nuln Oil', hex: '#14100e', step: 'Shade all over' }, { name: 'Calgar Blue', hex: '#4272b8', step: 'Layer raised areas' }, { name: 'Fenrisian Grey', hex: '#6d94b3', step: 'Edge highlight' }] },
+    { name: 'Gold Trim', paints: [{ name: 'Retributor Armour', hex: '#c39e5a', step: 'Trim & aquila' }, { name: 'Reikland Fleshshade', hex: '#ca6c4d', step: 'Shade trim' }] },
+  ],
+  'Tyranids': [
+    { name: 'Leviathan Skin', paints: [{ name: 'Rakarth Flesh', hex: '#a29e91', step: 'Skin base' }, { name: 'Reikland Fleshshade', hex: '#ca6c4d', step: 'Shade' }, { name: 'Pallid Wych Flesh', hex: '#cdcebe', step: 'Highlight' }] },
+    { name: 'Leviathan Carapace', paints: [{ name: 'Naggaroth Night', hex: '#3b2b50', step: 'Carapace base' }, { name: 'Xereus Purple', hex: '#471f5f', step: 'Layer' }, { name: 'Genestealer Purple', hex: '#7658a5', step: 'Edge highlight' }] },
+  ],
+  'Aeldari': [
+    { name: 'Iyanden Bone', paints: [{ name: 'Zandri Dust', hex: '#9e915c', step: 'Base' }, { name: 'Seraphim Sepia', hex: '#d7824a', step: 'Shade' }, { name: 'Ushabti Bone', hex: '#bbbb7f', step: 'Layer' }] },
+  ],
+  'Chaos Space Marines': [
+    { name: 'Black Legion', paints: [{ name: 'Abaddon Black', hex: '#231f20', step: 'Armour' }, { name: 'Balthasar Gold', hex: '#a47552', step: 'Trim' }, { name: 'Agrax Earthshade', hex: '#5a3601', step: 'Shade trim' }] },
+  ],
+  'Orks': [
+    { name: 'Ork Skin', paints: [{ name: 'Warpstone Glow', hex: '#1e7331', step: 'Skin base' }, { name: 'Biel-Tan Green', hex: '#1ba169', step: 'Shade' }, { name: 'Moot Green', hex: '#3daf44', step: 'Highlight' }] },
+  ],
+  'Death Guard': [
+    { name: 'Death Guard Armour', paints: [{ name: 'Death Guard Green', hex: '#6d6e48', step: 'Armour' }, { name: 'Agrax Earthshade', hex: '#5a3601', step: 'Shade' }, { name: 'Ogryn Camo', hex: '#9da94b', step: 'Edge highlight' }] },
+  ],
+  'Necrons': [
+    { name: 'Necron Metal', paints: [{ name: 'Leadbelcher', hex: '#888d91', step: 'Base/spray' }, { name: 'Nuln Oil', hex: '#14100e', step: 'Shade' }, { name: 'Necron Compound', hex: '#b4b8b0', step: 'Drybrush' }] },
+    { name: 'Energy Glow', paints: [{ name: 'Tesseract Glow', hex: '#40e040', step: 'Eyes & coils' }] },
+  ],
+  'Leagues of Votann': [
+    { name: 'Votann Stone', paints: [{ name: 'Mechanicus Standard Grey', hex: '#3d4b4d', step: 'Armour' }, { name: 'Nuln Oil', hex: '#14100e', step: 'Shade' }, { name: 'Dawnstone', hex: '#70756e', step: 'Layer' }] },
+  ],
+  'Genestealer Cults': [
+    { name: 'Cult Purple', paints: [{ name: 'Naggaroth Night', hex: '#3b2b50', step: 'Armour' }, { name: 'Druchii Violet', hex: '#7a468c', step: 'Shade' }, { name: 'Xereus Purple', hex: '#471f5f', step: 'Layer' }] },
+  ],
+  'Astra Militarum': [
+    { name: 'Cadian Fatigues', paints: [{ name: 'Castellan Green', hex: '#264715', step: 'Fatigues' }, { name: 'Agrax Earthshade', hex: '#5a3601', step: 'Shade' }, { name: 'Straken Green', hex: '#628126', step: 'Highlight' }] },
+    { name: 'Flak Armour', paints: [{ name: 'Zandri Dust', hex: '#9e915c', step: 'Armour plates' }, { name: 'Seraphim Sepia', hex: '#d7824a', step: 'Shade' }, { name: 'Ushabti Bone', hex: '#bbbb7f', step: 'Highlight' }] },
+  ],
+};
+
 type ProjectSize = 'small' | 'medium' | 'big';
 
 interface ProjectStep {
@@ -174,6 +211,32 @@ export default function ProjectGenerator() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="project-tips">
+            <h4>🎨 Suggested Paint Recipes for {project.model.faction}</h4>
+            {(FACTION_RECIPES[project.model.faction] || []).length > 0 ? (
+              <div className="project-recipes">
+                {(FACTION_RECIPES[project.model.faction] || []).map((recipe, i) => (
+                  <div key={i} className="project-recipe">
+                    <div className="project-recipe-name">{recipe.name}</div>
+                    <div className="project-recipe-paints">
+                      {recipe.paints.map((p, j) => (
+                        <div key={j} className="project-recipe-paint">
+                          <div className="project-recipe-swatch" style={{ background: p.hex }} />
+                          <div className="project-recipe-paint-info">
+                            <span className="project-recipe-paint-name">{p.name}</span>
+                            <span className="project-recipe-paint-step">{p.step}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="settings-desc">No specific recipes for this faction yet. Check the Suggestions page for general recipes.</p>
+            )}
           </div>
 
           <div className="project-tips">
