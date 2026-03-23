@@ -6,6 +6,7 @@ import PaintAutocomplete from '../components/PaintAutocomplete';
 import type { PaintPreset } from '../db/paint-presets';
 import { BulkAddPaints } from '../components/BulkAdd';
 import { Plus, Package, Search, Filter, Grid3X3, List, LayoutGrid, ChevronDown, ChevronRight, Trash2, Droplets, X } from 'lucide-react';
+import PageBanner from '../components/PageBanner';
 
 type ViewMode = 'list' | 'grid' | 'grouped';
 type SortMode = 'name' | 'brand' | 'colour';
@@ -76,8 +77,8 @@ export default function Paints() {
 
   return (
     <div>
+      <PageBanner title="Paint Rack" subtitle="Catalog paints across all major brands" icon="paints" />
       <div className="page-header">
-        <h2>Paint Rack</h2>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn btn-ghost btn-sm" onClick={() => { setShowBulk(!showBulk); setShowForm(false); }}>
             <Package size={16} />

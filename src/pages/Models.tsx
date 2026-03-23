@@ -9,6 +9,7 @@ import type { ModelPreset } from '../db/model-presets';
 import { BulkAddModels } from '../components/BulkAdd';
 import { getGWSearchUrl } from '../db/external-links';
 import { Plus, Package, Search, Filter, ChevronDown, ChevronRight, Grid3X3, List, LayoutGrid, MoreVertical, Trash2, ExternalLink, Star, Camera, X } from 'lucide-react';
+import PageBanner from '../components/PageBanner';
 
 type ViewMode = 'list' | 'grid' | 'grouped';
 
@@ -71,9 +72,9 @@ export default function Models() {
 
   return (
     <div>
+      <PageBanner title="My Models" subtitle="Track every miniature by faction and status" icon="models" />
       {/* ─── Header ─── */}
       <div className="page-header">
-        <h2>My Models</h2>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn btn-ghost btn-sm" onClick={() => { setShowBulk(!showBulk); setShowForm(false); }}>
             <Package size={16} />

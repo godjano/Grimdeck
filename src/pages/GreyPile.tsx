@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
 import type { ModelStatus } from '../types';
 import ProjectGenerator from '../components/ProjectGenerator';
+import PageBanner from '../components/PageBanner';
 
 const GREY_STATUSES: ModelStatus[] = ['unbuilt', 'built', 'primed'];
 
@@ -50,7 +51,7 @@ export default function GreyPile() {
 
   return (
     <div>
-      <div className="page-header"><h2>🪦 The Pile of Grey</h2></div>
+      <PageBanner title="The Pile of Grey" subtitle="Face your shame — promote through the pipeline" icon="skull" />
 
       {totalGrey === 0 && totalWip === 0 ? (
         <div className="empty">

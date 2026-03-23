@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
+import PageBanner from '../components/PageBanner';
 import { getRoster, ALL_KT_FACTIONS } from '../db/killteam-data';
 import { FACTION_ART } from '../db/faction-art';
 
@@ -16,8 +17,8 @@ export default function Campaigns() {
 
   return (
     <div>
+      <PageBanner title="Solo Campaigns" subtitle="Kill Team narrative missions" icon="campaigns" />
       <div className="page-header">
-        <h2>⚔️ Solo Campaigns</h2>
         <button className="btn btn-primary" onClick={() => setShowCreate(!showCreate)}>
           {showCreate ? '✕ Cancel' : '+ New Campaign'}
         </button>
