@@ -111,7 +111,7 @@ export default function Home() {
       <section className="section">
         <p className="section-eyebrow">Features</p>
         <h2 className="section-heading">Everything you need</h2>
-        <div className="feat-grid">
+        <div className="feature-grid">
           {[
             { to: '/models', icon: <Shield size={28} />, title: 'Collection', desc: 'Track every miniature by faction and status', color: '#3b82f6' },
             { to: '/paints', icon: <Palette size={28} />, title: 'Paint Rack', desc: 'Catalog paints across all major brands', color: '#a855f7' },
@@ -122,11 +122,11 @@ export default function Home() {
             { to: '/inspiration', icon: <Brush size={28} />, title: 'Inspiration', desc: 'Techniques, tips, and pro recipes', color: '#ec4899' },
             { to: '/community', icon: <Cloud size={28} />, title: 'Community', desc: 'Share models and browse the gallery', color: '#06b6d4' },
           ].map(f => (
-            <div key={f.to} className="feat-card" onClick={() => nav(f.to)}>
-              <div className="feat-icon" style={{ '--feat-color': f.color } as React.CSSProperties}>{f.icon}</div>
-              <div className="feat-info">
-                <div className="feat-title">{f.title}</div>
-                <div className="feat-desc">{f.desc}</div>
+            <div key={f.to} className="feature-card" onClick={() => nav(f.to)} style={{ '--feat-color': f.color } as React.CSSProperties}>
+              <div className="feature-icon" style={{ background: `color-mix(in srgb, ${f.color} 12%, transparent)`, color: f.color }}>{f.icon}</div>
+              <div>
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
               </div>
             </div>
           ))}
