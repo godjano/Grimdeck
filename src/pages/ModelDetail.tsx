@@ -7,7 +7,8 @@ import PaintAutocomplete from '../components/PaintAutocomplete';
 import type { PaintPreset } from '../db/paint-presets';
 import { FACTION_ROSTERS } from '../db/killteam-data';
 import { getGWSearchUrl } from '../db/external-links';
-import { ChevronLeft, Camera, Swords, Palette, BookOpen, Image, ExternalLink, Trash2, Copy, Plus, X } from 'lucide-react';
+import { ChevronLeft, Camera, Image, ExternalLink, Trash2, Copy, Plus, X } from 'lucide-react';
+import GoldIcon from '../components/GoldIcon';
 
 const STATUS_FLOW: ModelStatus[] = ['unbuilt', 'built', 'primed', 'wip', 'painted', 'based'];
 
@@ -130,10 +131,10 @@ export default function ModelDetail() {
   };
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode; count?: number }[] = [
-    { key: 'stats', label: 'Datacard', icon: <Swords size={16} /> },
-    { key: 'recipe', label: 'Recipe', icon: <Palette size={16} />, count: linkedPaints.length },
-    { key: 'journal', label: 'Journal', icon: <BookOpen size={16} />, count: logs.length },
-    { key: 'inspiration', label: 'Inspo', icon: <Image size={16} /> },
+    { key: 'stats', label: 'Datacard', icon: <GoldIcon name="campaigns" size={18} /> },
+    { key: 'recipe', label: 'Recipe', icon: <GoldIcon name="paints" size={18} /> , count: linkedPaints.length },
+    { key: 'journal', label: 'Journal', icon: <GoldIcon name="guides" size={18} />, count: logs.length },
+    { key: 'inspiration', label: 'Inspo', icon: <GoldIcon name="inspiration" size={18} /> },
   ];
 
   return (
@@ -192,7 +193,7 @@ export default function ModelDetail() {
                 </div>
                 {datacard.weapons.length > 0 && (
                   <div className="md-weapons">
-                    <h3 className="md-section-title"><Swords size={16} /> Weapons</h3>
+                    <h3 className="md-section-title"><GoldIcon name="campaigns" size={16} /> Weapons</h3>
                     {datacard.weapons.map(w => (
                       <div key={w.name} className="md-weapon">
                         <div className="md-weapon-name">{w.type === 'ranged' ? '🔫' : '⚔️'} {w.name}</div>
@@ -220,7 +221,7 @@ export default function ModelDetail() {
         {tab === 'recipe' && (
           <div className="md-recipe-tab">
             <div className="md-section-header">
-              <h3 className="md-section-title"><Palette size={16} /> Paint Recipe</h3>
+              <h3 className="md-section-title"><GoldIcon name="paints" size={16} /> Paint Recipe</h3>
               <button className="btn btn-sm btn-ghost" onClick={() => setShowAddPaint(!showAddPaint)}>
                 {showAddPaint ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Add Paint</>}
               </button>
@@ -265,7 +266,7 @@ export default function ModelDetail() {
 
         {tab === 'journal' && (
           <div className="md-journal-tab">
-            <h3 className="md-section-title"><BookOpen size={16} /> Painting Journal</h3>
+            <h3 className="md-section-title"><GoldIcon name="guides" size={16} /> Painting Journal</h3>
             <div className="md-journal-add">
               <textarea value={logText} onChange={e => setLogText(e.target.value)} placeholder="What did you work on?" rows={2} />
               <div className="md-journal-actions">

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useTheme } from './components/ThemeProvider';
 import FloatingTimer from './components/FloatingTimer';
 import { getUser, onAuthChange } from './db/cloud-sync';
-import { Shield, Palette, Skull, TrendingUp, Swords, Home, Settings, Users } from 'lucide-react';
+import GoldIcon from './components/GoldIcon';
 import type { User } from '@supabase/supabase-js';
 import './app.css';
 
@@ -72,14 +72,14 @@ export default function Layout() {
       </footer>
       {/* Mobile bottom nav */}
       <nav className="mobile-nav">
-        <NavLink to="/" end><Home size={20} /></NavLink>
-        <NavLink to="/models"><Shield size={20} /></NavLink>
-        <NavLink to="/paints"><Palette size={20} /></NavLink>
-        <NavLink to="/grey-pile"><Skull size={20} /></NavLink>
-        <NavLink to="/progress"><TrendingUp size={20} /></NavLink>
-        <NavLink to="/campaigns"><Swords size={20} /></NavLink>
-        <NavLink to="/community"><Users size={20} /></NavLink>
-        <NavLink to="/settings"><Settings size={20} /></NavLink>
+        <NavLink to="/" end><GoldIcon name="home" size={22} /></NavLink>
+        <NavLink to="/models"><GoldIcon name="models" size={22} /></NavLink>
+        <NavLink to="/paints"><GoldIcon name="paints" size={22} /></NavLink>
+        <NavLink to="/grey-pile"><GoldIcon name="skull" size={22} /></NavLink>
+        <NavLink to="/progress"><GoldIcon name="progress" size={22} /></NavLink>
+        <NavLink to="/campaigns"><GoldIcon name="campaigns" size={22} /></NavLink>
+        <NavLink to="/community"><GoldIcon name="community" size={22} /></NavLink>
+        <NavLink to="/settings"><GoldIcon name="settings" size={22} /></NavLink>
       </nav>
       <FloatingTimer />
     </div>

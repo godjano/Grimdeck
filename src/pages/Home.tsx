@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { Shield, Brush } from 'lucide-react';
+import GoldIcon from '../components/GoldIcon';
 
 import PaintingStreak from '../components/PaintingStreak';
 import SessionPlanner from '../components/SessionPlanner';
@@ -71,7 +71,7 @@ export default function Home() {
             {wip.slice(0, 4).map(m => (
               <div key={m.id} className="wip-showcase" onClick={() => nav(`/model/${m.id}`)}>
                 <div className="wip-showcase-img">
-                  {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <div className="wip-showcase-empty"><Brush size={24} strokeWidth={1} /></div>}
+                  {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <div className="wip-showcase-empty"><GoldIcon name="paints" size={24} /></div>}
                   <div className="wip-showcase-badge">WIP</div>
                 </div>
                 <div className="wip-showcase-info">
@@ -94,7 +94,7 @@ export default function Home() {
             {recent.map(m => (
               <div key={m.id} className="recent-card" onClick={() => nav(`/model/${m.id}`)}>
                 <div className="recent-avatar">
-                  {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <Shield size={16} strokeWidth={1} />}
+                  {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <GoldIcon name="models" size={16} />}
                 </div>
                 <div className="recent-info">
                   <div className="recent-name">{m.name} {m.quantity > 1 && <span className="qty-badge">×{m.quantity}</span>}</div>
