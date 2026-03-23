@@ -2451,3 +2451,224 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
   .ml-status-pills { gap: 4px; }
   .ml-pill { padding: 6px 10px; }
 }
+
+/* ═══════════════════════════════════════
+   FORCE DRAMATIC VISUALS — override everything
+   ═══════════════════════════════════════ */
+
+/* Model detail hero — HUGE faction art banner */
+.md-hero {
+  min-height: 320px !important;
+  border-radius: 16px !important;
+  background-size: cover !important;
+  background-position: center 30% !important;
+  border: 1px solid rgba(196,149,42,0.15) !important;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 -100px 80px rgba(6,6,8,0.8) !important;
+}
+.md-hero-overlay {
+  position: absolute !important; inset: 0 !important;
+  background: linear-gradient(180deg,
+    rgba(6,6,8,0.1) 0%,
+    rgba(6,6,8,0.3) 30%,
+    rgba(6,6,8,0.85) 70%,
+    rgba(6,6,8,0.98) 100%) !important;
+  z-index: 1 !important;
+}
+
+/* Portrait — golden border, glow */
+.md-portrait {
+  border: 2px solid rgba(196,149,42,0.4) !important;
+  box-shadow: 0 0 20px rgba(196,149,42,0.15), 0 4px 12px rgba(0,0,0,0.4) !important;
+}
+
+/* Name — big, golden */
+.md-name {
+  font-size: 1.6rem !important;
+  background: linear-gradient(135deg, #fff 0%, #c4962a 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Status dots — bigger, more visible */
+.md-pip-dot { width: 12px !important; height: 12px !important; }
+.md-status-pip.active .md-pip-dot {
+  box-shadow: 0 0 12px rgba(196,149,42,0.6), 0 0 4px rgba(196,149,42,0.8) !important;
+}
+
+/* Tabs — gold accent, visible */
+.md-tabs {
+  background: rgba(10,10,14,0.95) !important;
+  border: 1px solid rgba(196,149,42,0.08) !important;
+  border-top: none !important;
+  border-radius: 0 0 16px 16px !important;
+  margin-bottom: 24px !important;
+}
+.md-tab {
+  padding: 16px 12px !important;
+  font-size: 0.78rem !important;
+  font-weight: 600 !important;
+}
+.md-tab.active {
+  color: var(--gold-bright, #c4962a) !important;
+  border-bottom: 3px solid var(--gold-bright, #c4962a) !important;
+  background: rgba(196,149,42,0.04) !important;
+}
+
+/* Stat cards — colored, not just dark */
+.md-stat-grid { gap: 12px !important; }
+.md-stat-card {
+  background: linear-gradient(135deg, rgba(14,16,22,0.9), rgba(20,22,30,0.8)) !important;
+  border: 1px solid rgba(196,149,42,0.1) !important;
+  border-radius: 14px !important;
+  padding: 20px 14px !important;
+}
+.md-stat-value {
+  font-size: 1.8rem !important;
+  background: linear-gradient(135deg, #fff, #c4962a) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+.md-stat-wounds .md-stat-value {
+  background: linear-gradient(135deg, #ff6b6b, #ef4444) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Weapons — dark with red accent */
+.md-weapon {
+  background: rgba(14,16,22,0.8) !important;
+  border-left: 3px solid rgba(196,149,42,0.3) !important;
+  border-radius: 0 10px 10px 0 !important;
+  padding: 14px 16px !important;
+}
+.md-weapon-name { color: #fff !important; font-size: 0.88rem !important; }
+
+/* Recipe items — swatch bigger, more visible */
+.md-swatch {
+  width: 40px !important; height: 40px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+}
+.md-recipe-item {
+  background: rgba(14,16,22,0.7) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+}
+
+/* Empty states — bigger decorative icons */
+.md-empty-icon {
+  width: 72px !important;
+  opacity: 0.12 !important;
+  margin-bottom: 16px !important;
+}
+
+/* ─── MODELS LIST — dramatic changes ─── */
+
+/* Status pills — colored backgrounds per status */
+.ml-pill {
+  border-radius: 12px !important;
+  padding: 10px 16px !important;
+  min-width: 70px !important;
+}
+.ml-pill-count { font-size: 1.2rem !important; }
+
+/* Grid tiles — bigger, more visual */
+.ml-grid {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  gap: 14px !important;
+}
+.ml-tile {
+  border-radius: 14px !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+  transition: all 0.25s ease !important;
+}
+.ml-tile:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  border-color: rgba(196,149,42,0.25) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 20px rgba(196,149,42,0.08) !important;
+}
+.ml-tile-img { aspect-ratio: 1 !important; }
+.ml-tile-name { font-size: 0.82rem !important; font-weight: 700 !important; }
+
+/* Card rows — visible hover, photo bigger */
+.ml-card {
+  padding: 12px 14px !important;
+  border-radius: 12px !important;
+  border: 1px solid transparent !important;
+  margin-bottom: 2px !important;
+}
+.ml-card:hover {
+  background: rgba(196,149,42,0.04) !important;
+  border-color: rgba(196,149,42,0.1) !important;
+}
+.ml-card-photo {
+  width: 52px !important; height: 52px !important;
+  border-radius: 10px !important;
+}
+.ml-card-photo-empty {
+  width: 52px !important; height: 52px !important;
+  border-radius: 10px !important;
+}
+
+/* Group headers — gold accent */
+.ml-group-title {
+  font-size: 0.9rem !important;
+  color: var(--gold-bright, #c4962a) !important;
+}
+.ml-group-header {
+  padding: 12px 14px !important;
+  border-left: 3px solid rgba(196,149,42,0.2) !important;
+  border-radius: 0 !important;
+}
+.ml-group-header:hover {
+  background: rgba(196,149,42,0.04) !important;
+  border-left-color: rgba(196,149,42,0.5) !important;
+}
+
+/* Status badges — colored */
+.ml-card-status, .ml-tile-status {
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+.status-unbuilt { background: rgba(120,120,120,0.2) !important; color: #888 !important; }
+.status-built { background: rgba(59,130,246,0.15) !important; color: #60a5fa !important; }
+.status-primed { background: rgba(168,85,247,0.15) !important; color: #a78bfa !important; }
+.status-wip { background: rgba(245,158,11,0.15) !important; color: #fbbf24 !important; }
+.status-painted { background: rgba(34,197,94,0.15) !important; color: #4ade80 !important; }
+.status-based { background: rgba(196,149,42,0.2) !important; color: #c4962a !important; }
+
+/* Overflow menu — more polished */
+.ml-card-menu {
+  border-radius: 12px !important;
+  padding: 8px !important;
+  border: 1px solid rgba(196,149,42,0.1) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6) !important;
+}
+
+/* Search bar — more visible */
+.ml-search-wrap {
+  border-radius: 12px !important;
+  padding: 0 14px !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  background: rgba(14,16,22,0.8) !important;
+}
+.ml-search-wrap:focus-within {
+  border-color: rgba(196,149,42,0.3) !important;
+  box-shadow: 0 0 12px rgba(196,149,42,0.08) !important;
+}
+
+/* Frame decoration on model detail page */
+.model-detail-v2 { position: relative; }
+.model-detail-v2::before {
+  content: ''; position: fixed; top: 50%; right: -40px; transform: translateY(-50%);
+  width: 120px; height: 160px;
+  background: url('/decor/frame.jpg') no-repeat center;
+  background-size: contain; opacity: 0.02; filter: invert(1);
+  pointer-events: none; z-index: 0;
+}
