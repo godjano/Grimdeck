@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
 import type { ModelStatus } from '../types';
+import GoldIcon from '../components/GoldIcon';
 import ProjectGenerator from '../components/ProjectGenerator';
 import PageBanner from '../components/PageBanner';
 
@@ -56,7 +57,7 @@ export default function GreyPile() {
 
       {totalGrey === 0 && totalWip === 0 ? (
         <div className="empty">
-          <span className="empty-icon">🏆</span>
+          <span className="empty-icon"><GoldIcon name="medal" size={48} /></span>
           <p className="empty-text">Your pile is empty! You absolute legend.</p>
         </div>
       ) : (
@@ -85,27 +86,27 @@ export default function GreyPile() {
           {/* Quick Stats */}
           <div className="grey-stats">
             <div className="grey-stat">
-              <div className="grey-stat-icon">📦</div>
+              <div className="grey-stat-icon"><GoldIcon name="models" size={20} /></div>
               <div className="grey-stat-num">{greyModels.filter(m => m.status === 'unbuilt').reduce((s, m) => s + m.quantity, 0)}</div>
               <div className="grey-stat-label">Unbuilt</div>
             </div>
             <div className="grey-stat">
-              <div className="grey-stat-icon">✂️</div>
+              <div className="grey-stat-icon"><GoldIcon name="campaigns" size={20} /></div>
               <div className="grey-stat-num">{greyModels.filter(m => m.status === 'built').reduce((s, m) => s + m.quantity, 0)}</div>
               <div className="grey-stat-label">Built</div>
             </div>
             <div className="grey-stat">
-              <div className="grey-stat-icon">🫧</div>
+              <div className="grey-stat-icon"><GoldIcon name="skull" size={20} /></div>
               <div className="grey-stat-num">{greyModels.filter(m => m.status === 'primed').reduce((s, m) => s + m.quantity, 0)}</div>
               <div className="grey-stat-label">Primed</div>
             </div>
             <div className="grey-stat grey-stat-wip">
-              <div className="grey-stat-icon">🎨</div>
+              <div className="grey-stat-icon"><GoldIcon name="paints" size={20} /></div>
               <div className="grey-stat-num">{totalWip}</div>
               <div className="grey-stat-label">WIP</div>
             </div>
             <div className="grey-stat grey-stat-done">
-              <div className="grey-stat-icon">✅</div>
+              <div className="grey-stat-icon"><GoldIcon name="medal" size={20} /></div>
               <div className="grey-stat-num">{totalPainted}</div>
               <div className="grey-stat-label">Done</div>
             </div>
@@ -114,11 +115,11 @@ export default function GreyPile() {
           {/* Currently on the desk */}
           {wipModels.length > 0 && (
             <div className="grey-section">
-              <h3 className="section-title">🎨 Currently Painting</h3>
+              <h3 className="section-title"><GoldIcon name="paints" size={18} /> Currently Painting</h3>
               <div className="wip-strip">
                 {wipModels.map(m => (
                   <div key={m.id} className="wip-mini" onClick={() => nav(`/model/${m.id}`)}>
-                    {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <span>🎨</span>}
+                    {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <GoldIcon name="paints" size={20} />}
                     <div className="wip-mini-name">{m.name}</div>
                     <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'painted'); }}>✓ Done</button>
                   </div>

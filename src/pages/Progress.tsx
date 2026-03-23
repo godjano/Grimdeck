@@ -3,6 +3,8 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import type { ModelStatus } from '../types';
 import MonthlyStats from '../components/MonthlyStats';
+import GoldIcon from '../components/GoldIcon';
+import PageBanner from '../components/PageBanner';
 
 // ─── RPG RANK SYSTEM ───
 const RANKS = [
@@ -125,15 +127,18 @@ export default function Progress() {
 
   const byTier = (tier: TrophyTier) => TROPHIES.filter(t => t.tier === tier);
 
+  const b = import.meta.env.BASE_URL;
   return (
     <div>
+      <PageBanner title="Progress" subtitle="Track your hobby journey and achievements" icon="progress" />
+      <div className="gold-divider"><img src={`${b}decor/divider-gold.png`} alt="" /></div>
       {/* ─── Player Card (PSN Profile style) ─── */}
       <div className="player-card">
         <div className="player-card-bg" />
         <div className="player-card-content">
           <div className="player-avatar">
             <div className="player-avatar-ring" style={{ background: `conic-gradient(${TIER_COLORS[rank.tier.toLowerCase() as TrophyTier] || '#ffd700'} ${pctDone}%, var(--surface3) 0)` }}>
-              <div className="player-avatar-inner">{rank.icon}</div>
+              <div className="player-avatar-inner"><GoldIcon name="medal" size={48} /></div>
             </div>
             <div className="player-level">LVL {RANKS.indexOf(rank) + 1}</div>
           </div>
@@ -158,10 +163,10 @@ export default function Progress() {
 
       {/* Tabs */}
       <div className="game-tabs" style={{ marginBottom: 24 }}>
-        <button className={`game-tab ${tab === 'profile' ? 'active' : ''}`} onClick={() => setTab('profile')}>⚔️ Stats</button>
-        <button className={`game-tab ${tab === 'trophies' ? 'active' : ''}`} onClick={() => setTab('trophies')}>🏆 Trophies ({trophiesEarned.length}/{TROPHIES.length})</button>
-        <button className={`game-tab ${tab === 'factions' ? 'active' : ''}`} onClick={() => setTab('factions')}>🛡️ Factions</button>
-        <button className={`game-tab ${tab === 'timeline' ? 'active' : ''}`} onClick={() => setTab('timeline')}>📅 Timeline</button>
+        <button className={`game-tab ${tab === 'profile' ? 'active' : ''}`} onClick={() => setTab('profile')}><GoldIcon name="campaigns" size={16} /> Stats</button>
+        <button className={`game-tab ${tab === 'trophies' ? 'active' : ''}`} onClick={() => setTab('trophies')}><GoldIcon name="medal" size={16} /> Trophies ({trophiesEarned.length}/{TROPHIES.length})</button>
+        <button className={`game-tab ${tab === 'factions' ? 'active' : ''}`} onClick={() => setTab('factions')}><GoldIcon name="models" size={16} /> Factions</button>
+        <button className={`game-tab ${tab === 'timeline' ? 'active' : ''}`} onClick={() => setTab('timeline')}><GoldIcon name="guides" size={16} /> Timeline</button>
       </div>
 
       {/* ─── Stats Tab ─── */}
@@ -169,35 +174,35 @@ export default function Progress() {
         <>
           <div className="rpg-stats-grid">
             {[
-              { label: 'MODELS OWNED', val: total, icon: '📦' },
-              { label: 'PAINTED', val: painted, icon: '✅' },
-              { label: 'IN PROGRESS', val: wip, icon: '🎨' },
-              { label: 'GREY PILE', val: grey, icon: '🪦' },
-              { label: 'PAINTS OWNED', val: paintCount, icon: '🧪' },
-              { label: 'FACTIONS', val: factions.length, icon: '⚔️' },
-              { label: 'JOURNAL ENTRIES', val: logs.length, icon: '📝' },
-              { label: 'CAMPAIGNS', val: campaignCount, icon: '🗡️' },
+              { label: 'MODELS OWNED', val: total, iconName: 'models' },
+              { label: 'PAINTED', val: painted, iconName: 'medal' },
+              { label: 'IN PROGRESS', val: wip, iconName: 'paints' },
+              { label: 'GREY PILE', val: grey, iconName: 'skull' },
+              { label: 'PAINTS OWNED', val: paintCount, iconName: 'paints' },
+              { label: 'FACTIONS', val: factions.length, iconName: 'campaigns' },
+              { label: 'JOURNAL ENTRIES', val: logs.length, iconName: 'guides' },
+              { label: 'CAMPAIGNS', val: campaignCount, iconName: 'campaigns' },
             ].map(s => (
               <div key={s.label} className="rpg-stat-card">
-                <div className="rpg-sc-icon">{s.icon}</div>
+                <div className="rpg-sc-icon"><GoldIcon name={s.iconName} size={22} /></div>
                 <div className="rpg-sc-val">{s.val}</div>
                 <div className="rpg-sc-label">{s.label}</div>
               </div>
             ))}
           </div>
 
-          <h3 className="section-title">🔄 Pipeline</h3>
+          <h3 className="section-title"><GoldIcon name="settings" size={18} /> Pipeline</h3>
           <div className="pipeline">
             {[
-              { label: 'Unbuilt', count: unbuilt, color: '#555', icon: '📦' },
-              { label: 'Built', count: built, color: '#5d4037', icon: '✂️' },
-              { label: 'Primed', count: primed, color: '#37474f', icon: '🫧' },
-              { label: 'WIP', count: wip, color: '#e65100', icon: '🎨' },
-              { label: 'Done', count: painted, color: '#1b5e20', icon: '✅' },
+              { label: 'Unbuilt', count: unbuilt, color: '#555', iconName: 'models' },
+              { label: 'Built', count: built, color: '#5d4037', iconName: 'campaigns' },
+              { label: 'Primed', count: primed, color: '#37474f', iconName: 'skull' },
+              { label: 'WIP', count: wip, color: '#e65100', iconName: 'paints' },
+              { label: 'Done', count: painted, color: '#1b5e20', iconName: 'medal' },
             ].map(s => (
               <div className="pipeline-stage" key={s.label}>
                 <div className="pipeline-bar" style={{ background: s.color, height: total > 0 ? Math.max(8, (s.count / total) * 140) : 8 }} />
-                <div className="pipeline-icon">{s.icon}</div>
+                <div className="pipeline-icon"><GoldIcon name={s.iconName} size={20} /></div>
                 <div className="pipeline-count">{s.count}</div>
                 <div className="pipeline-label">{s.label}</div>
               </div>
@@ -206,7 +211,7 @@ export default function Progress() {
 
           <MonthlyStats />
 
-          <h3 className="section-title">🎖️ Rank Progression</h3>
+          <h3 className="section-title"><GoldIcon name="aquila" size={18} /> Rank Progression</h3>
           <div className="ranks-list">
             {RANKS.map((t, i) => {
               const isActive = rank.title === t.title;
