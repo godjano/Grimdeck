@@ -36,7 +36,7 @@
    RESET & BASE
    ═══════════════════════════════════════ */
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgba(10,10,14,0.82), rgba(10,10,14,0.82)), url('/bg-main.jpg') center/cover fixed; color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.6; }
+body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgba(10,10,14,0.55), rgba(10,10,14,0.55)), url('/bg-main.jpg') center/cover fixed; color:var(--text); -webkit-font-smoothing:antialiased; line-height:1.6; }
 ::selection { background: rgba(240,180,41,0.25); color: var(--text); }
 
 /* ═══════════════════════════════════════
