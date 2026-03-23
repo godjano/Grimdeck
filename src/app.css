@@ -2696,21 +2696,73 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
   grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
   gap: 10px !important;
 }
+
+/* Paint rack — physical shelf look */
+.pr-rack {
+  background: linear-gradient(180deg, rgba(30,22,16,0.3) 0%, rgba(20,15,10,0.5) 100%);
+  border: 1px solid rgba(139,90,43,0.15);
+  border-radius: 16px;
+  padding: 8px 12px 0;
+  position: relative;
+  overflow: hidden;
+}
+/* Side rails */
+.pr-rack::before, .pr-rack::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 6px;
+  background: linear-gradient(180deg, rgba(139,90,43,0.25), rgba(90,60,30,0.35), rgba(139,90,43,0.25));
+  border-radius: 3px;
+  z-index: 2;
+}
+.pr-rack::before { left: 0; }
+.pr-rack::after { right: 0; }
+
+.pr-shelf { padding: 6px 8px 0; }
+.pr-shelf-pots {
+  display: flex; flex-wrap: nowrap; gap: 6px;
+  justify-content: center;
+  padding-bottom: 6px;
+}
+/* The shelf board */
+.pr-shelf-board {
+  height: 6px;
+  background: linear-gradient(180deg, rgba(139,90,43,0.4) 0%, rgba(100,65,30,0.5) 40%, rgba(60,40,20,0.6) 100%);
+  border-radius: 2px;
+  margin: 0 -4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4), 0 1px 0 rgba(180,130,70,0.15) inset;
+  position: relative;
+}
+/* Shelf edge highlight */
+.pr-shelf-board::before {
+  content: ''; position: absolute; top: 0; left: 4px; right: 4px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,160,90,0.3), transparent);
+}
+/* Shelf bracket shadows */
+.pr-shelf-board::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 4px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.15), transparent);
+}
 .pr-pot {
   position: relative; text-align: center; cursor: default;
-  transition: transform 0.2s;
+  transition: transform 0.2s; width: 72px; flex-shrink: 0;
 }
-.pr-pot:hover { transform: translateY(-3px); }
+.pr-pot:hover { transform: translateY(-4px); }
 
-/* The paint cap — big, round, glossy */
+/* The paint cap — glossy dome */
 .pr-pot-cap {
-  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 8px;
+  width: 52px; height: 52px; border-radius: 50%; margin: 0 auto 4px;
   position: relative; overflow: hidden;
-  border: 3px solid rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.06);
   box-shadow:
-    0 4px 12px rgba(0,0,0,0.4),
-    inset 0 -8px 16px rgba(0,0,0,0.3),
-    inset 0 4px 8px rgba(255,255,255,0.15);
+    0 4px 10px rgba(0,0,0,0.5),
+    inset 0 -10px 16px rgba(0,0,0,0.35),
+    inset 0 4px 8px rgba(255,255,255,0.2);
+}
+/* Bottle neck under the cap */
+.pr-pot-cap::after {
+  content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 8px; border-radius: 0 0 4px 4px;
+  background: inherit; opacity: 0.7;
+  box-shadow: inset 0 -4px 6px rgba(0,0,0,0.3);
 }
 .pr-pot-shine {
   position: absolute; top: 6px; left: 10px;

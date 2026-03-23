@@ -110,20 +110,32 @@ export default function Paints() {
           <p>{paints.length === 0 ? 'Add your first paint to start your rack.' : 'No paints match your filters.'}</p>
         </div>
       ) : view === 'grid' ? (
-        /* Paint rack grid — paint pot style */
-        <div className="pr-grid">
-          {filtered.map(p => (
-            <div key={p.id} className="pr-pot" title={`${p.name}\n${p.brand} · ${p.range} · ${p.type}`}>
-              <div className="pr-pot-cap" style={{ background: p.hexColor || '#555' }}>
-                <div className="pr-pot-shine" />
+        /* Paint rack — shelves with pots */
+        <div className="pr-rack">
+          {(() => {
+            const cols = typeof window !== 'undefined' && window.innerWidth < 600 ? 5 : 8;
+            const rows: typeof filtered[] = [];
+            for (let i = 0; i < filtered.length; i += cols) rows.push(filtered.slice(i, i + cols));
+            return rows.map((row, ri) => (
+              <div key={ri} className="pr-shelf">
+                <div className="pr-shelf-pots">
+                  {row.map(p => (
+                    <div key={p.id} className="pr-pot" title={`${p.name}\n${p.brand} · ${p.range} · ${p.type}`}>
+                      <div className="pr-pot-cap" style={{ background: p.hexColor || '#555' }}>
+                        <div className="pr-pot-shine" />
+                      </div>
+                      <div className="pr-pot-body">
+                        <div className="pr-pot-name">{p.name}</div>
+                        <div className="pr-pot-brand">{p.brand}</div>
+                      </div>
+                      <button className="pr-pot-del" onClick={(e) => { e.stopPropagation(); deletePaint(p.id!); }}><Trash2 size={10} /></button>
+                    </div>
+                  ))}
+                </div>
+                <div className="pr-shelf-board" />
               </div>
-              <div className="pr-pot-body">
-                <div className="pr-pot-name">{p.name}</div>
-                <div className="pr-pot-brand">{p.brand}</div>
-              </div>
-              <button className="pr-pot-del" onClick={(e) => { e.stopPropagation(); deletePaint(p.id!); }}><Trash2 size={10} /></button>
-            </div>
-          ))}
+            ));
+          })()}
         </div>
       ) : view === 'grouped' ? (
         Object.entries(groups).sort(([a], [b]) => a.localeCompare(b)).map(([key, items]) => (
