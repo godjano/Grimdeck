@@ -7,8 +7,8 @@ import { MODEL_STATUSES, MANUFACTURERS, GAME_SYSTEMS, FORCE_ORG } from '../types
 import ModelAutocomplete from '../components/ModelAutocomplete';
 import type { ModelPreset } from '../db/model-presets';
 import { BulkAddModels } from '../components/BulkAdd';
-import { PhotoUpload } from '../components/PhotoUpload';
 import { getGWSearchUrl } from '../db/external-links';
+import { Plus, Package, Search, Filter, ChevronDown, ChevronRight, Grid3X3, List, LayoutGrid, MoreVertical, Trash2, ExternalLink, Star, Camera } from 'lucide-react';
 
 type ViewMode = 'list' | 'grid' | 'grouped';
 
@@ -22,13 +22,13 @@ export default function Models() {
   const [showWishlist, setShowWishlist] = useState(false);
   const [view, setView] = useState<ViewMode>('grouped');
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set(['__ALL_COLLAPSED__']));
-  
-  const nav = useNavigate();
+  const [showFilters, setShowFilters] = useState(false);
+  const [openMenu, setOpenMenu] = useState<number | null>(null);
 
+  const nav = useNavigate();
   const models = useLiveQuery(() => db.models.orderBy('createdAt').reverse().toArray()) ?? [];
   const factions = [...new Set(models.map(m => m.faction))].sort();
 
-  // Initialize collapsed with all factions on first render
   const allCollapsed = collapsed.has('__ALL_COLLAPSED__');
 
   const toggleGroup = (key: string) => {
@@ -38,29 +38,8 @@ export default function Models() {
     setCollapsed(next);
   };
 
-  const [bulkMode, setBulkMode] = useState(false);
-  const [bulkSelected, setBulkSelected] = useState<Set<number>>(new Set());
-
-  const _toggleBulkSelect = (id: number) => {
-  void _toggleBulkSelect;
-    const next = new Set(bulkSelected);
-    next.has(id) ? next.delete(id) : next.add(id);
-    setBulkSelected(next);
-  };
-
-  const bulkUpdateStatus = async (status: ModelStatus) => {
-    for (const id of bulkSelected) await db.models.update(id, { status });
-    setBulkSelected(new Set());
-    setBulkMode(false);
-  };
-
-  const collapseAll = () => {
-    setCollapsed(new Set([...factions, '__ALL_COLLAPSED__']));
-  };
-
-  const expandAll = () => {
-    setCollapsed(new Set());
-  };
+  const collapseAll = () => setCollapsed(new Set([...factions, '__ALL_COLLAPSED__']));
+  const expandAll = () => setCollapsed(new Set());
 
   const filtered = models.filter(m =>
     (!filterFaction || m.faction === filterFaction) &&
@@ -78,26 +57,29 @@ export default function Models() {
   const deleteModel = async (id: number) => {
     await db.models.delete(id);
     await db.modelPaintLinks.where('modelId').equals(id).delete();
+    setOpenMenu(null);
   };
 
   const updateStatus = async (id: number, status: ModelStatus) => {
     await db.models.update(id, { status });
   };
 
-  // Group by faction
   const groups: Record<string, typeof filtered> = {};
-  for (const m of filtered) {
-    (groups[m.faction] ??= []).push(m);
-  }
+  for (const m of filtered) (groups[m.faction] ??= []).push(m);
+
+  const activeFilters = [filterFaction, filterStatus, filterSystem].filter(Boolean).length;
 
   return (
     <div>
+      {/* ─── Header ─── */}
       <div className="page-header">
         <h2>My Models</h2>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-ghost" onClick={() => { setShowBulk(!showBulk); setShowForm(false); }}>📦 Bulk</button>
-          <button className="btn btn-primary" onClick={() => { setShowForm(!showForm); setShowBulk(false); }}>
-            {showForm ? '✕' : '+ Add'}
+          <button className="btn btn-ghost btn-sm" onClick={() => { setShowBulk(!showBulk); setShowForm(false); }}>
+            <Package size={16} />
+          </button>
+          <button className="btn btn-primary btn-sm" onClick={() => { setShowForm(!showForm); setShowBulk(false); }}>
+            {showForm ? <X size={16} /> : <><Plus size={16} /> Add</>}
           </button>
         </div>
       </div>
@@ -105,218 +87,234 @@ export default function Models() {
       {showBulk && <BulkAddModels onDone={() => setShowBulk(false)} />}
       {showForm && <AddModelForm onDone={() => setShowForm(false)} />}
 
-      <div className="stats">
+      {/* ─── Status summary — compact pills ─── */}
+      <div className="ml-status-pills">
         {MODEL_STATUSES.map(s => (
-          <div className="stat" key={s}><div className="stat-num">{statusCounts[s] || 0}</div><div className="stat-label">{s}</div></div>
+          <button key={s} className={`ml-pill ${filterStatus === s ? 'active' : ''}`}
+            onClick={() => setFilterStatus(filterStatus === s ? '' : s)}>
+            <span className="ml-pill-count">{statusCounts[s] || 0}</span>
+            <span className="ml-pill-label">{s}</span>
+          </button>
         ))}
       </div>
 
-      <div className="filters">
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search..." className="filter-search" />
+      {/* ─── Search + filter toggle ─── */}
+      <div className="ml-search-row">
+        <div className="ml-search-wrap">
+          <Search size={16} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search models..." />
+        </div>
         <button className={`btn btn-sm ${showWishlist ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setShowWishlist(!showWishlist)}>
-          {showWishlist ? '⭐ Wishlist' : '📦 Collection'}
+          <Star size={14} fill={showWishlist ? 'currentColor' : 'none'} />
         </button>
-        <select value={filterFaction} onChange={e => setFilterFaction(e.target.value)}>
-          <option value="">All factions</option>
-          {factions.map(f => <option key={f} value={f}>{f}</option>)}
-        </select>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-          <option value="">All statuses</option>
-          {MODEL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <select value={filterSystem} onChange={e => setFilterSystem(e.target.value)}>
-          <option value="">All game systems</option>
-          {GAME_SYSTEMS.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <div className="view-toggle">
-          <button className={`view-btn ${view === 'grouped' ? 'active' : ''}`} onClick={() => setView('grouped')}>▤</button>
-          <button className={`view-btn ${view === 'grid' ? 'active' : ''}`} onClick={() => setView('grid')}>▦</button>
-          <button className={`view-btn ${view === 'list' ? 'active' : ''}`} onClick={() => setView('list')}>☰</button>
+        <button className={`btn btn-sm btn-ghost ${activeFilters ? 'ml-filter-active' : ''}`} onClick={() => setShowFilters(!showFilters)}>
+          <Filter size={14} /> {activeFilters ? activeFilters : ''}
+        </button>
+        <div className="ml-view-toggle">
+          <button className={view === 'grouped' ? 'active' : ''} onClick={() => setView('grouped')}><LayoutGrid size={14} /></button>
+          <button className={view === 'grid' ? 'active' : ''} onClick={() => setView('grid')}><Grid3X3 size={14} /></button>
+          <button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}><List size={14} /></button>
         </div>
       </div>
 
-      <div className="results-bar">
-        <div className="results-count">{filtered.length} {showWishlist ? 'wishlisted' : 'owned'} models · {filtered.reduce((s, m) => s + m.quantity, 0)} minis · {filtered.reduce((s, m) => s + (m.points || 0), 0)}pts</div>
-        <div style={{ display: 'flex', gap: 4 }}>
-          <button className={`btn btn-sm ${bulkMode ? 'btn-primary' : 'btn-ghost'}`} onClick={() => { setBulkMode(!bulkMode); setBulkSelected(new Set()); }}>
-            {bulkMode ? `✓ ${bulkSelected.size} selected` : '☑ Bulk edit'}
-          </button>
-          {bulkMode && bulkSelected.size > 0 && (
-            <>
-              {MODEL_STATUSES.map(s => <button key={s} className="btn btn-sm btn-ghost" onClick={() => bulkUpdateStatus(s)}>{s}</button>)}
-            </>
-          )}
-          {view === 'grouped' && !bulkMode && (
-            <>
-              <button className="btn btn-sm btn-ghost" onClick={expandAll}>Expand</button>
-              <button className="btn btn-sm btn-ghost" onClick={collapseAll}>Collapse</button>
-            </>
-          )}
+      {/* ─── Collapsible filters ─── */}
+      {showFilters && (
+        <div className="ml-filters">
+          <select value={filterFaction} onChange={e => setFilterFaction(e.target.value)}>
+            <option value="">All factions</option>
+            {factions.map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+            <option value="">All statuses</option>
+            {MODEL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select value={filterSystem} onChange={e => setFilterSystem(e.target.value)}>
+            <option value="">All systems</option>
+            {GAME_SYSTEMS.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+          {activeFilters > 0 && <button className="btn btn-sm btn-ghost" onClick={() => { setFilterFaction(''); setFilterStatus(''); setFilterSystem(''); }}>Clear</button>}
         </div>
+      )}
+
+      {/* ─── Results bar ─── */}
+      <div className="ml-results">
+        <span>{filtered.length} models · {filtered.reduce((s, m) => s + m.quantity, 0)} minis · {filtered.reduce((s, m) => s + (m.points || 0), 0)}pts</span>
+        {view === 'grouped' && (
+          <div style={{ display: 'flex', gap: 4 }}>
+            <button className="btn btn-sm btn-ghost" onClick={expandAll}>Expand</button>
+            <button className="btn btn-sm btn-ghost" onClick={collapseAll}>Collapse</button>
+          </div>
+        )}
       </div>
 
+      {/* ─── Empty state ─── */}
       {filtered.length === 0 ? (
-        <div className="empty">
-          <span className="empty-icon">🛡️</span>
-          <p className="empty-text">No models found. {models.length === 0 ? 'Add your first!' : 'Try a different filter.'}</p>
+        <div className="md-empty-tab" style={{ marginTop: 40 }}>
+          <img src="/decor/skull.jpg" alt="" className="md-empty-icon" />
+          <p>{models.length === 0 ? 'Add your first model to begin.' : 'No models match your filters.'}</p>
         </div>
       ) : view === 'grid' ? (
-        <div className="model-grid">
+        /* ─── Grid view — photo tiles ─── */
+        <div className="ml-grid">
           {filtered.map(m => (
-            <div key={m.id} className={`model-tile status-border-${m.status}`}>
-              {m.photoUrl ? (
-                <img src={m.photoUrl} alt={m.name} className="model-tile-photo" />
-              ) : (
-                <div className="model-tile-placeholder">🛡️</div>
-              )}
-              <div className="model-tile-info">
-                <div className="model-tile-name">{m.name}</div>
-                <div className="model-tile-meta">{m.faction} · ×{m.quantity}</div>
-                <span className={`status status-${m.status}`}>{m.status}</span>
+            <div key={m.id} className="ml-tile" onClick={() => nav(`/model/${m.id}`)}>
+              <div className="ml-tile-img">
+                {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <div className="ml-tile-placeholder"><Camera size={24} strokeWidth={1} /></div>}
+                <span className={`ml-tile-status status-${m.status}`}>{m.status}</span>
+              </div>
+              <div className="ml-tile-info">
+                <div className="ml-tile-name">{m.name}</div>
+                <div className="ml-tile-meta">{m.faction}</div>
               </div>
             </div>
           ))}
         </div>
       ) : view === 'grouped' ? (
+        /* ─── Grouped view — clean faction groups ─── */
         Object.entries(groups).sort(([a], [b]) => a.localeCompare(b)).map(([faction, items]) => {
           const isCollapsed = allCollapsed || collapsed.has(faction);
           return (
-          <div key={faction} className="paint-group">
-            <div className="paint-group-header" onClick={() => toggleGroup(faction)}>
-              <span className="paint-group-toggle">{isCollapsed ? '▸' : '▾'}</span>
-              <span className="paint-group-title">{faction}</span>
-              <span className="paint-group-count">{items.length} units · {items.reduce((s, m) => s + m.quantity, 0)} minis</span>
-            </div>
-            {!isCollapsed && items.map(m => (
-              <div className="card" key={m.id} onClick={() => nav(`/model/${m.id}`)} style={{ cursor: "pointer" }}>
-                {m.photoUrl && <img src={m.photoUrl} alt={m.name} className="card-photo" />}
-                <div className="card-body">
-                  <div className="card-title">{m.name} {m.quantity > 1 && <span className="qty-badge">×{m.quantity}</span>}</div>
-                  <div className="card-sub">{m.unitType}{m.points ? ` · ${m.points}pts` : ''}</div>
-                  <select className="status-select" value={m.status} onChange={e => updateStatus(m.id!, e.target.value as ModelStatus)}>
-                    {MODEL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                  </select>
-                </div>
-                <span className={`status status-${m.status}`}>{m.status}</span>
-                <a href={getGWSearchUrl(m.name)} target="_blank" rel="noreferrer" className="gw-link-sm" onClick={e => e.stopPropagation()} title="View on GW">🔗</a>
-                <PhotoUpload modelId={m.id!} currentPhoto={m.photoUrl || undefined} />
-                <button className="btn btn-danger btn-sm" onClick={(e) => { e.stopPropagation(); deleteModel(m.id!); }}>🗑</button>
+            <div key={faction} className="ml-group">
+              <div className="ml-group-header" onClick={() => toggleGroup(faction)}>
+                {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+                <span className="ml-group-title">{faction}</span>
+                <span className="ml-group-count">{items.length} · {items.reduce((s, m) => s + m.quantity, 0)} minis</span>
               </div>
-            ))}
-          </div>
-        );})
-      ) : (
-        filtered.map(m => (
-          <div className="card" key={m.id} onClick={() => nav(`/model/${m.id}`)} style={{ cursor: "pointer" }}>
-            {m.photoUrl && <img src={m.photoUrl} alt={m.name} className="card-photo" />}
-            <div className="card-body">
-              <div className="card-title">{m.name} {m.quantity > 1 && <span className="qty-badge">×{m.quantity}</span>}</div>
-              <div className="card-sub">{m.faction} · {m.unitType}{m.points ? ` · ${m.points}pts` : ''}</div>
-              <select className="status-select" value={m.status} onChange={e => updateStatus(m.id!, e.target.value as ModelStatus)}>
-                {MODEL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+              {!isCollapsed && (
+                <div className="ml-group-items">
+                  {items.map(m => (
+                    <ModelCard key={m.id} m={m} nav={nav} openMenu={openMenu} setOpenMenu={setOpenMenu}
+                      updateStatus={updateStatus} deleteModel={deleteModel} />
+                  ))}
+                </div>
+              )}
             </div>
-            <span className={`status status-${m.status}`}>{m.status}</span>
-            <PhotoUpload modelId={m.id!} currentPhoto={m.photoUrl || undefined} />
-            <button className="btn btn-danger btn-sm" onClick={() => deleteModel(m.id!)}>🗑</button>
-          </div>
-        ))
+          );
+        })
+      ) : (
+        /* ─── List view ─── */
+        <div className="ml-list">
+          {filtered.map(m => (
+            <ModelCard key={m.id} m={m} nav={nav} openMenu={openMenu} setOpenMenu={setOpenMenu}
+              updateStatus={updateStatus} deleteModel={deleteModel} />
+          ))}
+        </div>
       )}
     </div>
   );
 }
 
+/* ─── Clean model card with overflow menu ─── */
+function ModelCard({ m, nav, openMenu, setOpenMenu, updateStatus, deleteModel }: {
+  m: any; nav: any; openMenu: number | null; setOpenMenu: (id: number | null) => void;
+  updateStatus: (id: number, s: ModelStatus) => void; deleteModel: (id: number) => void;
+}) {
+  return (
+    <div className="ml-card" onClick={() => nav(`/model/${m.id}`)}>
+      {m.photoUrl ? (
+        <img src={m.photoUrl} alt={m.name} className="ml-card-photo" />
+      ) : (
+        <div className="ml-card-photo-empty"><Camera size={16} strokeWidth={1} /></div>
+      )}
+      <div className="ml-card-body">
+        <div className="ml-card-name">{m.name} {m.quantity > 1 && <span className="qty-badge">×{m.quantity}</span>}</div>
+        <div className="ml-card-sub">{m.unitType}{m.points ? ` · ${m.points}pts` : ''}</div>
+      </div>
+      <span className={`ml-card-status status-${m.status}`}>{m.status}</span>
+      <div className="ml-card-menu-wrap" onClick={e => e.stopPropagation()}>
+        <button className="btn-icon-sm" onClick={() => setOpenMenu(openMenu === m.id ? null : m.id)}>
+          <MoreVertical size={16} />
+        </button>
+        {openMenu === m.id && (
+          <div className="ml-card-menu">
+            {MODEL_STATUSES.map(s => (
+              <button key={s} className={m.status === s ? 'active' : ''} onClick={() => { updateStatus(m.id!, s as ModelStatus); setOpenMenu(null); }}>{s}</button>
+            ))}
+            <hr />
+            <a href={getGWSearchUrl(m.name)} target="_blank" rel="noreferrer" onClick={() => setOpenMenu(null)}>
+              <ExternalLink size={12} /> GW Store
+            </a>
+            <button className="danger" onClick={() => deleteModel(m.id!)}><Trash2 size={12} /> Delete</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Add Model Form (unchanged logic, cleaner markup) ─── */
 function AddModelForm({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState('');
   const [faction, setFaction] = useState('');
-  const [unitType, setUnitType] = useState('');
+  const [unitType, setUnitType] = useState('Infantry');
   const [quantity, setQuantity] = useState(1);
-  const [status, setStatus] = useState<ModelStatus>('unbuilt');
-  const [manufacturer, setManufacturer] = useState('Games Workshop');
   const [gameSystem, setGameSystem] = useState('Warhammer 40K');
-  const [countsAs, setCountsAs] = useState('');
-  const [pricePaid, setPricePaid] = useState(0);
-  const [wishlist, setWishlist] = useState(false);
+  const [manufacturer, setManufacturer] = useState('Games Workshop');
   const [points, setPoints] = useState(0);
-  const [forceOrg, setForceOrg] = useState('Other');
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [forceOrg, setForceOrg] = useState('');
+  const [proxy, setProxy] = useState('');
+  const [wishlist, setWishlist] = useState(false);
 
-  const handlePresetSelect = (preset: ModelPreset) => {
-    setName(preset.name); setFaction(preset.faction); setUnitType(preset.unitType); setQuantity(preset.defaultQty);
+  const handlePreset = (preset: ModelPreset) => {
+    setName(preset.name);
+    setFaction(preset.faction);
+    if (preset.unitType) setUnitType(preset.unitType);
     if (preset.points) setPoints(preset.points);
     if (preset.forceOrg) setForceOrg(preset.forceOrg);
   };
 
-  const save = async () => {
-    if (!name.trim() || !faction.trim()) return;
-    await db.models.add({ name: name.trim(), faction: faction.trim(), unitType: unitType.trim(), quantity, status: wishlist ? 'unbuilt' : status, notes: '', photoUrl: '', createdAt: Date.now(), manufacturer, gameSystem, countsAs: countsAs.trim(), pricePaid, wishlist, points, forceOrg });
+  const submit = async () => {
+    if (!name.trim()) return;
+    await db.models.add({
+      name: name.trim(), faction: faction.trim() || 'Unknown', unitType, quantity,
+      status: 'unbuilt', gameSystem, manufacturer, points, forceOrg, countsAs: proxy.trim(),
+      wishlist, createdAt: Date.now(), notes: '', photoUrl: '', pricePaid: 0,
+    });
     onDone();
   };
 
   return (
-    <div className="form-overlay">
-      <div className="form-title">{wishlist ? '⭐ Add to Wishlist' : 'Add New Model'}</div>
-      <div style={{ marginBottom: 16, display: 'flex', gap: 6 }}>
-        <button className={`btn btn-sm ${!wishlist ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setWishlist(false)}>📦 Own it</button>
-        <button className={`btn btn-sm ${wishlist ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setWishlist(true)}>⭐ Wishlist</button>
-      </div>
-
-      {/* Essential fields */}
-      <div className="form-grid">
-        <div className="field full-width">
-          <label>Name * (type to search)</label>
-          <ModelAutocomplete value={name} onChange={setName} onSelect={handlePresetSelect} />
+    <div className="detail-section" style={{ marginBottom: 20 }}>
+      <h3 style={{ marginBottom: 12 }}>Add Model</h3>
+      <div className="field"><label>Name</label><ModelAutocomplete value={name} onChange={setName} onSelect={handlePreset} /></div>
+      <div className="field"><label>Faction</label><input value={faction} onChange={e => setFaction(e.target.value)} placeholder="e.g. Space Marines" /></div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="field"><label>Unit Type</label>
+          <select value={unitType} onChange={e => setUnitType(e.target.value)}>
+            {['Infantry', 'Vehicle', 'Monster', 'Character', 'Terrain', 'Other'].map(t => <option key={t}>{t}</option>)}
+          </select>
         </div>
-        <div className="field"><label>Faction *</label><input value={faction} onChange={e => setFaction(e.target.value)} placeholder="e.g. Space Marines" /></div>
-        <div className="field"><label>Quantity</label><input type="number" min={1} value={quantity} onChange={e => setQuantity(+e.target.value || 1)} /></div>
-        {!wishlist && (
-          <div className="field">
-            <label>Status</label>
-            <select value={status} onChange={e => setStatus(e.target.value as ModelStatus)}>
-              {MODEL_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
-        )}
-      </div>
-
-      {/* Advanced toggle */}
-      <button className="btn-advanced-toggle" onClick={() => setShowAdvanced(!showAdvanced)}>
-        {showAdvanced ? '▾ Less options' : '▸ More options (points, type, manufacturer...)'}
-      </button>
-
-      {showAdvanced && (
-        <div className="form-grid" style={{ marginTop: 12 }}>
-          <div className="field"><label>Unit Type</label><input value={unitType} onChange={e => setUnitType(e.target.value)} placeholder="e.g. Troops" /></div>
-          <div className="field"><label>Points</label><input type="number" min={0} value={points} onChange={e => setPoints(+e.target.value || 0)} /></div>
-          <div className="field">
-            <label>Force Org</label>
-            <select value={forceOrg} onChange={e => setForceOrg(e.target.value)}>
-              {FORCE_ORG.map(f => <option key={f} value={f}>{f}</option>)}
-            </select>
-          </div>
-          <div className="field">
-            <label>Game System</label>
-            <select value={gameSystem} onChange={e => setGameSystem(e.target.value)}>
-              {GAME_SYSTEMS.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </div>
-          <div className="field">
-            <label>Manufacturer</label>
-            <select value={manufacturer} onChange={e => setManufacturer(e.target.value)}>
-              {MANUFACTURERS.map(m => <option key={m} value={m}>{m}</option>)}
-            </select>
-          </div>
-          <div className="field"><label>Price (€)</label><input type="number" min={0} step={0.01} value={pricePaid} onChange={e => setPricePaid(+e.target.value || 0)} /></div>
-          <div className="field full-width"><label>Counts As (proxy)</label><input value={countsAs} onChange={e => setCountsAs(e.target.value)} placeholder="e.g. Custodes Captain" /></div>
+        <div className="field"><label>Quantity</label><input type="number" min={1} value={quantity} onChange={e => setQuantity(+e.target.value)} /></div>
+        <div className="field"><label>Game System</label>
+          <select value={gameSystem} onChange={e => setGameSystem(e.target.value)}>
+            {GAME_SYSTEMS.map(s => <option key={s}>{s}</option>)}
+          </select>
         </div>
-      )}
-
-      <div className="form-actions" style={{ marginTop: 16, justifyContent: 'flex-end' }}>
+        <div className="field"><label>Points</label><input type="number" min={0} value={points} onChange={e => setPoints(+e.target.value)} /></div>
+        <div className="field"><label>Manufacturer</label>
+          <select value={manufacturer} onChange={e => setManufacturer(e.target.value)}>
+            {MANUFACTURERS.map(m => <option key={m}>{m}</option>)}
+          </select>
+        </div>
+        <div className="field"><label>Force Org</label>
+          <select value={forceOrg} onChange={e => setForceOrg(e.target.value)}>
+            <option value="">None</option>
+            {FORCE_ORG.map(f => <option key={f}>{f}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="field"><label>Proxy for</label><input value={proxy} onChange={e => setProxy(e.target.value)} placeholder="Optional — what this proxies as" /></div>
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+        <input type="checkbox" checked={wishlist} onChange={e => setWishlist(e.target.checked)} /> Wishlist (don't own yet)
+      </label>
+      <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+        <button className="btn btn-primary" onClick={submit}>Add Model</button>
         <button className="btn btn-ghost" onClick={onDone}>Cancel</button>
-        <button className="btn btn-primary" onClick={save} disabled={!name.trim() || !faction.trim()}>
-          {wishlist ? '⭐ Add to Wishlist' : 'Save'}
-        </button>
       </div>
     </div>
   );
+}
+
+function X({ size }: { size: number }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
 }

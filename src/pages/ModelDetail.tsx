@@ -7,13 +7,54 @@ import PaintAutocomplete from '../components/PaintAutocomplete';
 import type { PaintPreset } from '../db/paint-presets';
 import { FACTION_ROSTERS } from '../db/killteam-data';
 import { getGWSearchUrl } from '../db/external-links';
+import { ChevronLeft, Camera, Swords, Palette, BookOpen, Image, ExternalLink, Trash2, Copy, Plus, X } from 'lucide-react';
 
 const STATUS_FLOW: ModelStatus[] = ['unbuilt', 'built', 'primed', 'wip', 'painted', 'based'];
+
+// Map faction names to faction-art filenames
+const FACTION_ART_MAP: Record<string, string> = {
+  'Angels of Death': 'angels-of-death-13-1.jpeg', 'Battleclade': 'battleclade-10-2.jpeg',
+  'Brood Brothers': 'brood-brothers-0-32.jpeg', 'Canoptek Circle': 'canoptek-circle-0-22.jpeg',
+  'Celestian Insidiants': 'celestian-insidiants-10-2.jpeg', 'Death Korps': 'death-korps-0-31.jpeg',
+  'Deathwatch': 'deathwatch-12-10.jpeg', 'Exaction Squad': 'exaction-squad-0-30.jpeg',
+  'Farstalker Kinband': 'farstalker-kinband-0-32.jpeg', 'Hearthkyn Salvagers': 'hearthkyn-salvagers-14-18.jpeg',
+  'Hierotek Circle': 'hierotek-circle-15-3.jpeg', 'Hunter Clade': 'hunter-clade-14-8.jpeg',
+  'Imperial Navy Breachers': 'imperial-navy-breachers-14-1.jpeg', 'Inquisitorial Agents': 'inquisitorial-agents-0-31.jpeg',
+  'Mandrakes': 'mandrakes-0-31.jpeg', 'Murderwing': 'murderwing-11-2.jpeg',
+  'Nemesis Claw': 'nemesis-claw-0-30.jpeg', 'Pathfinders': 'pathfinders-0-32.jpeg',
+  'Plague Marines': 'plague-marines-10-2.jpeg', 'Sanctifiers': 'sanctifiers-0-30.jpeg',
+  'Scout Squad': 'scout-squad-0-32.jpeg', 'Wolf Scouts': 'wolf-scouts-10-0.jpeg',
+  'XV26 Stealth Battlesuits': 'xv26-stealth-battlesuits-10-2.jpeg',
+  // Common 40K factions mapped to closest art
+  'Space Marines': 'angels-of-death-13-1.jpeg', 'Adeptus Astartes': 'angels-of-death-13-1.jpeg',
+  'Blood Angels': 'angels-of-death-13-1.jpeg', 'Dark Angels': 'murderwing-11-2.jpeg',
+  'Space Wolves': 'wolf-scouts-10-0.jpeg', 'Astra Militarum': 'death-korps-0-31.jpeg',
+  'Imperial Guard': 'death-korps-0-31.jpeg', 'Genestealer Cults': 'brood-brothers-0-32.jpeg',
+  'Necrons': 'canoptek-circle-0-22.jpeg', 'Adepta Sororitas': 'celestian-insidiants-10-2.jpeg',
+  'Sisters of Battle': 'celestian-insidiants-10-2.jpeg', 'Adeptus Mechanicus': 'hunter-clade-14-8.jpeg',
+  "T'au Empire": 'pathfinders-0-32.jpeg', 'Tau': 'pathfinders-0-32.jpeg',
+  'Drukhari': 'mandrakes-0-31.jpeg', 'Chaos Space Marines': 'nemesis-claw-0-30.jpeg',
+  'Death Guard': 'plague-marines-10-2.jpeg', 'Inquisition': 'inquisitorial-agents-0-31.jpeg',
+  'Leagues of Votann': 'hearthkyn-salvagers-14-18.jpeg',
+};
+
+function getFactionArt(faction: string): string | null {
+  const file = FACTION_ART_MAP[faction];
+  if (file) return `/faction-art/${file}`;
+  const lower = faction.toLowerCase();
+  for (const [key, val] of Object.entries(FACTION_ART_MAP)) {
+    if (lower.includes(key.toLowerCase().split(' ')[0])) return `/faction-art/${val}`;
+  }
+  return null;
+}
+
+type Tab = 'stats' | 'recipe' | 'journal' | 'inspiration';
 
 export default function ModelDetail() {
   const { id } = useParams();
   const nav = useNavigate();
   const modelId = Number(id);
+  const [tab, setTab] = useState<Tab>('stats');
 
   const model = useLiveQuery(() => db.models.get(modelId), [modelId]);
   const linkedPaints = useLiveQuery(() =>
@@ -38,20 +79,21 @@ export default function ModelDetail() {
 
   const setStatus = async (status: ModelStatus) => { await db.models.update(modelId, { status }); };
   const currentIdx = STATUS_FLOW.indexOf(model.status);
+  const factionArt = getFactionArt(model.faction);
+  const roster = FACTION_ROSTERS[model.faction];
+  const datacard = roster?.find(op => model.name.toLowerCase().includes(op.name.toLowerCase().split(' ')[0]));
 
   const addPaintToRecipe = async (paintId: number) => {
     await db.modelPaintLinks.add({ modelId, paintId, usageNote: usageNote.trim() });
     setPaintSearch(''); setUsageNote(''); setShowAddPaint(false);
   };
-
   const removePaint = async (linkId: number) => { await db.modelPaintLinks.delete(linkId); };
 
   const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const file = e.target.files?.[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = async () => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = async () => {
         const canvas = document.createElement('canvas');
         const scale = Math.min(600 / img.width, 600 / img.height, 1);
@@ -71,11 +113,10 @@ export default function ModelDetail() {
   };
 
   const handleLogPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const file = e.target.files?.[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = async () => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = async () => {
         const canvas = document.createElement('canvas');
         const scale = Math.min(400 / img.width, 400 / img.height, 1);
@@ -88,226 +129,224 @@ export default function ModelDetail() {
     reader.readAsDataURL(file);
   };
 
-  // Find matching datacard
-  const roster = FACTION_ROSTERS[model.faction];
-  const datacard = roster?.find(op => model.name.toLowerCase().includes(op.name.toLowerCase().split(' ')[0]));
+  const tabs: { key: Tab; label: string; icon: React.ReactNode; count?: number }[] = [
+    { key: 'stats', label: 'Datacard', icon: <Swords size={16} /> },
+    { key: 'recipe', label: 'Recipe', icon: <Palette size={16} />, count: linkedPaints.length },
+    { key: 'journal', label: 'Journal', icon: <BookOpen size={16} />, count: logs.length },
+    { key: 'inspiration', label: 'Inspo', icon: <Image size={16} /> },
+  ];
 
   return (
-    <div>
-      <button className="btn btn-ghost btn-sm" onClick={() => nav('/models')} style={{ marginBottom: 16 }}>← Back to Models</button>
-
-      {/* ─── Header — RPG Character Sheet Style ─── */}
-      <div className="rpg-sheet">
-        <div className="rpg-stats-left">
-          <h2 className="rpg-name">{model.name}</h2>
-          <div className="rpg-meta">{model.faction}{model.points ? ` · ${model.points}pts` : ''}</div>
-          <a href={getGWSearchUrl(model.name)} target="_blank" rel="noreferrer" className="gw-link">View on Games Workshop ↗</a>
-
-          {datacard ? (
-            <div className="rpg-stat-list">
-              <div className="rpg-stat-row"><span className="rpg-stat-abbr">M</span><span className="rpg-stat-name">Move</span><span className="rpg-stat-val">{datacard.movement}"</span></div>
-              <div className="rpg-stat-row"><span className="rpg-stat-abbr">APL</span><span className="rpg-stat-name">Actions</span><span className="rpg-stat-val">{datacard.apl}</span></div>
-              <div className="rpg-stat-row"><span className="rpg-stat-abbr">SV</span><span className="rpg-stat-name">Save</span><span className="rpg-stat-val">{datacard.save}+</span></div>
-              <div className="rpg-wounds-block">
-                <span className="rpg-wounds-icon">❤️</span>
-                <span className="rpg-wounds-label">Wounds</span>
-                <span className="rpg-wounds-val">{datacard.wounds}</span>
-              </div>
-            </div>
-          ) : (
-            <div className="rpg-stat-list">
-              <div className="rpg-stat-row"><span className="rpg-stat-abbr">QTY</span><span className="rpg-stat-name">Quantity</span><span className="rpg-stat-val">{model.quantity}</span></div>
-              <div className="rpg-stat-row"><span className="rpg-stat-abbr">SYS</span><span className="rpg-stat-name">System</span><span className="rpg-stat-val rpg-stat-text">{model.gameSystem}</span></div>
-            </div>
-          )}
-        </div>
-
-        <div className="rpg-portrait" onClick={() => photoRef.current?.click()}>
-          {model.photoUrl ? <img src={model.photoUrl} alt={model.name} /> : <div className="rpg-portrait-empty">📷<br />Add Photo</div>}
-          <input ref={photoRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
-          <div className="rpg-portrait-frame" />
-        </div>
-
-        <div className="rpg-weapons-right">
-          <div className="status-pipeline">
-            {STATUS_FLOW.map((s, i) => (
-              <button key={s} className={`pipeline-step ${model.status === s ? 'active' : i < currentIdx ? 'done' : ''}`} onClick={() => setStatus(s)}>
-                {i < currentIdx ? '✓' : ''} {s}
-              </button>
-            ))}
+    <div className="model-detail-v2">
+      {/* ─── HERO BANNER with faction art ─── */}
+      <div className="md-hero" style={factionArt ? { backgroundImage: `url(${factionArt})` } : {}}>
+        <div className="md-hero-overlay" />
+        <button className="btn btn-ghost btn-sm md-back" onClick={() => nav('/models')}>
+          <ChevronLeft size={16} /> Back
+        </button>
+        <div className="md-hero-content">
+          <div className="md-portrait" onClick={() => photoRef.current?.click()}>
+            {model.photoUrl ? <img src={model.photoUrl} alt={model.name} /> : <Camera size={28} strokeWidth={1.5} />}
+            <input ref={photoRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
           </div>
-
-          {datacard && datacard.weapons.length > 0 && (
-            <div style={{ marginTop: 16 }}>
-              <div className="rpg-section-label">Weapons</div>
-              {datacard.weapons.map(w => (
-                <div key={w.name} className="rpg-weapon">
-                  <div className="rpg-weapon-header">
-                    <span className="rpg-weapon-icon">{w.type === 'ranged' ? '🔫' : '⚔️'}</span>
-                    <span className="rpg-weapon-name">{w.name}</span>
-                  </div>
-                  <div className="rpg-weapon-stats">
-                    <span>{w.attacks}A</span><span>{w.skill}+</span><span>{w.normalDmg}/{w.critDmg}dmg</span>
-                  </div>
-                </div>
+          <div className="md-hero-info">
+            <h1 className="md-name">{model.name}</h1>
+            <div className="md-faction">{model.faction}{model.points ? ` · ${model.points}pts` : ''}</div>
+            <div className="md-status-row">
+              {STATUS_FLOW.map((s, i) => (
+                <button key={s} className={`md-status-pip ${model.status === s ? 'active' : i < currentIdx ? 'done' : ''}`} onClick={() => setStatus(s)} title={s}>
+                  <span className="md-pip-dot" />
+                  <span className="md-pip-label">{s}</span>
+                </button>
               ))}
             </div>
-          )}
+          </div>
         </div>
+        <a href={getGWSearchUrl(model.name)} target="_blank" rel="noreferrer" className="md-gw-link">
+          <ExternalLink size={14} /> GW Store
+        </a>
       </div>
 
-      {/* ─── Paint Recipe ─── */}
-      <div className="detail-section">
-        <div className="detail-section-header">
-          <h3>🎨 Paint Recipe</h3>
-          <button className="btn btn-sm btn-ghost" onClick={() => setShowAddPaint(!showAddPaint)}>
-            {showAddPaint ? '✕' : '+ Add Paint'}
+      {/* ─── TAB BAR ─── */}
+      <div className="md-tabs">
+        {tabs.map(t => (
+          <button key={t.key} className={`md-tab ${tab === t.key ? 'active' : ''}`} onClick={() => setTab(t.key)}>
+            {t.icon}
+            <span>{t.label}</span>
+            {t.count ? <span className="md-tab-count">{t.count}</span> : null}
           </button>
-        </div>
+        ))}
+      </div>
 
-        {showAddPaint && (
-          <div className="recipe-add">
-            <div className="field">
-              <label>Search your paints</label>
-              <PaintAutocomplete value={paintSearch} onChange={setPaintSearch} onSelect={async (preset: PaintPreset) => {
-                const paint = await db.paints.where('name').equals(preset.name).first();
-                if (paint?.id) { await addPaintToRecipe(paint.id); }
-                else { setPaintSearch(preset.name); }
-              }} />
-            </div>
-            <div className="field">
-              <label>Usage (e.g. "base coat armour")</label>
-              <input value={usageNote} onChange={e => setUsageNote(e.target.value)} placeholder="Where/how you use this paint" />
-            </div>
-          </div>
-        )}
-
-        {linkedPaints.length === 0 ? (
-          <p className="detail-empty">No paints assigned yet. Add paints to build a recipe.</p>
-        ) : (
-          <>
-            <div className="recipe-list">
-              {linkedPaints.map(({ link, paint }) => (
-                <div key={link.id} className="recipe-item">
-                  <div className="swatch" style={{ width: 28, height: 28, background: paint.hexColor || '#555' }} />
-                  <div className="recipe-item-info">
-                    <div className="recipe-paint-name">{paint.name}</div>
-                    <div className="recipe-usage">{link.usageNote || paint.brand + ' · ' + paint.type}</div>
-                  </div>
-                  <button className="btn btn-danger btn-sm" onClick={() => removePaint(link.id!)}>✕</button>
+      {/* ─── TAB CONTENT ─── */}
+      <div className="md-content">
+        {tab === 'stats' && (
+          <div className="md-stats-tab">
+            {datacard ? (
+              <>
+                <div className="md-stat-grid">
+                  <div className="md-stat-card"><div className="md-stat-label">Move</div><div className="md-stat-value">{datacard.movement}"</div></div>
+                  <div className="md-stat-card"><div className="md-stat-label">APL</div><div className="md-stat-value">{datacard.apl}</div></div>
+                  <div className="md-stat-card"><div className="md-stat-label">Save</div><div className="md-stat-value">{datacard.save}+</div></div>
+                  <div className="md-stat-card md-stat-wounds"><div className="md-stat-label">Wounds</div><div className="md-stat-value">{datacard.wounds}</div></div>
                 </div>
-              ))}
-            </div>
-            <button className="btn btn-sm btn-ghost" style={{ marginTop: 10 }} onClick={() => {
-              const text = `Paint recipe for ${model.name} (${model.faction}):\n` + linkedPaints.map(({ link, paint }) => `• ${paint.name} (${paint.brand}) — ${link.usageNote || paint.type}`).join('\n');
-              navigator.clipboard.writeText(text);
-            }}>📋 Copy recipe as text</button>
-          </>
-        )}
-      </div>
-
-      {/* ─── Painting Journal ─── */}
-      <div className="detail-section">
-        <h3>📝 Painting Journal</h3>
-        <div className="journal-add">
-          <textarea value={logText} onChange={e => setLogText(e.target.value)} placeholder="What did you work on today?" rows={2} />
-          <div className="journal-actions">
-            <button className="btn btn-sm btn-ghost" onClick={() => logPhotoRef.current?.click()}>📷 Photo</button>
-            <button className="btn btn-sm btn-primary" onClick={() => addLog()} disabled={!logText.trim()}>Add Entry</button>
-            <input ref={logPhotoRef} type="file" accept="image/*" capture="environment" onChange={handleLogPhoto} style={{ display: 'none' }} />
-          </div>
-        </div>
-        {logs.length === 0 ? (
-          <p className="detail-empty">No journal entries yet. Track your painting sessions here.</p>
-        ) : (
-          <div className="journal-list">
-            {logs.map(log => (
-              <div key={log.id} className="journal-entry">
-                <div className="journal-time">{new Date(log.timestamp).toLocaleDateString()} {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                {log.text && <div className="journal-text">{log.text}</div>}
-                {log.photoUrl && <img src={log.photoUrl} alt="Progress" className="journal-photo" />}
+                {datacard.weapons.length > 0 && (
+                  <div className="md-weapons">
+                    <h3 className="md-section-title"><Swords size={16} /> Weapons</h3>
+                    {datacard.weapons.map(w => (
+                      <div key={w.name} className="md-weapon">
+                        <div className="md-weapon-name">{w.type === 'ranged' ? '🔫' : '⚔️'} {w.name}</div>
+                        <div className="md-weapon-stats">
+                          <span>{w.attacks}A</span><span>BS {w.skill}+</span><span>{w.normalDmg}/{w.critDmg} dmg</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="md-stat-grid">
+                <div className="md-stat-card"><div className="md-stat-label">Quantity</div><div className="md-stat-value">{model.quantity}</div></div>
+                <div className="md-stat-card"><div className="md-stat-label">System</div><div className="md-stat-value md-stat-text">{model.gameSystem}</div></div>
+                <div className="md-stat-card"><div className="md-stat-label">Type</div><div className="md-stat-value md-stat-text">{model.unitType}</div></div>
+                <div className="md-stat-card"><div className="md-stat-label">Status</div><div className="md-stat-value md-stat-text">{model.status}</div></div>
               </div>
-            ))}
+            )}
+            {/* Decorative skull divider */}
+            <div className="md-divider"><img src="/decor/skull.jpg" alt="" /></div>
+          </div>
+        )}
+
+        {tab === 'recipe' && (
+          <div className="md-recipe-tab">
+            <div className="md-section-header">
+              <h3 className="md-section-title"><Palette size={16} /> Paint Recipe</h3>
+              <button className="btn btn-sm btn-ghost" onClick={() => setShowAddPaint(!showAddPaint)}>
+                {showAddPaint ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Add Paint</>}
+              </button>
+            </div>
+            {showAddPaint && (
+              <div className="md-add-paint">
+                <PaintAutocomplete value={paintSearch} onChange={setPaintSearch} onSelect={async (preset: PaintPreset) => {
+                  const paint = await db.paints.where('name').equals(preset.name).first();
+                  if (paint?.id) await addPaintToRecipe(paint.id);
+                  else setPaintSearch(preset.name);
+                }} />
+                <input value={usageNote} onChange={e => setUsageNote(e.target.value)} placeholder="Usage (e.g. base coat armour)" className="md-usage-input" />
+              </div>
+            )}
+            {linkedPaints.length === 0 ? (
+              <div className="md-empty-tab">
+                <img src="/decor/gear.png" alt="" className="md-empty-icon" />
+                <p>No paints assigned yet</p>
+              </div>
+            ) : (
+              <>
+                <div className="md-recipe-list">
+                  {linkedPaints.map(({ link, paint }) => (
+                    <div key={link.id} className="md-recipe-item">
+                      <div className="md-swatch" style={{ background: paint.hexColor || '#555' }} />
+                      <div className="md-recipe-info">
+                        <div className="md-recipe-name">{paint.name}</div>
+                        <div className="md-recipe-note">{link.usageNote || `${paint.brand} · ${paint.type}`}</div>
+                      </div>
+                      <button className="btn-icon-sm" onClick={() => removePaint(link.id!)}><Trash2 size={14} /></button>
+                    </div>
+                  ))}
+                </div>
+                <button className="btn btn-sm btn-ghost" style={{ marginTop: 12 }} onClick={() => {
+                  const text = `Paint recipe for ${model.name} (${model.faction}):\n` + linkedPaints.map(({ link, paint }) => `• ${paint.name} (${paint.brand}) — ${link.usageNote || paint.type}`).join('\n');
+                  navigator.clipboard.writeText(text);
+                }}><Copy size={14} /> Copy recipe</button>
+              </>
+            )}
+          </div>
+        )}
+
+        {tab === 'journal' && (
+          <div className="md-journal-tab">
+            <h3 className="md-section-title"><BookOpen size={16} /> Painting Journal</h3>
+            <div className="md-journal-add">
+              <textarea value={logText} onChange={e => setLogText(e.target.value)} placeholder="What did you work on?" rows={2} />
+              <div className="md-journal-actions">
+                <button className="btn btn-sm btn-ghost" onClick={() => logPhotoRef.current?.click()}><Camera size={14} /> Photo</button>
+                <button className="btn btn-sm btn-primary" onClick={() => addLog()} disabled={!logText.trim()}><Plus size={14} /> Add</button>
+                <input ref={logPhotoRef} type="file" accept="image/*" capture="environment" onChange={handleLogPhoto} style={{ display: 'none' }} />
+              </div>
+            </div>
+            {logs.length === 0 ? (
+              <div className="md-empty-tab">
+                <img src="/decor/key.png" alt="" className="md-empty-icon" />
+                <p>No entries yet. Track your progress here.</p>
+              </div>
+            ) : (
+              <div className="md-journal-list">
+                {logs.map(log => (
+                  <div key={log.id} className="md-journal-entry">
+                    <div className="md-journal-time">{new Date(log.timestamp).toLocaleDateString()}</div>
+                    {log.text && <div className="md-journal-text">{log.text}</div>}
+                    {log.photoUrl && <img src={log.photoUrl} alt="Progress" className="md-journal-photo" />}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {tab === 'inspiration' && (
+          <div className="md-inspo-tab">
+            <h3 className="md-section-title"><Image size={16} /> Inspiration Board</h3>
+            <p className="md-inspo-hint">Save reference images — right-click → Copy Image, then paste here.</p>
+            <InspirationBoard modelId={modelId} />
           </div>
         )}
       </div>
-
-      {/* ─── Inspiration Board ─── */}
-      <div className="detail-section">
-        <h3>📸 Inspiration Board</h3>
-        <p className="detail-empty" style={{ marginBottom: 12 }}>Save reference images from Instagram, Reddit, or anywhere. Right-click → Copy Image, then paste here.</p>
-        <InspirationBoard modelId={modelId} />
-      </div>
-
-      {/* Datacard stats are now in the RPG sheet header above */}
     </div>
   );
 }
 
 function InspirationBoard({ modelId }: { modelId: number }) {
   const [images, setImages] = useState<string[]>(() => {
-    try { return JSON.parse(localStorage.getItem(`inspo_${modelId}`) || '[]'); } catch { return []; }
+    try { return JSON.parse(localStorage.getItem(`inspo-${modelId}`) || '[]'); } catch { return []; }
   });
-  const fileRef = useRef<HTMLInputElement>(null);
 
-  const save = (imgs: string[]) => { setImages(imgs); localStorage.setItem(`inspo_${modelId}`, JSON.stringify(imgs)); };
+  const save = (imgs: string[]) => { setImages(imgs); localStorage.setItem(`inspo-${modelId}`, JSON.stringify(imgs)); };
 
-  const processFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const scale = Math.min(500 / img.width, 500 / img.height, 1);
-        canvas.width = img.width * scale; canvas.height = img.height * scale;
-        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
-        save([...images, canvas.toDataURL('image/jpeg', 0.7)]);
-      };
-      img.src = reader.result as string;
-    };
-    reader.readAsDataURL(file);
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile(); if (!file) continue;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new window.Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const scale = Math.min(500 / img.width, 500 / img.height, 1);
+            canvas.width = img.width * scale; canvas.height = img.height * scale;
+            canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+            save([...images, canvas.toDataURL('image/jpeg', 0.7)]);
+          };
+          img.src = reader.result as string;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
   };
-
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) processFile(file);
-    e.target.value = '';
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.currentTarget.classList.remove('drag-active');
-    const file = e.dataTransfer.files[0];
-    if (file?.type.startsWith('image/')) processFile(file);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); e.currentTarget.classList.add('drag-active'); };
-  const handleDragLeave = (e: React.DragEvent) => { e.currentTarget.classList.remove('drag-active'); };
-
-  const removeImage = (i: number) => save(images.filter((_, j) => j !== i));
 
   return (
-    <div>
-      {/* Drag & drop zone */}
-      <div className="inspo-drop-zone" onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
-        <div className="inspo-drop-icon">📸</div>
-        <div className="inspo-drop-text">Drag & drop an image here</div>
-        <div className="inspo-drop-or">or</div>
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button className="btn btn-sm btn-primary" onClick={() => fileRef.current?.click()}>📁 Choose File</button>
-          <button className="btn btn-sm btn-ghost" onClick={() => { if (fileRef.current) { fileRef.current.setAttribute('capture', 'environment'); fileRef.current.click(); fileRef.current.removeAttribute('capture'); } }}>📷 Take Photo</button>
+    <div className="md-inspo-board" onPaste={handlePaste} tabIndex={0}>
+      {images.length === 0 ? (
+        <div className="md-inspo-empty">
+          <img src="/decor/heart.png" alt="" className="md-empty-icon" />
+          <p>Paste images here (Ctrl+V)</p>
         </div>
-        <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{ display: 'none' }} />
-      </div>
-
-      <p className="inspo-help">💡 <strong>From Instagram:</strong> Screenshot the post (Win+Shift+S) → save → drag here. Or right-click image → "Save image as" → drag/upload.</p>
-
-      {images.length > 0 && (
-        <div className="inspo-grid">
-          {images.map((img, i) => (
-            <div key={i} className="inspo-item">
-              <img src={img} alt={`Inspiration ${i + 1}`} />
-              <button className="inspo-remove" onClick={() => removeImage(i)}>✕</button>
+      ) : (
+        <div className="md-inspo-grid">
+          {images.map((src, i) => (
+            <div key={i} className="md-inspo-img">
+              <img src={src} alt={`Ref ${i + 1}`} />
+              <button className="md-inspo-remove" onClick={() => save(images.filter((_, j) => j !== i))}><X size={12} /></button>
             </div>
           ))}
         </div>
