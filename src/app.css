@@ -2677,7 +2677,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 
 /* Paint rack — physical shelf look */
 .pr-rack {
-  background: linear-gradient(180deg, #2a1e12 0%, #1a120a 100%);
+  background: url('/tex-wood.jpg') center/200px;
   border: 2px solid #8b5a2b;
   border-radius: 16px;
   padding: 12px 16px 0;
@@ -2691,7 +2691,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 /* Side rails */
 .pr-rack::before, .pr-rack::after {
   content: ''; position: absolute; top: 0; bottom: 0; width: 10px;
-  background: linear-gradient(180deg, #8b5a2b, #5a3a1a, #8b5a2b);
+  background: url('/tex-wood.jpg') center/100px;
   z-index: 2;
   box-shadow: inset -2px 0 4px rgba(0,0,0,0.4), 2px 0 6px rgba(0,0,0,0.3);
 }
@@ -2706,8 +2706,8 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 }
 /* The shelf board */
 .pr-shelf-board {
-  height: 10px;
-  background: linear-gradient(180deg, #a0703c 0%, #7a5228 30%, #5a3a1a 70%, #3d2610 100%);
+  height: 12px;
+  background: url('/tex-wood.jpg') center/150px;
   border-radius: 3px;
   margin: 0 -6px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.6), 0 1px 0 rgba(200,160,90,0.4) inset, 0 -1px 0 rgba(0,0,0,0.5);
