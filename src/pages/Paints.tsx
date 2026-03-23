@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import type { PaintType } from '../types';
-import { PAINT_TYPES, PAINT_BRANDS } from '../types';
+import { PAINT_TYPES } from '../types';
 import PaintAutocomplete from '../components/PaintAutocomplete';
 import type { PaintPreset } from '../db/paint-presets';
 import { BulkAddPaints } from '../components/BulkAdd';
+import { Plus, Package, Search, Filter, Grid3X3, List, LayoutGrid, ChevronDown, ChevronRight, Trash2, Droplets, X } from 'lucide-react';
 
 type ViewMode = 'list' | 'grid' | 'grouped';
 
@@ -15,8 +15,9 @@ export default function Paints() {
   const [filterBrand, setFilterBrand] = useState('');
   const [filterType, setFilterType] = useState('');
   const [search, setSearch] = useState('');
-  const [view, setView] = useState<ViewMode>('grouped');
+  const [view, setView] = useState<ViewMode>('grid');
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [showFilters, setShowFilters] = useState(false);
 
   const paints = useLiveQuery(() => db.paints.orderBy('name').toArray()) ?? [];
   const brands = [...new Set(paints.map(p => p.brand))].sort();
@@ -38,21 +39,24 @@ export default function Paints() {
     setCollapsed(next);
   };
 
-  // Group by brand then type
   const groups: Record<string, typeof filtered> = {};
   for (const p of filtered) {
     const key = `${p.brand} · ${p.type}`;
     (groups[key] ??= []).push(p);
   }
 
+  const activeFilters = [filterBrand, filterType].filter(Boolean).length;
+
   return (
     <div>
       <div className="page-header">
-        <h2>My Paints</h2>
+        <h2>Paint Rack</h2>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-ghost" onClick={() => { setShowBulk(!showBulk); setShowForm(false); }}>📦 Bulk</button>
-          <button className="btn btn-primary" onClick={() => { setShowForm(!showForm); setShowBulk(false); }}>
-            {showForm ? '✕' : '+ Add'}
+          <button className="btn btn-ghost btn-sm" onClick={() => { setShowBulk(!showBulk); setShowForm(false); }}>
+            <Package size={16} />
+          </button>
+          <button className="btn btn-primary btn-sm" onClick={() => { setShowForm(!showForm); setShowBulk(false); }}>
+            {showForm ? <X size={16} /> : <><Plus size={16} /> Add</>}
           </button>
         </div>
       </div>
@@ -60,63 +64,82 @@ export default function Paints() {
       {showBulk && <BulkAddPaints onDone={() => setShowBulk(false)} />}
       {showForm && <AddPaintForm onDone={() => setShowForm(false)} />}
 
-      <div className="stats">
-        <div className="stat"><div className="stat-num">{paints.length}</div><div className="stat-label">Total</div></div>
+      {/* Brand pills */}
+      <div className="pr-brand-pills">
+        <button className={`pr-brand-pill ${!filterBrand ? 'active' : ''}`} onClick={() => setFilterBrand('')}>
+          All <span>{paints.length}</span>
+        </button>
         {brands.map(b => (
-          <div className="stat" key={b}><div className="stat-num">{paints.filter(p => p.brand === b).length}</div><div className="stat-label">{b}</div></div>
+          <button key={b} className={`pr-brand-pill ${filterBrand === b ? 'active' : ''}`} onClick={() => setFilterBrand(filterBrand === b ? '' : b)}>
+            {b} <span>{paints.filter(p => p.brand === b).length}</span>
+          </button>
         ))}
       </div>
 
-      <div className="filters">
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search..." className="filter-search" />
-        <select value={filterBrand} onChange={e => setFilterBrand(e.target.value)}>
-          <option value="">All brands</option>
-          {brands.map(b => <option key={b} value={b}>{b}</option>)}
-        </select>
-        <select value={filterType} onChange={e => setFilterType(e.target.value)}>
-          <option value="">All types</option>
-          {PAINT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
-        <div className="view-toggle">
-          <button className={`view-btn ${view === 'grouped' ? 'active' : ''}`} onClick={() => setView('grouped')} title="Grouped">▤</button>
-          <button className={`view-btn ${view === 'grid' ? 'active' : ''}`} onClick={() => setView('grid')} title="Grid">▦</button>
-          <button className={`view-btn ${view === 'list' ? 'active' : ''}`} onClick={() => setView('list')} title="List">☰</button>
+      {/* Search + filters */}
+      <div className="ml-search-row">
+        <div className="ml-search-wrap">
+          <Search size={16} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search paints..." />
+        </div>
+        <button className={`btn btn-sm btn-ghost ${activeFilters ? 'ml-filter-active' : ''}`} onClick={() => setShowFilters(!showFilters)}>
+          <Filter size={14} />
+        </button>
+        <div className="ml-view-toggle">
+          <button className={view === 'grid' ? 'active' : ''} onClick={() => setView('grid')}><Grid3X3 size={14} /></button>
+          <button className={view === 'grouped' ? 'active' : ''} onClick={() => setView('grouped')}><LayoutGrid size={14} /></button>
+          <button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}><List size={14} /></button>
         </div>
       </div>
 
-      <div className="results-count">{filtered.length} paints</div>
+      {showFilters && (
+        <div className="ml-filters">
+          <select value={filterType} onChange={e => setFilterType(e.target.value)}>
+            <option value="">All types</option>
+            {PAINT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+          {activeFilters > 0 && <button className="btn btn-sm btn-ghost" onClick={() => { setFilterBrand(''); setFilterType(''); }}>Clear</button>}
+        </div>
+      )}
+
+      <div className="ml-results"><span>{filtered.length} paints</span></div>
 
       {filtered.length === 0 ? (
-        <div className="empty">
-          <span className="empty-icon">🎨</span>
-          <p className="empty-text">No paints found. {paints.length === 0 ? 'Add your first!' : 'Try a different filter.'}</p>
+        <div className="md-empty-tab" style={{ marginTop: 40 }}>
+          <Droplets size={48} strokeWidth={1} style={{ opacity: 0.15, marginBottom: 12 }} />
+          <p>{paints.length === 0 ? 'Add your first paint to start your rack.' : 'No paints match your filters.'}</p>
         </div>
       ) : view === 'grid' ? (
-        <div className="paint-grid">
+        /* Paint rack grid — paint pot style */
+        <div className="pr-grid">
           {filtered.map(p => (
-            <div key={p.id} className="paint-tile" title={`${p.name}\n${p.brand} · ${p.range} · ${p.type}`}>
-              <div className="paint-tile-swatch" style={{ background: p.hexColor || '#555' }} />
-              <div className="paint-tile-name">{p.name}</div>
-              <div className="paint-tile-meta">{p.brand}</div>
-              <button className="paint-tile-del" onClick={(e) => { e.stopPropagation(); deletePaint(p.id!); }}>✕</button>
+            <div key={p.id} className="pr-pot" title={`${p.name}\n${p.brand} · ${p.range} · ${p.type}`}>
+              <div className="pr-pot-cap" style={{ background: p.hexColor || '#555' }}>
+                <div className="pr-pot-shine" />
+              </div>
+              <div className="pr-pot-body">
+                <div className="pr-pot-name">{p.name}</div>
+                <div className="pr-pot-brand">{p.brand}</div>
+              </div>
+              <button className="pr-pot-del" onClick={(e) => { e.stopPropagation(); deletePaint(p.id!); }}><Trash2 size={10} /></button>
             </div>
           ))}
         </div>
       ) : view === 'grouped' ? (
         Object.entries(groups).sort(([a], [b]) => a.localeCompare(b)).map(([key, items]) => (
-          <div key={key} className="paint-group">
-            <div className="paint-group-header" onClick={() => toggleGroup(key)}>
-              <span className="paint-group-toggle">{collapsed.has(key) ? '▸' : '▾'}</span>
-              <span className="paint-group-title">{key}</span>
-              <span className="paint-group-count">{items.length}</span>
+          <div key={key} className="pr-group">
+            <div className="ml-group-header" onClick={() => toggleGroup(key)}>
+              {collapsed.has(key) ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+              <span className="ml-group-title">{key}</span>
+              <span className="ml-group-count">{items.length}</span>
             </div>
             {!collapsed.has(key) && (
-              <div className="paint-group-items">
+              <div className="pr-chips">
                 {items.map(p => (
-                  <div key={p.id} className="paint-chip">
-                    <div className="paint-chip-swatch" style={{ background: p.hexColor || '#555' }} />
-                    <span className="paint-chip-name">{p.name}</span>
-                    <button className="paint-chip-del" onClick={() => deletePaint(p.id!)}>✕</button>
+                  <div key={p.id} className="pr-chip">
+                    <div className="pr-chip-dot" style={{ background: p.hexColor || '#555' }} />
+                    <span className="pr-chip-name">{p.name}</span>
+                    <button className="pr-chip-del" onClick={() => deletePaint(p.id!)}><X size={10} /></button>
                   </div>
                 ))}
               </div>
@@ -124,16 +147,18 @@ export default function Paints() {
           </div>
         ))
       ) : (
-        filtered.map(p => (
-          <div className="card" key={p.id}>
-            <div className="swatch" style={{ background: p.hexColor || '#555' }} />
-            <div className="card-body">
-              <div className="card-title">{p.name}</div>
-              <div className="card-sub">{p.brand}{p.range ? ` · ${p.range}` : ''} · {p.type}</div>
+        <div className="pr-list">
+          {filtered.map(p => (
+            <div key={p.id} className="pr-list-item">
+              <div className="pr-list-swatch" style={{ background: p.hexColor || '#555' }} />
+              <div className="pr-list-info">
+                <div className="pr-list-name">{p.name}</div>
+                <div className="pr-list-meta">{p.brand}{p.range ? ` · ${p.range}` : ''} · {p.type}</div>
+              </div>
+              <button className="btn-icon-sm" onClick={() => deletePaint(p.id!)}><Trash2 size={14} /></button>
             </div>
-            <button className="btn btn-danger btn-sm" onClick={() => deletePaint(p.id!)}>🗑</button>
-          </div>
-        ))
+          ))}
+        </div>
       )}
     </div>
   );
@@ -143,51 +168,47 @@ function AddPaintForm({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState('');
   const [brand, setBrand] = useState('Citadel');
   const [range, setRange] = useState('');
-  const [type, setType] = useState<PaintType>('base');
-  const [hexColor, setHexColor] = useState('#888888');
+  const [type, setType] = useState('Base');
+  const [hex, setHex] = useState('#888888');
 
-  const handlePresetSelect = (preset: PaintPreset) => {
-    setName(preset.name); setBrand(preset.brand); setRange(preset.range); setType(preset.type); setHexColor(preset.hex);
+  const handlePreset = (preset: PaintPreset) => {
+    setName(preset.name); setBrand(preset.brand);
+    if (preset.range) setRange(preset.range);
+    if (preset.type) setType(preset.type);
+    if (preset.hex) setHex(preset.hex);
   };
 
-  const save = async () => {
+  const submit = async () => {
     if (!name.trim()) return;
-    await db.paints.add({ name: name.trim(), brand, range: range.trim(), type, hexColor, owned: true, quantity: 1, notes: '' });
+    await db.paints.add({ name: name.trim(), brand, range: range.trim(), type: type as any, hexColor: hex, quantity: 1, owned: true, notes: '' });
     onDone();
   };
 
   return (
-    <div className="form-overlay">
-      <div className="form-title">Add New Paint</div>
-      <div className="form-grid">
-        <div className="field full-width">
-          <label>Paint Name * (type to search)</label>
-          <PaintAutocomplete value={name} onChange={setName} onSelect={handlePresetSelect} />
-        </div>
-        <div className="field">
-          <label>Brand</label>
+    <div className="detail-section" style={{ marginBottom: 20 }}>
+      <h3 style={{ marginBottom: 12 }}>Add Paint</h3>
+      <div className="field"><label>Name</label><PaintAutocomplete value={name} onChange={setName} onSelect={handlePreset} /></div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="field"><label>Brand</label>
           <select value={brand} onChange={e => setBrand(e.target.value)}>
-            {PAINT_BRANDS.map(b => <option key={b} value={b}>{b}</option>)}
+            {['Citadel', 'Vallejo', 'Army Painter', 'AK Interactive', 'Scale75', 'ProAcryl', 'Turbo Dork', 'Monument', 'Kimera'].map(b => <option key={b}>{b}</option>)}
           </select>
         </div>
-        <div className="field"><label>Range</label><input value={range} onChange={e => setRange(e.target.value)} placeholder="e.g. Game Color" /></div>
-        <div className="field">
-          <label>Type</label>
-          <select value={type} onChange={e => setType(e.target.value as PaintType)}>
-            {PAINT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+        <div className="field"><label>Type</label>
+          <select value={type} onChange={e => setType(e.target.value)}>
+            {PAINT_TYPES.map(t => <option key={t}>{t}</option>)}
           </select>
         </div>
-        <div className="field">
-          <label>Color</label>
-          <div className="color-picker-row">
-            <input type="color" value={hexColor} onChange={e => setHexColor(e.target.value)} />
-            <input value={hexColor} onChange={e => setHexColor(e.target.value)} placeholder="#FF0000" style={{ flex: 1 }} />
-          </div>
-        </div>
-        <div className="field full-width form-actions" style={{ justifyContent: 'flex-end', flexDirection: 'row' }}>
-          <button className="btn btn-ghost" onClick={onDone}>Cancel</button>
-          <button className="btn btn-primary" onClick={save} disabled={!name.trim()}>Save Paint</button>
-        </div>
+      </div>
+      <div className="field"><label>Range</label><input value={range} onChange={e => setRange(e.target.value)} placeholder="e.g. Contrast, Model Color" /></div>
+      <div className="field" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <label>Colour</label>
+        <input type="color" value={hex} onChange={e => setHex(e.target.value)} style={{ width: 48, height: 36, border: 'none', cursor: 'pointer' }} />
+        <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>{hex}</span>
+      </div>
+      <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+        <button className="btn btn-primary" onClick={submit}>Add Paint</button>
+        <button className="btn btn-ghost" onClick={onDone}>Cancel</button>
       </div>
     </div>
   );

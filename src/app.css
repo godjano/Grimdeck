@@ -2672,3 +2672,258 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
   background-size: contain; opacity: 0.02; filter: invert(1);
   pointer-events: none; z-index: 0;
 }
+
+/* ═══════════════════════════════════════
+   PAINT RACK — Paint pot visual style
+   ═══════════════════════════════════════ */
+
+/* Brand pills */
+.pr-brand-pills {
+  display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto;
+  padding-bottom: 4px; scrollbar-width: none;
+}
+.pr-brand-pills::-webkit-scrollbar { display: none; }
+.pr-brand-pill {
+  display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  background: rgba(14,16,22,0.6); border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 20px; padding: 8px 16px; cursor: pointer;
+  font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.5);
+  transition: all 0.2s;
+}
+.pr-brand-pill:hover { border-color: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); }
+.pr-brand-pill.active { border-color: var(--gold-bright, #c4962a); color: var(--gold-bright, #c4962a); background: rgba(196,149,42,0.08); }
+.pr-brand-pill span {
+  font-size: 0.6rem; background: rgba(255,255,255,0.06); padding: 1px 6px;
+  border-radius: 8px; font-weight: 700;
+}
+.pr-brand-pill.active span { background: rgba(196,149,42,0.15); }
+
+/* Paint pot grid */
+.pr-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
+  gap: 10px !important;
+}
+.pr-pot {
+  position: relative; text-align: center; cursor: default;
+  transition: transform 0.2s;
+}
+.pr-pot:hover { transform: translateY(-3px); }
+
+/* The paint cap — big, round, glossy */
+.pr-pot-cap {
+  width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 8px;
+  position: relative; overflow: hidden;
+  border: 3px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.4),
+    inset 0 -8px 16px rgba(0,0,0,0.3),
+    inset 0 4px 8px rgba(255,255,255,0.15);
+}
+.pr-pot-shine {
+  position: absolute; top: 6px; left: 10px;
+  width: 18px; height: 10px; border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  filter: blur(3px);
+}
+
+/* Paint pot body */
+.pr-pot-body { padding: 0 4px; }
+.pr-pot-name {
+  font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.8);
+  line-height: 1.2; margin-bottom: 1px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.pr-pot-brand {
+  font-size: 0.55rem; color: rgba(255,255,255,0.25);
+}
+
+/* Delete on hover */
+.pr-pot-del {
+  position: absolute; top: 0; right: 4px;
+  background: rgba(0,0,0,0.6); border: none; border-radius: 50%;
+  width: 18px; height: 18px; cursor: pointer;
+  color: rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+}
+.pr-pot:hover .pr-pot-del { opacity: 1; }
+.pr-pot-del:hover { color: #ef4444; background: rgba(239,68,68,0.2); }
+
+/* Paint chips in grouped view */
+.pr-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 0 8px 28px; }
+.pr-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px 5px 6px;
+  background: rgba(14,16,22,0.6); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px; font-size: 0.72rem; transition: all 0.2s;
+}
+.pr-chip:hover { border-color: rgba(255,255,255,0.12); }
+.pr-chip-dot {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.1);
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.1);
+}
+.pr-chip-name { font-weight: 600; color: rgba(255,255,255,0.7); }
+.pr-chip-del {
+  background: none; border: none; cursor: pointer; padding: 0 2px;
+  color: rgba(255,255,255,0.2);
+}
+.pr-chip-del:hover { color: #ef4444; }
+
+/* Paint list view */
+.pr-list { display: flex; flex-direction: column; gap: 2px; }
+.pr-list-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 10px; transition: background 0.15s;
+}
+.pr-list-item:hover { background: rgba(255,255,255,0.03); }
+.pr-list-swatch {
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.1);
+}
+.pr-list-info { flex: 1; min-width: 0; }
+.pr-list-name { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85); }
+.pr-list-meta { font-size: 0.68rem; color: rgba(255,255,255,0.3); }
+
+/* ═══════════════════════════════════════
+   HOME — Feature cards & WIP showcase
+   ═══════════════════════════════════════ */
+
+/* Feature cards — icon with colored glow */
+.feat-grid {
+  display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important;
+}
+.feat-card {
+  display: flex !important; align-items: center !important; gap: 14px !important;
+  background: rgba(14,16,22,0.7) !important;
+  border: 1px solid rgba(255,255,255,0.04) !important;
+  border-radius: 14px !important; padding: 18px 16px !important;
+  cursor: pointer !important; transition: all 0.25s !important;
+  position: relative; overflow: hidden;
+}
+.feat-card:hover {
+  border-color: rgba(255,255,255,0.1) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+}
+.feat-card::before {
+  content: ''; position: absolute; top: -20px; left: -20px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: var(--feat-color, #c4962a); opacity: 0.06;
+  filter: blur(20px); pointer-events: none;
+}
+.feat-icon {
+  width: 48px !important; height: 48px !important; border-radius: 12px !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  background: color-mix(in srgb, var(--feat-color, #c4962a) 12%, transparent) !important;
+  color: var(--feat-color, #c4962a) !important;
+  flex-shrink: 0; font-size: 1rem !important; margin: 0 !important;
+}
+.feat-info { flex: 1; min-width: 0; }
+.feat-title { font-size: 0.88rem; font-weight: 700; color: rgba(255,255,255,0.9); margin-bottom: 2px; }
+.feat-desc { font-size: 0.7rem; color: rgba(255,255,255,0.35); line-height: 1.4; }
+
+/* WIP showcase — photo-forward cards */
+.wip-grid {
+  display: grid !important; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  gap: 12px !important;
+}
+.wip-showcase {
+  border-radius: 14px !important; overflow: hidden !important; cursor: pointer !important;
+  background: rgba(14,16,22,0.8) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  transition: all 0.25s !important;
+}
+.wip-showcase:hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(245,158,11,0.3) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 20px rgba(245,158,11,0.06) !important;
+}
+.wip-showcase-img {
+  position: relative; aspect-ratio: 4/3; background: rgba(255,255,255,0.02);
+  overflow: hidden;
+}
+.wip-showcase-img img { width: 100%; height: 100%; object-fit: cover; }
+.wip-showcase-empty {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.08);
+}
+.wip-showcase-badge {
+  position: absolute; top: 8px; right: 8px;
+  background: rgba(245,158,11,0.9); color: #000; font-size: 0.55rem;
+  font-weight: 800; padding: 3px 8px; border-radius: 6px;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.wip-showcase-info { padding: 10px 12px; }
+.wip-showcase-name { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.85); }
+.wip-showcase-faction { font-size: 0.65rem; color: rgba(255,255,255,0.3); margin-top: 2px; }
+
+/* Recently added — clean rows with avatar */
+.recent-list { display: flex; flex-direction: column; gap: 2px; }
+.recent-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 12px; cursor: pointer;
+  transition: all 0.15s;
+}
+.recent-card:hover { background: rgba(255,255,255,0.03); }
+.recent-avatar {
+  width: 40px; height: 40px; border-radius: 10px; overflow: hidden; flex-shrink: 0;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.1);
+}
+.recent-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.recent-info { flex: 1; min-width: 0; }
+.recent-name { font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.85); }
+.recent-meta { font-size: 0.68rem; color: rgba(255,255,255,0.3); }
+
+/* Stats band — bigger numbers, gold accent */
+.stats-band {
+  background: rgba(10,10,14,0.7) !important;
+  border-top: 1px solid rgba(196,149,42,0.08) !important;
+  border-bottom: 1px solid rgba(196,149,42,0.08) !important;
+  padding: 40px 0 !important;
+}
+.band-num {
+  font-size: 2rem !important; font-weight: 800 !important;
+  font-family: 'Cinzel', serif !important;
+  background: linear-gradient(135deg, #fff, #c4962a) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+.band-label {
+  font-size: 0.6rem !important; text-transform: uppercase !important;
+  letter-spacing: 1.5px !important; color: rgba(255,255,255,0.3) !important;
+  margin-top: 4px !important;
+}
+.band-divider {
+  width: 1px !important; height: 40px !important;
+  background: linear-gradient(180deg, transparent, rgba(196,149,42,0.2), transparent) !important;
+}
+
+/* Section headings — gold underline */
+.section-heading {
+  font-family: 'Cinzel', serif !important;
+  position: relative !important; display: inline-block !important;
+}
+.section-heading::after {
+  content: '' !important; display: block !important;
+  width: 40px !important; height: 2px !important;
+  background: var(--gold-bright, #c4962a) !important;
+  margin-top: 8px !important; border-radius: 1px !important;
+  opacity: 1 !important; filter: none !important;
+}
+.section-eyebrow {
+  font-size: 0.6rem !important; text-transform: uppercase !important;
+  letter-spacing: 2px !important; color: var(--gold-bright, #c4962a) !important;
+  font-weight: 700 !important;
+}
+
+@media (max-width: 768px) {
+  .feat-grid { grid-template-columns: 1fr !important; }
+  .pr-grid { grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)) !important; }
+  .pr-pot-cap { width: 52px; height: 52px; }
+  .wip-grid { grid-template-columns: repeat(2, 1fr) !important; }
+}

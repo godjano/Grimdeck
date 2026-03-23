@@ -67,13 +67,16 @@ export default function Home() {
         <section className="section">
           <p className="section-eyebrow">On the desk</p>
           <h2 className="section-heading">Currently Painting</h2>
-          <div className="wip-cards">
+          <div className="wip-grid">
             {wip.slice(0, 4).map(m => (
-              <div key={m.id} className="wip-card" onClick={() => nav(`/model/${m.id}`)}>
-                {m.photoUrl ? <img src={m.photoUrl} alt={m.name} className="wip-photo" /> : <div className="wip-photo-empty">🎨</div>}
-                <div className="wip-info">
-                  <div className="wip-name">{m.name}</div>
-                  <div className="wip-faction">{m.faction}</div>
+              <div key={m.id} className="wip-showcase" onClick={() => nav(`/model/${m.id}`)}>
+                <div className="wip-showcase-img">
+                  {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <div className="wip-showcase-empty"><Brush size={24} strokeWidth={1} /></div>}
+                  <div className="wip-showcase-badge">WIP</div>
+                </div>
+                <div className="wip-showcase-info">
+                  <div className="wip-showcase-name">{m.name}</div>
+                  <div className="wip-showcase-faction">{m.faction}</div>
                 </div>
               </div>
             ))}
@@ -87,15 +90,20 @@ export default function Home() {
         <section className="section">
           <p className="section-eyebrow">Latest</p>
           <h2 className="section-heading">Recently Added</h2>
-          {recent.map(m => (
-            <div key={m.id} className="card" onClick={() => nav(`/model/${m.id}`)} style={{ cursor: 'pointer' }}>
-              <div className="card-body">
-                <div className="card-title">{m.name} {m.quantity > 1 && <span className="qty-badge">×{m.quantity}</span>}</div>
-                <div className="card-sub">{m.faction} · {timeAgo(m.createdAt)}</div>
+          <div className="recent-list">
+            {recent.map(m => (
+              <div key={m.id} className="recent-card" onClick={() => nav(`/model/${m.id}`)}>
+                <div className="recent-avatar">
+                  {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <Shield size={16} strokeWidth={1} />}
+                </div>
+                <div className="recent-info">
+                  <div className="recent-name">{m.name} {m.quantity > 1 && <span className="qty-badge">×{m.quantity}</span>}</div>
+                  <div className="recent-meta">{m.faction} · {timeAgo(m.createdAt)}</div>
+                </div>
+                <span className={`ml-card-status status-${m.status}`}>{m.status}</span>
               </div>
-              <span className={`status status-${m.status}`}>{m.status}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </section>
       )}
 
@@ -103,47 +111,25 @@ export default function Home() {
       <section className="section">
         <p className="section-eyebrow">Features</p>
         <h2 className="section-heading">Everything you need</h2>
-        <div className="feature-grid">
-          <div className="feature-card" onClick={() => nav('/models')}>
-            <div className="feature-icon"><Shield size={32} /></div>
-            <h3>Model Collection</h3>
-            <p>Track every miniature by faction, unit type, and painting status.</p>
-          </div>
-          <div className="feature-card" onClick={() => nav('/paints')}>
-            <div className="feature-icon"><Palette size={32} /></div>
-            <h3>Paint Inventory</h3>
-            <p>Catalog 500+ paints across Citadel, Vallejo, and Army Painter.</p>
-          </div>
-          <div className="feature-card" onClick={() => nav('/grey-pile')}>
-            <div className="feature-icon"><Skull size={32} /></div>
-            <h3>Pile of Grey</h3>
-            <p>Face your shame and promote models through the pipeline.</p>
-          </div>
-          <div className="feature-card" onClick={() => nav('/progress')}>
-            <div className="feature-icon"><TrendingUp size={32} /></div>
-            <h3>Progress & Ranks</h3>
-            <p>Gamified stats, achievements, and ranks to stay motivated.</p>
-          </div>
-          <div className="feature-card" onClick={() => nav('/campaigns')}>
-            <div className="feature-icon"><Swords size={32} /></div>
-            <h3>Solo Campaigns</h3>
-            <p>Narrative Kill Team campaigns with AI opponents.</p>
-          </div>
-          <div className="feature-card" onClick={() => nav('/suggestions')}>
-            <div className="feature-icon"><BookOpen size={32} /></div>
-            <h3>Paint Guides</h3>
-            <p>Step-by-step tutorials and colour scheme tools.</p>
-          </div>
-          <div className="feature-card" onClick={() => nav('/inspiration')}>
-            <div className="feature-icon"><Brush size={32} /></div>
-            <h3>Inspiration</h3>
-            <p>Techniques, recipes, and pro tips library.</p>
-          </div>
-          <div className="feature-card" onClick={() => nav('/settings')}>
-            <div className="feature-icon"><Cloud size={32} /></div>
-            <h3>Cloud Sync</h3>
-            <p>Back up and sync across devices via GitHub.</p>
-          </div>
+        <div className="feat-grid">
+          {[
+            { to: '/models', icon: <Shield size={28} />, title: 'Collection', desc: 'Track every miniature by faction and status', color: '#3b82f6' },
+            { to: '/paints', icon: <Palette size={28} />, title: 'Paint Rack', desc: 'Catalog paints across all major brands', color: '#a855f7' },
+            { to: '/grey-pile', icon: <Skull size={28} />, title: 'Pile of Grey', desc: 'Face your shame — promote through the pipeline', color: '#6b7280' },
+            { to: '/progress', icon: <TrendingUp size={28} />, title: 'Progress', desc: 'Ranks, trophies, and painting streaks', color: '#f59e0b' },
+            { to: '/campaigns', icon: <Swords size={28} />, title: 'Campaigns', desc: 'Solo Kill Team narrative missions', color: '#ef4444' },
+            { to: '/suggestions', icon: <BookOpen size={28} />, title: 'Paint Guides', desc: 'Step-by-step tutorials and recipes', color: '#10b981' },
+            { to: '/inspiration', icon: <Brush size={28} />, title: 'Inspiration', desc: 'Techniques, tips, and pro recipes', color: '#ec4899' },
+            { to: '/community', icon: <Cloud size={28} />, title: 'Community', desc: 'Share models and browse the gallery', color: '#06b6d4' },
+          ].map(f => (
+            <div key={f.to} className="feat-card" onClick={() => nav(f.to)}>
+              <div className="feat-icon" style={{ '--feat-color': f.color } as React.CSSProperties}>{f.icon}</div>
+              <div className="feat-info">
+                <div className="feat-title">{f.title}</div>
+                <div className="feat-desc">{f.desc}</div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </div>

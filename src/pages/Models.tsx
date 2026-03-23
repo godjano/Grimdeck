@@ -8,7 +8,7 @@ import ModelAutocomplete from '../components/ModelAutocomplete';
 import type { ModelPreset } from '../db/model-presets';
 import { BulkAddModels } from '../components/BulkAdd';
 import { getGWSearchUrl } from '../db/external-links';
-import { Plus, Package, Search, Filter, ChevronDown, ChevronRight, Grid3X3, List, LayoutGrid, MoreVertical, Trash2, ExternalLink, Star, Camera } from 'lucide-react';
+import { Plus, Package, Search, Filter, ChevronDown, ChevronRight, Grid3X3, List, LayoutGrid, MoreVertical, Trash2, ExternalLink, Star, Camera, X } from 'lucide-react';
 
 type ViewMode = 'list' | 'grid' | 'grouped';
 
@@ -315,6 +315,4 @@ function AddModelForm({ onDone }: { onDone: () => void }) {
   );
 }
 
-function X({ size }: { size: number }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
-}
+// end of file
