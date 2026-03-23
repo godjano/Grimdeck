@@ -43,13 +43,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
    SITE STRUCTURE
    ═══════════════════════════════════════ */
 .site { min-height:100vh; display:flex; flex-direction:column;
-  background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(64,224,208,0.03) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(220,38,38,0.02) 0%, transparent 50%),
-    url('/bg-pattern.webp');
-  background-color: var(--bg);
-  background-repeat: repeat;
-  background-size: 300px;
+  background: transparent;
 }
 .site-main { flex:1; max-width:1080px; margin:0 auto; padding:0 40px; width:100%; }
 
@@ -1621,15 +1615,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
    ═══════════════════════════════════════ */
 
 /* Warm cinematic background */
-.site {
-  background-image:
-    radial-gradient(ellipse at 50% 30%, rgba(196,100,20,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 20% 80%, rgba(138,8,8,0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 60%, rgba(196,149,42,0.04) 0%, transparent 50%),
-    url('/bg-pattern.webp') !important;
-  background-color: var(--bg) !important;
-  background-size: 100%, 100%, 100%, 300px !important;
-}
+/* site bg handled by body */
 
 /* Cinematic hero overhaul */
 .hero {
@@ -1829,15 +1815,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
    ═══════════════════════════════════════ */
 
 /* Metal texture on site background */
-.site {
-  background-image:
-    radial-gradient(ellipse at 50% 20%, rgba(196,100,20,0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 20% 80%, rgba(138,8,8,0.08) 0%, transparent 50%),
-    url('/decor/metal-dark.jpg') !important;
-  background-color: #060608 !important;
-  background-size: 100%, 100%, 400px !important;
-  background-blend-mode: normal, normal, overlay !important;
-}
+/* site bg handled by body */
 
 /* Daemon crest as hero background */
 .hero::before {
@@ -2082,13 +2060,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 /* Keep ornate frame ONLY on player card — it's the "character sheet" */
 .player-card::after { opacity: 0.04; }
 
-/* Cleaner site background — just the metal texture, no competing patterns */
-.site {
-  background-image: url('/decor/metal-dark.jpg') !important;
-  background-size: 500px !important;
-  background-blend-mode: normal !important;
-  background-color: #060608 !important;
-}
+/* site bg handled by body */
 
 /* Add atmospheric gradient overlay on top */
 .site::before {
