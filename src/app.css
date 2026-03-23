@@ -2177,6 +2177,25 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 
 /* Tab content */
 .md-content { padding: 20px 0; }
+.md-stats-tab, .md-recipe-tab, .md-journal-tab {
+  background: url('/decor/scroll-panel.jpg') center/cover no-repeat;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(196,150,42,0.15);
+}
+.md-stats-tab {
+  background-image: url('/decor/datacard-bg.jpg');
+}
+.md-stats-tab .md-stat-label, .md-stats-tab .md-stat-value,
+.md-stats-tab .md-section-title, .md-stats-tab .md-weapon-name,
+.md-stats-tab .md-weapon-stats span {
+  color: #1a1208;
+  text-shadow: none;
+}
+.md-stats-tab .md-stat-card {
+  background: rgba(0,0,0,0.15);
+  backdrop-filter: blur(2px);
+}
 .md-section-title {
   display: flex; align-items: center; gap: 8px;
   font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 600;
