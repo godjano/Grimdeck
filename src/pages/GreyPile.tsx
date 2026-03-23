@@ -52,6 +52,7 @@ export default function GreyPile() {
   return (
     <div>
       <PageBanner title="The Pile of Grey" subtitle="Face your shame — promote through the pipeline" icon="skull" />
+      <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
 
       {totalGrey === 0 && totalWip === 0 ? (
         <div className="empty">

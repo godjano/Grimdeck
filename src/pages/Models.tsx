@@ -77,6 +77,7 @@ export default function Models() {
   return (
     <div>
       <PageBanner title="My Models" subtitle="Track every miniature by faction and status" icon="models" />
+      <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
       {/* ─── Header ─── */}
       <div className="page-header">
         <div style={{ display: 'flex', gap: 8 }}>
