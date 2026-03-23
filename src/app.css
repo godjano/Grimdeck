@@ -2437,6 +2437,13 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
   border: 1px solid rgba(196,149,42,0.15) !important;
   box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 -100px 80px rgba(6,6,8,0.8) !important;
 }
+.md-hero-frame .md-hero-overlay {
+  background: linear-gradient(180deg,
+    rgba(6,6,8,0.05) 0%,
+    rgba(6,6,8,0.2) 40%,
+    rgba(6,6,8,0.7) 80%,
+    rgba(6,6,8,0.92) 100%) !important;
+}
 .md-hero-overlay {
   position: absolute !important; inset: 0 !important;
   background: linear-gradient(180deg,

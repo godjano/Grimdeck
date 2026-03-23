@@ -34,8 +34,12 @@ export default function Models() {
 
   const toggleGroup = (key: string) => {
     const next = new Set(collapsed);
-    next.delete('__ALL_COLLAPSED__');
-    next.has(key) ? next.delete(key) : next.add(key);
+    if (next.has('__ALL_COLLAPSED__')) {
+      next.delete('__ALL_COLLAPSED__');
+      factions.forEach(f => { if (f !== key) next.add(f); });
+    } else {
+      next.has(key) ? next.delete(key) : next.add(key);
+    }
     setCollapsed(next);
   };
 

@@ -140,7 +140,7 @@ export default function ModelDetail() {
   return (
     <div className="model-detail-v2">
       {/* ─── HERO BANNER with faction art ─── */}
-      <div className="md-hero" style={factionArt ? { backgroundImage: `url(${factionArt})` } : {}}>
+      <div className={`md-hero ${factionArt ? '' : 'md-hero-frame'}`} style={factionArt ? { backgroundImage: `url(${factionArt})` } : {}}>
         <div className="md-hero-overlay" />
         <button className="btn btn-ghost btn-sm md-back" onClick={() => nav('/models')}>
           <ChevronLeft size={16} /> Back
