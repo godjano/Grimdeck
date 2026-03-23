@@ -11,6 +11,11 @@ const ICONS: Record<string, string> = {
   inspiration: 'icon-grimoire.png',
   community: 'icon-shield.png',
   settings: 'icon-gear.png',
+  aquila: 'icon-aquila.png',
+  medal: 'icon-medal.png',
+  'skull-cog': 'icon-skull-cog.png',
+  'chaos-skull': 'icon-chaos-skull.png',
+  target: 'icon-target.png',
 };
 
 export default function GoldIcon({ name, size = 20 }: { name: keyof typeof ICONS | string; size?: number }) {

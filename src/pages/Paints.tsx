@@ -5,7 +5,7 @@ import { PAINT_TYPES } from '../types';
 import PaintAutocomplete from '../components/PaintAutocomplete';
 import type { PaintPreset } from '../db/paint-presets';
 import { BulkAddPaints } from '../components/BulkAdd';
-import { Plus, Package, Search, Filter, Grid3X3, List, LayoutGrid, ChevronDown, ChevronRight, Trash2, Droplets, X } from 'lucide-react';
+import { Plus, Package, Search, Filter, Grid3X3, List, LayoutGrid, ChevronDown, ChevronRight, Trash2, X } from 'lucide-react';
 import PageBanner from '../components/PageBanner';
 
 type ViewMode = 'list' | 'grid' | 'grouped';
@@ -161,7 +161,7 @@ export default function Paints() {
 
       {filtered.length === 0 ? (
         <div className="md-empty-tab" style={{ marginTop: 40 }}>
-          <Droplets size={48} strokeWidth={1} style={{ opacity: 0.15, marginBottom: 12 }} />
+          <img src={`${import.meta.env.BASE_URL}decor/empty-workstation.jpg`} alt="" style={{ width: 200, height: 'auto', borderRadius: 12, opacity: 0.6, marginBottom: 12 }} />
           <p>{paints.length === 0 ? 'Add your first paint to start your rack.' : 'No paints match your filters.'}</p>
         </div>
       ) : view === 'grid' ? (

@@ -155,7 +155,7 @@ export default function Models() {
       {/* ─── Empty state ─── */}
       {filtered.length === 0 ? (
         <div className="md-empty-tab" style={{ marginTop: 40 }}>
-          <img src="/decor/skull.jpg" alt="" className="md-empty-icon" />
+          <img src={`${import.meta.env.BASE_URL}decor/empty-workstation.jpg`} alt="" className="md-empty-icon" style={{ width: 200, height: 'auto', borderRadius: 12, opacity: 0.6 }} />
           <p>{models.length === 0 ? 'Add your first model to begin.' : 'No models match your filters.'}</p>
         </div>
       ) : view === 'grid' ? (
@@ -235,7 +235,7 @@ function ModelCard({ m, nav, openMenu, setOpenMenu, updateStatus, deleteModel }:
             {MODEL_STATUSES.map(s => (
               <button key={s} className={m.status === s ? 'active' : ''} onClick={() => { updateStatus(m.id!, s as ModelStatus); setOpenMenu(null); }}>{s}</button>
             ))}
-            <hr />
+            <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
             <a href={getGWSearchUrl(m.name)} target="_blank" rel="noreferrer" onClick={() => setOpenMenu(null)}>
               <ExternalLink size={12} /> GW Store
             </a>

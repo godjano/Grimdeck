@@ -3016,3 +3016,17 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
   background-size: 400px !important;
   background-blend-mode: soft-light !important;
 }
+
+/* ═══ GOLD ORNAMENTAL DIVIDER ═══ */
+.gold-divider, .md-divider {
+  text-align: center;
+  margin: 16px 0;
+  line-height: 0;
+}
+.gold-divider img, .md-divider img {
+  height: 28px;
+  width: auto;
+  max-width: 90%;
+  object-fit: contain;
+  opacity: 0.85;
+}
