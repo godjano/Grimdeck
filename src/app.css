@@ -2985,3 +2985,15 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
   .page-banner-content { padding: 0 16px 12px; }
   .page-banner-content h1 { font-size: 1.2rem; }
 }
+
+/* ═══ PARCHMENT CARD TEXTURE ═══ */
+.feature-card, .ml-card:hover, .ml-tile, .detail-section, .form-overlay,
+.settings-section, .tool-card, .mission-panel, .rank-card, .trophy-card,
+.wip-showcase, .scheme-card, .guide-card, .guide-step-card, .gallery-card,
+.op-card, .game-controls, .md-stat-card, .md-weapon, .md-recipe-item,
+.pr-rack, .shame-dashboard, .player-card, .wizard-card, .project-gen,
+.streak-card, .session-planner, .monthly-stats {
+  background-image: url('/tex-parchment.jpg') !important;
+  background-size: 400px !important;
+  background-blend-mode: soft-light !important;
+}
