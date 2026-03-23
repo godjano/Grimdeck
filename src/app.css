@@ -2006,3 +2006,132 @@ body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var
 }
 .gallery-card { position: relative; }
 .gallery-info { position: relative; z-index: 1; }
+
+/* ═══════════════════════════════════════
+   UX DESIGNER CLEANUP — Less noise, more impact
+   ═══════════════════════════════════════ */
+
+/* REMOVE excessive decorative overlays from cards */
+.card::before, .card::after,
+.feature-card:hover::before,
+.gallery-card::before,
+.trophy-card.earned::before,
+.achievement.unlocked::before,
+.project-gen::before,
+.settings-section::after, .tool-card::after,
+.site-header::before { display: none !important; }
+
+/* Keep only the key decorative elements */
+/* Hero gets the Wolf Scout as a cinematic background */
+.hero {
+  position: relative;
+  min-height: 80vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 80px 0 !important;
+  overflow: hidden;
+}
+.hero::before {
+  content: '' !important; position: absolute; inset: 0;
+  background: url('/faction-art/wolf-scouts-10-0.jpeg') no-repeat center center !important;
+  background-size: cover !important;
+  opacity: 0.2 !important;
+  filter: none !important;
+}
+.hero::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(6,6,8,0.3) 0%, rgba(6,6,8,0.7) 50%, rgba(6,6,8,0.95) 100%);
+  pointer-events: none;
+}
+.hero > * { position: relative; z-index: 2; }
+
+/* Cleaner hero text */
+.hero-title {
+  text-shadow: 0 4px 40px rgba(0,0,0,0.8), 0 0 80px rgba(196,149,42,0.15) !important;
+}
+.hero-title span {
+  text-shadow: 0 4px 60px rgba(196,149,42,0.25), 0 0 120px rgba(196,149,42,0.1) !important;
+}
+
+/* Clean card style — no textures, just subtle borders */
+.card {
+  background: rgba(14,16,22,0.8) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(196,149,42,0.06) !important;
+  border-top: 1px solid rgba(196,149,42,0.12) !important;
+}
+.card:hover {
+  background: rgba(20,22,28,0.9) !important;
+  border-color: rgba(196,149,42,0.15) !important;
+}
+
+/* Feature cards — clean glass */
+.feature-card, .home-card {
+  background: rgba(14,16,22,0.7) !important;
+  backdrop-filter: blur(12px);
+}
+.feature-card::after, .home-card::after { display: none !important; }
+
+/* Settings/tool sections — clean */
+.settings-section, .tool-card, .form-overlay, .detail-section {
+  background: rgba(14,16,22,0.8) !important;
+  backdrop-filter: blur(8px);
+}
+
+/* Keep daemon crest ONLY on Grey Pile shame banner — it's thematic */
+.shame-dashboard {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, rgba(14,10,10,0.9), rgba(20,14,14,0.8)) !important;
+}
+.shame-dashboard::before {
+  opacity: 0.06 !important;
+}
+
+/* Keep ornate frame ONLY on player card — it's the "character sheet" */
+.player-card::after { opacity: 0.04; }
+
+/* Cleaner site background — just the metal texture, no competing patterns */
+.site {
+  background-image: url('/decor/metal-dark.jpg') !important;
+  background-size: 500px !important;
+  background-blend-mode: normal !important;
+  background-color: #060608 !important;
+}
+
+/* Add atmospheric gradient overlay on top */
+.site::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(196,100,20,0.04) 0%, transparent 60%);
+}
+.site > * { position: relative; z-index: 1; }
+
+/* Murderwing image on campaign page */
+.campaign-map {
+  position: relative;
+}
+
+/* Section backgrounds for visual rhythm */
+.section:nth-child(even) {
+  background: rgba(14,16,22,0.3);
+  margin-left: -40px; margin-right: -40px;
+  padding-left: 40px; padding-right: 40px;
+  border-top: 1px solid rgba(196,149,42,0.04);
+  border-bottom: 1px solid rgba(196,149,42,0.04);
+}
+
+/* Stat band — cleaner */
+.stats-band {
+  background: rgba(10,10,14,0.6) !important;
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(196,149,42,0.08) !important;
+  border-bottom: 1px solid rgba(196,149,42,0.08) !important;
+}
+.stats-band::before { display: none !important; }
+
+/* Footer — minimal */
+.site-footer { background: rgba(6,6,8,0.8); }
+.site-footer::before { display: none !important; }
+
+@media (max-width: 768px) {
+  .hero { min-height: 60vh; }
+  .section:nth-child(even) { margin-left: -20px; margin-right: -20px; padding-left: 20px; padding-right: 20px; }
+}
