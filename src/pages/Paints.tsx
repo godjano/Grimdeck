@@ -8,6 +8,24 @@ import { BulkAddPaints } from '../components/BulkAdd';
 import { Plus, Package, Search, Filter, Grid3X3, List, LayoutGrid, ChevronDown, ChevronRight, Trash2, Droplets, X } from 'lucide-react';
 
 type ViewMode = 'list' | 'grid' | 'grouped';
+type SortMode = 'name' | 'brand' | 'colour';
+
+function hexToHsl(hex: string): [number, number, number] {
+  const c = hex.replace('#', '');
+  const r = parseInt(c.substring(0, 2), 16) / 255;
+  const g = parseInt(c.substring(2, 4), 16) / 255;
+  const b = parseInt(c.substring(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h = 0;
+  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+  else if (max === g) h = ((b - r) / d + 2) / 6;
+  else h = ((r - g) / d + 4) / 6;
+  return [h, s, l];
+}
 
 export default function Paints() {
   const [showForm, setShowForm] = useState(false);
@@ -18,6 +36,7 @@ export default function Paints() {
   const [view, setView] = useState<ViewMode>('grid');
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState<SortMode>('name');
 
   const paints = useLiveQuery(() => db.paints.orderBy('name').toArray()) ?? [];
   const brands = [...new Set(paints.map(p => p.brand))].sort();
@@ -26,7 +45,15 @@ export default function Paints() {
     (!filterBrand || p.brand === filterBrand) &&
     (!filterType || p.type === filterType) &&
     (!search || p.name.toLowerCase().includes(search.toLowerCase()))
-  );
+  ).sort((a, b) => {
+    if (sortBy === 'colour') {
+      const [h1, s1, l1] = hexToHsl(a.hexColor || '#000000');
+      const [h2, s2, l2] = hexToHsl(b.hexColor || '#000000');
+      return h1 - h2 || s1 - s2 || l1 - l2;
+    }
+    if (sortBy === 'brand') return (a.brand + a.name).localeCompare(b.brand + b.name);
+    return a.name.localeCompare(b.name);
+  });
 
   const deletePaint = async (id: number) => {
     await db.paints.delete(id);
@@ -102,7 +129,14 @@ export default function Paints() {
         </div>
       )}
 
-      <div className="ml-results"><span>{filtered.length} paints</span></div>
+      <div className="ml-results">
+        <span>{filtered.length} paints</span>
+        <select className="pr-sort-select" value={sortBy} onChange={e => setSortBy(e.target.value as SortMode)}>
+          <option value="name">Sort: Name</option>
+          <option value="brand">Sort: Brand</option>
+          <option value="colour">Sort: Colour 🎨</option>
+        </select>
+      </div>
 
       {filtered.length === 0 ? (
         <div className="md-empty-tab" style={{ marginTop: 40 }}>
