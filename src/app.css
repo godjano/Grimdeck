@@ -2991,7 +2991,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .settings-section, .tool-card, .mission-panel, .rank-card, .trophy-card,
 .wip-showcase, .scheme-card, .guide-card, .guide-step-card, .gallery-card,
 .op-card, .game-controls, .md-stat-card, .md-weapon, .md-recipe-item,
-.pr-rack, .shame-dashboard, .player-card, .wizard-card, .project-gen,
+.shame-dashboard, .player-card, .wizard-card, .project-gen,
 .streak-card, .session-planner, .monthly-stats {
   background-image: url('/tex-parchment.jpg') !important;
   background-size: 400px !important;

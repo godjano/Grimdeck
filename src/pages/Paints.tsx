@@ -28,6 +28,23 @@ function hexToHsl(hex: string): [number, number, number] {
   return [h, s, l];
 }
 
+// Colour family: neutrals first, then rainbow order, then metallics
+function colourFamily(h: number, s: number, l: number): number {
+  if (l < 0.08) return 0;           // blacks
+  if (l > 0.92) return 1;           // whites
+  if (s < 0.1) return 2;            // greys
+  // rainbow: red→orange→yellow→green→cyan→blue→purple→pink
+  const deg = h * 360;
+  if (deg < 15) return 10;          // red
+  if (deg < 40) return 11;          // orange
+  if (deg < 70) return 12;          // yellow
+  if (deg < 160) return 13;         // green
+  if (deg < 200) return 14;         // cyan
+  if (deg < 260) return 15;         // blue
+  if (deg < 310) return 16;         // purple
+  return 10;                        // pink → back to red family
+}
+
 export default function Paints() {
   const [showForm, setShowForm] = useState(false);
   const [showBulk, setShowBulk] = useState(false);
@@ -50,7 +67,10 @@ export default function Paints() {
     if (sortBy === 'colour') {
       const [h1, s1, l1] = hexToHsl(a.hexColor || '#000000');
       const [h2, s2, l2] = hexToHsl(b.hexColor || '#000000');
-      return h1 - h2 || s1 - s2 || l1 - l2;
+      const f1 = colourFamily(h1, s1, l1), f2 = colourFamily(h2, s2, l2);
+      if (f1 !== f2) return f1 - f2;       // group by colour family
+      if (Math.abs(h1 - h2) > 0.02) return h1 - h2; // within family: by hue
+      return l1 - l2;                       // same hue: dark to light
     }
     if (sortBy === 'brand') return (a.brand + a.name).localeCompare(b.brand + b.name);
     return a.name.localeCompare(b.name);
