@@ -147,7 +147,8 @@ export default function Paints() {
         /* Paint rack — shelves with pots */
         <div className="pr-rack">
           {(() => {
-            const cols = typeof window !== 'undefined' && window.innerWidth < 600 ? 5 : 8;
+            const maxCols = typeof window !== 'undefined' && window.innerWidth < 600 ? 5 : 8;
+            const cols = Math.min(maxCols, filtered.length) || 1;
             const rows: typeof filtered[] = [];
             for (let i = 0; i < filtered.length; i += cols) rows.push(filtered.slice(i, i + cols));
             return rows.map((row, ri) => (
