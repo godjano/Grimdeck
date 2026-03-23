@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
-import { Shield, Palette, Skull, TrendingUp, Swords, BookOpen, Brush, Cloud} from 'lucide-react';
+import { Shield, Brush } from 'lucide-react';
 
 import PaintingStreak from '../components/PaintingStreak';
 import SessionPlanner from '../components/SessionPlanner';
@@ -113,14 +113,14 @@ export default function Home() {
         <h2 className="section-heading">Everything you need</h2>
         <div className="feature-grid">
           {[
-            { to: '/models', icon: <Shield size={28} />, title: 'Collection', desc: 'Track every miniature by faction and status', color: '#3b82f6' },
-            { to: '/paints', icon: <Palette size={28} />, title: 'Paint Rack', desc: 'Catalog paints across all major brands', color: '#a855f7' },
-            { to: '/grey-pile', icon: <Skull size={28} />, title: 'Pile of Grey', desc: 'Face your shame — promote through the pipeline', color: '#6b7280' },
-            { to: '/progress', icon: <TrendingUp size={28} />, title: 'Progress', desc: 'Ranks, trophies, and painting streaks', color: '#f59e0b' },
-            { to: '/campaigns', icon: <Swords size={28} />, title: 'Campaigns', desc: 'Solo Kill Team narrative missions', color: '#ef4444' },
-            { to: '/suggestions', icon: <BookOpen size={28} />, title: 'Paint Guides', desc: 'Step-by-step tutorials and recipes', color: '#10b981' },
-            { to: '/inspiration', icon: <Brush size={28} />, title: 'Inspiration', desc: 'Techniques, tips, and pro recipes', color: '#ec4899' },
-            { to: '/community', icon: <Cloud size={28} />, title: 'Community', desc: 'Share models and browse the gallery', color: '#06b6d4' },
+            { to: '/models', icon: <img src="/decor/icon-shield.png" alt="" width={44} height={44} />, title: 'Collection', desc: 'Track every miniature by faction and status', color: '#3b82f6' },
+            { to: '/paints', icon: <img src="/decor/icon-palette.png" alt="" width={44} height={44} />, title: 'Paint Rack', desc: 'Catalog paints across all major brands', color: '#a855f7' },
+            { to: '/grey-pile', icon: <img src="/decor/icon-skull.png" alt="" width={44} height={44} />, title: 'Pile of Grey', desc: 'Face your shame — promote through the pipeline', color: '#6b7280' },
+            { to: '/progress', icon: <img src="/decor/icon-trophy.png" alt="" width={44} height={44} />, title: 'Progress', desc: 'Ranks, trophies, and painting streaks', color: '#f59e0b' },
+            { to: '/campaigns', icon: <img src="/decor/icon-sword.png" alt="" width={44} height={44} />, title: 'Campaigns', desc: 'Solo Kill Team narrative missions', color: '#ef4444' },
+            { to: '/suggestions', icon: <img src="/decor/icon-book.png" alt="" width={44} height={44} />, title: 'Paint Guides', desc: 'Step-by-step tutorials and recipes', color: '#10b981' },
+            { to: '/inspiration', icon: <img src="/decor/icon-grimoire.png" alt="" width={44} height={44} />, title: 'Inspiration', desc: 'Techniques, tips, and pro recipes', color: '#ec4899' },
+            { to: '/community', icon: <img src="/decor/icon-star-shield.png" alt="" width={44} height={44} />, title: 'Community', desc: 'Share models and browse the gallery', color: '#06b6d4' },
           ].map(f => (
             <div key={f.to} className="feature-card" onClick={() => nav(f.to)} style={{ '--feat-color': f.color } as React.CSSProperties}>
               <div className="feature-icon" style={{ background: `color-mix(in srgb, ${f.color} 12%, transparent)`, color: f.color }}>{f.icon}</div>
