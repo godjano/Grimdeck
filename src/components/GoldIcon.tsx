@@ -54,6 +54,20 @@ const ICONS: Record<string, string> = {
   victory: 'icon-victory.png',
   defeat: 'icon-defeat.png',
   handshake: 'icon-handshake.png',
+  // Board legend
+  'flag-player': 'icon-flag-player.png',
+  'flag-enemy': 'icon-flag-enemy.png',
+  'heavy-cover': 'icon-heavy-cover.png',
+  'light-cover': 'icon-light-cover.png',
+  vantage: 'icon-vantage2.png',
+  objective: 'icon-objective2.png',
+  // Roles
+  'role-leader': 'icon-role-leader.png',
+  'role-fighter': 'icon-role-fighter.png',
+  'role-gunner': 'icon-role-gunner.png',
+  'role-heavy': 'icon-role-heavy.png',
+  'role-scout': 'icon-role-scout.png',
+  'role-medic': 'icon-role-medic.png',
 };
 
 export default function GoldIcon({ name, size = 20 }: { name: keyof typeof ICONS | string; size?: number }) {

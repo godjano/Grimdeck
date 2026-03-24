@@ -67,7 +67,7 @@ export default function OperativeSelection({ faction, onConfirm, onBack }: Props
               <div key={i} className="selection-slot">
                 <div className="selection-slot-info">
                   <span className="selection-slot-name">{op.name}</span>
-                  <span className="selection-slot-role">{op.role}</span>
+                  <span className="selection-slot-role"><GoldIcon name={`role-${op.role.toLowerCase().split(' ')[0]}`} size={14} /> {op.role}</span>
                 </div>
                 <div className="selection-slot-stats">
                   M:{op.movement}" · APL:{op.apl} · SV:{op.save}+ · W:{op.wounds}

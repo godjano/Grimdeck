@@ -8,7 +8,7 @@ import { aiActivationV2, AI_CONFIGS, type AIDifficulty } from '../db/killteam-ai
 import { formatProbability, expectedHits, expectedDamage } from '../db/dice-math';
 import { rollRandomEvent, type RandomEvent } from '../db/random-events';
 import { getOpColor } from '../db/operative-icons';
-import { RoleIcon, BoardToken, getFactionEmoji, ROLE_INFO } from '../db/operative-icons.tsx';
+import { RoleIcon, BoardToken, getFactionEmoji } from '../db/operative-icons.tsx';
 
 interface Props {
   playerFaction: string;
@@ -235,7 +235,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                       <BoardToken role={op.op.role} team={op.team} size={14} />
                     </div>
                   ) : cell === 'objective' ? (
-                    <span className="cell-obj-marker">◎</span>
+                    <GoldIcon name="objective" size={16} />
                   ) : ''}
                 </div>
               );
@@ -259,23 +259,21 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
           </div>
 
           <div className="board-legend">
-            <span className="legend-item"><span className="legend-swatch" style={{ background: '#0d2b0d' }} />Your deploy zone</span>
-            <span className="legend-item"><span className="legend-swatch" style={{ background: '#2b0d0d' }} />Enemy deploy zone</span>
-            <span className="legend-item"><span className="legend-swatch" style={{ background: '#4e342e' }} />Heavy cover (blocks LOS)</span>
-            <span className="legend-item"><span className="legend-swatch" style={{ background: '#37474f' }} />Light cover</span>
-            <span className="legend-item"><span className="legend-swatch" style={{ background: '#4a148c' }} />Vantage point</span>
-            <span className="legend-item" style={{ color: 'var(--gold)' }}>◎ Objective</span>
+            <span className="legend-item"><GoldIcon name="flag-player" size={18} /> Your deploy zone</span>
+            <span className="legend-item"><GoldIcon name="flag-enemy" size={18} /> Enemy deploy zone</span>
+            <span className="legend-item"><GoldIcon name="heavy-cover" size={18} /> Heavy cover (blocks LOS)</span>
+            <span className="legend-item"><GoldIcon name="light-cover" size={18} /> Light cover</span>
+            <span className="legend-item"><GoldIcon name="vantage" size={18} /> Vantage point</span>
+            <span className="legend-item"><GoldIcon name="objective" size={18} /> Objective</span>
           </div>
           <div className="board-legend">
             <strong style={{ marginRight: 8 }}>Roles:</strong>
-            {ROLE_INFO.map(r => (
-              <span key={r.role} className="legend-item">
-                <span className="legend-swatch" style={{ background: '#388e3c', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <RoleIcon role={r.role} size={10} color="#fff" />
-                </span>
-                {r.label}
-              </span>
-            ))}
+            <span className="legend-item"><GoldIcon name="role-leader" size={18} /> Leader</span>
+            <span className="legend-item"><GoldIcon name="role-fighter" size={18} /> Fighter</span>
+            <span className="legend-item"><GoldIcon name="role-gunner" size={18} /> Gunner</span>
+            <span className="legend-item"><GoldIcon name="role-heavy" size={18} /> Heavy</span>
+            <span className="legend-item"><GoldIcon name="role-scout" size={18} /> Scout</span>
+            <span className="legend-item"><GoldIcon name="role-medic" size={18} /> Medic</span>
           </div>
           <div className="terrain-list">
             <strong><GoldIcon name="models" size={14} /> Terrain to place on your board:</strong>
@@ -445,7 +443,7 @@ function OpCard({ op, selected, onSelect }: { op: OpState; idx: number; selected
     <div className={`op-card ${op.team === 'player' ? 'team-player' : ''} ${selected ? 'selected' : ''} ${dead ? 'dead' : ''} ${op.activated ? 'activated' : ''}`} onClick={onSelect}>
       <div className="op-card-header">
         <span className="op-card-name">{getFactionEmoji(op.op.faction)} {op.op.name}</span>
-        <span className="op-card-role"><RoleIcon role={op.op.role} size={12} color="currentColor" /> {op.op.role}</span>
+        <span className="op-card-role"><GoldIcon name={`role-${op.op.role.toLowerCase().split(' ')[0]}`} size={14} /> {op.op.role}</span>
       </div>
       <div className="op-card-stats">
         <div className="op-stat"><div className="op-stat-label">Move</div><div className="op-stat-val">{op.op.movement}"</div></div>
