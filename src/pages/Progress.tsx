@@ -8,16 +8,16 @@ import PageBanner from '../components/PageBanner';
 
 // ─── RPG RANK SYSTEM ───
 const RANKS = [
-  { min: 0, title: 'Neophyte', icon: '🪖', tier: 'Bronze', desc: 'Fresh from the box. Your journey begins.', xpMult: 1 },
-  { min: 5, title: 'Initiate', icon: '🖌️', tier: 'Bronze', desc: 'You have taken up the brush.', xpMult: 1.1 },
-  { min: 15, title: 'Battle Brother', icon: '🛡️', tier: 'Bronze', desc: 'Your models stand ready for war.', xpMult: 1.2 },
-  { min: 30, title: 'Veteran', icon: '⚔️', tier: 'Silver', desc: 'Seasoned by countless painting sessions.', xpMult: 1.3 },
-  { min: 50, title: 'Champion', icon: '🏰', tier: 'Silver', desc: 'Your skill is recognised across the chapter.', xpMult: 1.5 },
-  { min: 75, title: 'Captain', icon: '👑', tier: 'Silver', desc: 'You lead by example. Others follow your recipes.', xpMult: 1.7 },
-  { min: 100, title: 'Chapter Master', icon: '🌟', tier: 'Gold', desc: 'A hundred souls given colour and purpose.', xpMult: 2 },
-  { min: 150, title: 'Lord Commander', icon: '🔥', tier: 'Gold', desc: 'Your armies are the stuff of legend.', xpMult: 2.5 },
-  { min: 250, title: 'Primarch', icon: '⚡', tier: 'Platinum', desc: 'You have transcended. The Emperor notices.', xpMult: 3 },
-  { min: 500, title: 'Emperor of Mankind', icon: '☀️', tier: 'Platinum', desc: 'There is only paint. And you are its master.', xpMult: 5 },
+  { min: 0, title: 'Neophyte', icon: 'skull', tier: 'Bronze', desc: 'Fresh from the box. Your journey begins.', xpMult: 1 },
+  { min: 5, title: 'Initiate', icon: 'paints', tier: 'Bronze', desc: 'You have taken up the brush.', xpMult: 1.1 },
+  { min: 15, title: 'Battle Brother', icon: 'models', tier: 'Bronze', desc: 'Your models stand ready for war.', xpMult: 1.2 },
+  { min: 30, title: 'Veteran', icon: 'campaigns', tier: 'Silver', desc: 'Seasoned by countless painting sessions.', xpMult: 1.3 },
+  { min: 50, title: 'Champion', icon: 'target', tier: 'Silver', desc: 'Your skill is recognised across the chapter.', xpMult: 1.5 },
+  { min: 75, title: 'Captain', icon: 'medal', tier: 'Silver', desc: 'You lead by example. Others follow your recipes.', xpMult: 1.7 },
+  { min: 100, title: 'Chapter Master', icon: 'aquila', tier: 'Gold', desc: 'A hundred souls given colour and purpose.', xpMult: 2 },
+  { min: 150, title: 'Lord Commander', icon: 'skull-cog', tier: 'Gold', desc: 'Your armies are the stuff of legend.', xpMult: 2.5 },
+  { min: 250, title: 'Primarch', icon: 'chaos-skull', tier: 'Platinum', desc: 'You have transcended. The Emperor notices.', xpMult: 3 },
+  { min: 500, title: 'Emperor of Mankind', icon: 'aquila', tier: 'Platinum', desc: 'There is only paint. And you are its master.', xpMult: 5 },
 ];
 
 // ─── TROPHY SYSTEM (PlayStation style) ───
@@ -35,38 +35,38 @@ interface Stats {
 
 const TROPHIES: Trophy[] = [
   // Bronze
-  { id: 'first_model', name: 'The Beginning', desc: 'Add your first model', icon: '📦', tier: 'bronze', check: s => s.total >= 1, rarity: 'Common' },
-  { id: 'first_paint', name: 'First Stroke', desc: 'Paint your first mini', icon: '🖌️', tier: 'bronze', check: s => s.painted >= 1, rarity: 'Common' },
-  { id: 'five_painted', name: 'Getting Started', desc: 'Paint 5 minis', icon: '🎨', tier: 'bronze', check: s => s.painted >= 5, rarity: 'Common' },
-  { id: 'ten_paints', name: 'Colour Collector', desc: 'Own 10 paints', icon: '🧪', tier: 'bronze', check: s => s.paints >= 10, rarity: 'Common' },
-  { id: 'first_log', name: 'Dear Diary', desc: 'Write your first painting log', icon: '📝', tier: 'bronze', check: s => s.logs >= 1, rarity: 'Common' },
-  { id: 'first_photo', name: 'Say Cheese', desc: 'Add a photo to a model', icon: '📸', tier: 'bronze', check: s => s.photos >= 1, rarity: 'Common' },
-  { id: 'twenty_models', name: 'Growing Collection', desc: 'Own 20 minis', icon: '📦', tier: 'bronze', check: s => s.total >= 20, rarity: 'Common' },
+  { id: 'first_model', name: 'The Beginning', desc: 'Add your first model', icon: 'models', tier: 'bronze', check: s => s.total >= 1, rarity: 'Common' },
+  { id: 'first_paint', name: 'First Stroke', desc: 'Paint your first mini', icon: 'paints', tier: 'bronze', check: s => s.painted >= 1, rarity: 'Common' },
+  { id: 'five_painted', name: 'Getting Started', desc: 'Paint 5 minis', icon: 'paints', tier: 'bronze', check: s => s.painted >= 5, rarity: 'Common' },
+  { id: 'ten_paints', name: 'Colour Collector', desc: 'Own 10 paints', icon: 'paints', tier: 'bronze', check: s => s.paints >= 10, rarity: 'Common' },
+  { id: 'first_log', name: 'Dear Diary', desc: 'Write your first painting log', icon: 'guides', tier: 'bronze', check: s => s.logs >= 1, rarity: 'Common' },
+  { id: 'first_photo', name: 'Say Cheese', desc: 'Add a photo to a model', icon: 'target', tier: 'bronze', check: s => s.photos >= 1, rarity: 'Common' },
+  { id: 'twenty_models', name: 'Growing Collection', desc: 'Own 20 minis', icon: 'models', tier: 'bronze', check: s => s.total >= 20, rarity: 'Common' },
 
   // Silver
-  { id: 'squad_done', name: 'Squad Complete!', desc: 'Paint 10 minis', icon: '👥', tier: 'silver', check: s => s.painted >= 10, rarity: 'Uncommon' },
-  { id: 'multi_faction', name: 'Xenos Sympathiser', desc: 'Own models from 3+ factions', icon: '🌍', tier: 'silver', check: s => s.factions >= 3, rarity: 'Uncommon' },
-  { id: 'fifty_paints', name: 'Paint Hoarder', desc: 'Own 50 paints', icon: '🎨', tier: 'silver', check: s => s.paints >= 50, rarity: 'Uncommon' },
-  { id: 'army_painted', name: 'Army Builder', desc: 'Paint 50 minis', icon: '🏗️', tier: 'silver', check: s => s.painted >= 50, rarity: 'Uncommon' },
-  { id: 'ten_logs', name: 'Dedicated Scribe', desc: 'Log 10 painting sessions', icon: '📖', tier: 'silver', check: s => s.logs >= 10, rarity: 'Uncommon' },
-  { id: 'five_photos', name: 'Photographer', desc: 'Add photos to 5 models', icon: '📷', tier: 'silver', check: s => s.photos >= 5, rarity: 'Uncommon' },
-  { id: 'hundred_models', name: 'Hoarder', desc: 'Own 100 minis', icon: '🏠', tier: 'silver', check: s => s.total >= 100, rarity: 'Uncommon' },
-  { id: 'first_campaign', name: 'Warmaster', desc: 'Start a solo campaign', icon: '⚔️', tier: 'silver', check: s => s.campaigns >= 1, rarity: 'Uncommon' },
+  { id: 'squad_done', name: 'Squad Complete!', desc: 'Paint 10 minis', icon: 'models', tier: 'silver', check: s => s.painted >= 10, rarity: 'Uncommon' },
+  { id: 'multi_faction', name: 'Xenos Sympathiser', desc: 'Own models from 3+ factions', icon: 'chaos-skull', tier: 'silver', check: s => s.factions >= 3, rarity: 'Uncommon' },
+  { id: 'fifty_paints', name: 'Paint Hoarder', desc: 'Own 50 paints', icon: 'paints', tier: 'silver', check: s => s.paints >= 50, rarity: 'Uncommon' },
+  { id: 'army_painted', name: 'Army Builder', desc: 'Paint 50 minis', icon: 'campaigns', tier: 'silver', check: s => s.painted >= 50, rarity: 'Uncommon' },
+  { id: 'ten_logs', name: 'Dedicated Scribe', desc: 'Log 10 painting sessions', icon: 'guides', tier: 'silver', check: s => s.logs >= 10, rarity: 'Uncommon' },
+  { id: 'five_photos', name: 'Photographer', desc: 'Add photos to 5 models', icon: 'target', tier: 'silver', check: s => s.photos >= 5, rarity: 'Uncommon' },
+  { id: 'hundred_models', name: 'Hoarder', desc: 'Own 100 minis', icon: 'skull', tier: 'silver', check: s => s.total >= 100, rarity: 'Uncommon' },
+  { id: 'first_campaign', name: 'Warmaster', desc: 'Start a solo campaign', icon: 'campaigns', tier: 'silver', check: s => s.campaigns >= 1, rarity: 'Uncommon' },
 
   // Gold
-  { id: 'centurion', name: 'Centurion', desc: 'Paint 100 minis', icon: '💯', tier: 'gold', check: s => s.painted >= 100, rarity: 'Rare' },
-  { id: 'faction_complete', name: 'Completionist', desc: 'Fully paint one faction', icon: '🏆', tier: 'gold', check: s => s.factionsComplete >= 1, rarity: 'Rare' },
-  { id: 'no_grey', name: 'Grey Pile Slayer', desc: 'Have zero unpainted minis', icon: '✨', tier: 'gold', check: s => s.total > 0 && s.grey === 0, rarity: 'Rare' },
-  { id: 'two_fifty', name: 'Brush Master', desc: 'Paint 250 minis', icon: '🎖️', tier: 'gold', check: s => s.painted >= 250, rarity: 'Very Rare' },
-  { id: 'hundred_paints', name: 'Paint Library', desc: 'Own 100 paints', icon: '🏛️', tier: 'gold', check: s => s.paints >= 100, rarity: 'Rare' },
+  { id: 'centurion', name: 'Centurion', desc: 'Paint 100 minis', icon: 'medal', tier: 'gold', check: s => s.painted >= 100, rarity: 'Rare' },
+  { id: 'faction_complete', name: 'Completionist', desc: 'Fully paint one faction', icon: 'aquila', tier: 'gold', check: s => s.factionsComplete >= 1, rarity: 'Rare' },
+  { id: 'no_grey', name: 'Grey Pile Slayer', desc: 'Have zero unpainted minis', icon: 'skull', tier: 'gold', check: s => s.total > 0 && s.grey === 0, rarity: 'Rare' },
+  { id: 'two_fifty', name: 'Brush Master', desc: 'Paint 250 minis', icon: 'medal', tier: 'gold', check: s => s.painted >= 250, rarity: 'Very Rare' },
+  { id: 'hundred_paints', name: 'Paint Library', desc: 'Own 100 paints', icon: 'paints', tier: 'gold', check: s => s.paints >= 100, rarity: 'Rare' },
 
   // Platinum
-  { id: 'five_hundred', name: 'Living Legend', desc: 'Paint 500 minis', icon: '👑', tier: 'platinum', check: s => s.painted >= 500, rarity: 'Ultra Rare' },
-  { id: 'all_factions', name: 'Omnissiah\'s Chosen', desc: 'Own models from 10+ factions', icon: '⚙️', tier: 'platinum', check: s => s.factions >= 10, rarity: 'Ultra Rare' },
+  { id: 'five_hundred', name: 'Living Legend', desc: 'Paint 500 minis', icon: 'aquila', tier: 'platinum', check: s => s.painted >= 500, rarity: 'Ultra Rare' },
+  { id: 'all_factions', name: 'Omnissiah\'s Chosen', desc: 'Own models from 10+ factions', icon: 'skull-cog', tier: 'platinum', check: s => s.factions >= 10, rarity: 'Ultra Rare' },
 
   // Secret
-  { id: 'speed_demon', name: '???', desc: 'Have 20+ WIP at once', icon: '🤫', tier: 'secret', check: s => s.wip >= 20, rarity: 'Secret' },
-  { id: 'thousand', name: '???', desc: 'Own 1000 minis', icon: '🤫', tier: 'secret', check: s => s.total >= 1000, rarity: 'Secret' },
+  { id: 'speed_demon', name: '???', desc: 'Have 20+ WIP at once', icon: 'skull', tier: 'secret', check: s => s.wip >= 20, rarity: 'Secret' },
+  { id: 'thousand', name: '???', desc: 'Own 1000 minis', icon: 'skull', tier: 'secret', check: s => s.total >= 1000, rarity: 'Secret' },
 ];
 
 const TIER_COLORS: Record<TrophyTier, string> = {
@@ -218,7 +218,7 @@ export default function Progress() {
               const isDone = painted >= t.min;
               return (
                 <div key={i} className={`rank-item ${isActive ? 'active' : isDone ? 'done' : 'locked'}`}>
-                  <span className="rank-item-icon">{t.icon}</span>
+                  <span className="rank-item-icon"><GoldIcon name={t.icon} size={24} /></span>
                   <div className="rank-item-info">
                     <div className="rank-item-title">{t.title} <span className="rank-item-tier" style={{ color: TIER_COLORS[t.tier.toLowerCase() as TrophyTier] }}>{t.tier}</span></div>
                     <div className="rank-item-desc">{t.min} minis · {t.desc}</div>
@@ -270,7 +270,7 @@ export default function Progress() {
                     const isSecret = t.tier === 'secret' && !earned && !showSecret;
                     return (
                       <div key={t.id} className={`trophy-card ${earned ? 'earned' : 'locked'}`} style={{ borderColor: earned ? TIER_COLORS[t.tier] + '40' : undefined }}>
-                        <div className="trophy-icon" style={{ filter: earned ? 'none' : 'grayscale(1) brightness(0.3)' }}>{isSecret ? '🔒' : t.icon}</div>
+                        <div className="trophy-icon" style={{ filter: earned ? 'none' : 'grayscale(1) brightness(0.3)' }}>{isSecret ? <GoldIcon name="skull" size={28} /> : <GoldIcon name={t.icon} size={28} />}</div>
                         <div className="trophy-name">{isSecret ? '???' : t.name}</div>
                         <div className="trophy-desc">{isSecret ? 'Keep playing to discover' : t.desc}</div>
                         {t.rarity && <div className="trophy-rarity" style={{ color: TIER_COLORS[t.tier] }}>{earned ? '✓ ' : ''}{t.rarity}</div>}
