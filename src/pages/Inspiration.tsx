@@ -1,3 +1,5 @@
+import GoldIcon from '../components/GoldIcon';
+import PageBanner from '../components/PageBanner';
 import { useState } from 'react';
 
 type Tab = 'techniques' | 'recipes' | 'tips';
@@ -152,18 +154,18 @@ const RECIPES: Recipe[] = [
 ];
 
 const TIPS = [
-  { title: 'Two Thin Coats', icon: '🎨', text: 'Always thin your paints. Two thin coats give smoother coverage than one thick coat. Thick paint obscures detail.' },
+  { title: 'Two Thin Coats', icon: 'paints', text: 'Always thin your paints. Two thin coats give smoother coverage than one thick coat. Thick paint obscures detail.' },
   { title: 'Wet Palette', icon: '💧', text: 'Use a wet palette to keep paints workable longer. DIY: tupperware + wet paper towel + baking parchment.' },
-  { title: 'Brush Care', icon: '🖌️', text: 'Never let paint dry in your brush. Rinse frequently. Use brush soap after each session. Don\'t dip past the ferrule.' },
-  { title: 'Good Lighting', icon: '💡', text: 'A daylight lamp (5000-6500K) is the single best investment. You can\'t paint what you can\'t see accurately.' },
-  { title: 'Prime Everything', icon: '🫧', text: 'Always prime your models. Paint won\'t stick to bare plastic. Grey primer is the most versatile.' },
-  { title: 'Batch Paint', icon: '⚡', text: 'Paint all models in a unit at the same time, one colour at a time. Assembly line method is 3x faster.' },
+  { title: 'Brush Care', icon: 'brushes', text: 'Never let paint dry in your brush. Rinse frequently. Use brush soap after each session. Don\'t dip past the ferrule.' },
+  { title: 'Good Lighting', icon: 'lightning', text: 'A daylight lamp (5000-6500K) is the single best investment. You can\'t paint what you can\'t see accurately.' },
+  { title: 'Prime Everything', icon: 'skull', text: 'Always prime your models. Paint won\'t stick to bare plastic. Grey primer is the most versatile.' },
+  { title: 'Batch Paint', icon: 'lightning', text: 'Paint all models in a unit at the same time, one colour at a time. Assembly line method is 3x faster.' },
   { title: 'Shake Your Paints', icon: '🫨', text: 'Shake paint pots for 30+ seconds before use. The pigment settles. A mixing ball helps.' },
-  { title: 'Fix Mistakes Immediately', icon: '🔄', text: 'Wet paint wipes off easily. Once dry, paint over with the base colour. Everyone makes mistakes.' },
+  { title: 'Fix Mistakes Immediately', icon: 'settings', text: 'Wet paint wipes off easily. Once dry, paint over with the base colour. Everyone makes mistakes.' },
   { title: 'Contrast Over Zenithal', icon: '🌓', text: 'Black prime → white spray from above → contrast paint = instant shading. Best speed painting method.' },
-  { title: 'Edge Highlight Trick', icon: '✨', text: 'Use the side of your brush, not the tip. Drag along the edge. Brace your hands together for stability.' },
-  { title: 'Varnish Your Models', icon: '🛡️', text: 'Matte varnish protects your paint job during gaming. Apply after fully painted and based.' },
-  { title: 'Done Is Better Than Perfect', icon: '✅', text: 'A painted army on the table beats an unpainted army in a box. Tabletop standard is perfectly fine.' },
+  { title: 'Edge Highlight Trick', icon: 'lightning', text: 'Use the side of your brush, not the tip. Drag along the edge. Brace your hands together for stability.' },
+  { title: 'Varnish Your Models', icon: 'shield-check', text: 'Matte varnish protects your paint job during gaming. Apply after fully painted and based.' },
+  { title: 'Done Is Better Than Perfect', icon: 'medal', text: 'A painted army on the table beats an unpainted army in a box. Tabletop standard is perfectly fine.' },
 ];
 
 export default function Inspiration() {
@@ -177,13 +179,14 @@ export default function Inspiration() {
   return (
     <div>
       <div className="page-header" style={{ paddingTop: 48 }}>
-        <h2>🎨 Inspiration & Reference</h2>
+        <PageBanner title="Inspiration & Reference" subtitle="Techniques, recipes, and tips" icon="inspiration" />
+        <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
       </div>
 
       <div className="game-tabs" style={{ marginBottom: 20 }}>
-        <button className={`game-tab ${tab === 'techniques' ? 'active' : ''}`} onClick={() => setTab('techniques')}>🖌️ Techniques ({TECHNIQUES.length})</button>
-        <button className={`game-tab ${tab === 'recipes' ? 'active' : ''}`} onClick={() => setTab('recipes')}>🎨 Paint Recipes ({RECIPES.length})</button>
-        <button className={`game-tab ${tab === 'tips' ? 'active' : ''}`} onClick={() => setTab('tips')}>💡 Quick Tips ({TIPS.length})</button>
+        <button className={`game-tab ${tab === 'techniques' ? 'active' : ''}`} onClick={() => setTab('techniques')}><GoldIcon name="brushes" size={14} /> Techniques ({TECHNIQUES.length})</button>
+        <button className={`game-tab ${tab === 'recipes' ? 'active' : ''}`} onClick={() => setTab('recipes')}><GoldIcon name="paints" size={14} /> Paint Recipes ({RECIPES.length})</button>
+        <button className={`game-tab ${tab === 'tips' ? 'active' : ''}`} onClick={() => setTab('tips')}><GoldIcon name="lightning" size={14} /> Quick Tips ({TIPS.length})</button>
       </div>
 
       <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search techniques, recipes..." className="filter-search" style={{ marginBottom: 20, width: '100%' }} />
@@ -205,7 +208,7 @@ export default function Inspiration() {
                   <div key={i} className="ref-step"><span className="scheme-step-num">{i + 1}</span><span>{s}</span></div>
                 ))}
               </div>
-              <div className="ref-when">📌 <strong>When to use:</strong> {t.when}</div>
+              <div className="ref-when"><GoldIcon name="target" size={14} /> <strong>When to use:</strong> {t.when}</div>
             </div>
           )}
         </div>
@@ -245,7 +248,7 @@ export default function Inspiration() {
         <div className="tips-grid">
           {TIPS.map(t => (
             <div key={t.title} className="tip-card">
-              <div className="tip-icon">{t.icon}</div>
+              <div className="tip-icon"><GoldIcon name={t.icon} size={22} /></div>
               <div className="tip-title">{t.title}</div>
               <div className="tip-text">{t.text}</div>
             </div>

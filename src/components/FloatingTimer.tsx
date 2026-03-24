@@ -1,3 +1,4 @@
+import GoldIcon from './GoldIcon';
 import { useState, useEffect, useRef } from 'react';
 
 export default function FloatingTimer() {
@@ -22,7 +23,7 @@ export default function FloatingTimer() {
   return (
     <>
       <button className="floating-timer-btn" onClick={() => setOpen(!open)} title="Paint Timer">
-        {running ? `⏱ ${fmt(seconds)}` : '⏱'}
+        <>{running ? <><GoldIcon name="winged-hour" size={14} /> {fmt(seconds)}</> : <GoldIcon name="winged-hour" size={14} />}</>
       </button>
       {open && (
         <div className="floating-timer-panel">

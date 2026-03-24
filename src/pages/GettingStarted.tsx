@@ -1,3 +1,4 @@
+import GoldIcon from '../components/GoldIcon';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
@@ -64,7 +65,7 @@ export default function GettingStarted() {
                 if (p) await db.paints.add({ name: p.name, brand: p.brand, range: p.range, type: p.type, hexColor: p.hex, owned: true, quantity: 1, notes: '' });
               }
               setStep(2);
-            }}>🎨 Yes, add a basic Citadel starter set</button>
+            }}><GoldIcon name="paints" size={14} /> Yes, add a basic Citadel starter set</button>
             <button className="wizard-option" onClick={() => setStep(2)}>I'll add my paints later</button>
           </div>
         </div>
@@ -73,13 +74,13 @@ export default function GettingStarted() {
       {step === 2 && (
         <div className="wizard-card" style={{ textAlign: 'center' }}>
           <div className="wizard-step-num">3 of 3</div>
-          <div style={{ fontSize: '4rem', marginBottom: 16 }}>🎉</div>
+          <div style={{ marginBottom: 16 }}><GoldIcon name="medal" size={64} /></div>
           <h3>You're all set!</h3>
           <p className="settings-desc">Your collection is ready. Here's what to do next:</p>
           <div className="wizard-next-steps">
             <button className="btn btn-primary btn-lg" onClick={() => nav('/grey-pile')}>🪦 See your Grey Pile</button>
-            <button className="btn btn-outline btn-lg" onClick={() => nav('/suggestions')}>📖 Browse Painting Guides</button>
-            <button className="btn btn-ghost btn-lg" onClick={() => nav('/')}>🏠 Go to Home</button>
+            <button className="btn btn-outline btn-lg" onClick={() => nav('/suggestions')}><GoldIcon name="guides" size={14} /> Browse Painting Guides</button>
+            <button className="btn btn-ghost btn-lg" onClick={() => nav('/')}><GoldIcon name="home" size={14} /> Go to Home</button>
           </div>
         </div>
       )}

@@ -156,7 +156,7 @@ export default function Paints() {
         <select className="pr-sort-select" value={sortBy} onChange={e => setSortBy(e.target.value as SortMode)}>
           <option value="name">Sort: Name</option>
           <option value="brand">Sort: Brand</option>
-          <option value="colour">Sort: Colour 🎨</option>
+          <option value="colour">Sort: Colour</option>
         </select>
       </div>
 

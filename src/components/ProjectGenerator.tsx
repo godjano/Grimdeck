@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
 import type { MiniatureModel } from '../types';
+import GoldIcon from './GoldIcon';
 
 const FACTION_RECIPES: Record<string, { name: string; paints: { name: string; hex: string; step: string }[] }[]> = {
   'Space Marines': [
@@ -59,34 +60,34 @@ interface Project {
 }
 
 const SIZE_CONFIG: Record<ProjectSize, { label: string; icon: string; desc: string; maxQty: number }> = {
-  small: { label: 'Quick Win', icon: '⚡', desc: '1 model, ~1-2 hours', maxQty: 1 },
-  medium: { label: 'Weekend Project', icon: '🎯', desc: '3-5 models, ~3-5 hours', maxQty: 5 },
-  big: { label: 'Campaign Push', icon: '🏔️', desc: '10+ models, full army unit', maxQty: 999 },
+  small: { label: 'Quick Win', icon: 'lightning', desc: '1 model, ~1-2 hours', maxQty: 1 },
+  medium: { label: 'Weekend Project', icon: 'target', desc: '3-5 models, ~3-5 hours', maxQty: 5 },
+  big: { label: 'Campaign Push', icon: 'campaigns', desc: '10+ models, full army unit', maxQty: 999 },
 };
 
 function generateSteps(model: MiniatureModel): ProjectStep[] {
   const steps: ProjectStep[] = [
-    { id: 'clean', label: 'Clean & Assemble', desc: 'Remove from sprue, clean mould lines, glue together', icon: '✂️', done: model.status !== 'unbuilt' },
-    { id: 'prime', label: 'Prime', desc: 'Apply primer spray (black, grey, or white depending on scheme)', icon: '🫧', done: ['primed', 'wip', 'painted', 'based'].includes(model.status) },
-    { id: 'base_coat', label: 'Base Coat', desc: 'Apply main colours to all areas — armour, cloth, skin, metals', icon: '🎨', done: ['painted', 'based'].includes(model.status) },
-    { id: 'shade', label: 'Shade / Wash', desc: 'Apply washes to add depth — Nuln Oil for metals, Agrax for warm tones', icon: '🌊', done: ['painted', 'based'].includes(model.status) },
-    { id: 'highlight', label: 'Highlight', desc: 'Edge highlight or drybrush raised areas for definition', icon: '✨', done: ['painted', 'based'].includes(model.status) },
-    { id: 'details', label: 'Details', desc: 'Eyes, lenses, purity seals, small details that bring it to life', icon: '🔍', done: ['painted', 'based'].includes(model.status) },
-    { id: 'base', label: 'Base', desc: 'Apply texture paint, drybrush, add tufts or static grass', icon: '🏔️', done: model.status === 'based' },
-    { id: 'varnish', label: 'Varnish', desc: 'Protect with matte varnish spray — your model is complete!', icon: '🛡️', done: false },
+    { id: 'clean', label: 'Clean & Assemble', desc: 'Remove from sprue, clean mould lines, glue together', icon: 'campaigns', done: model.status !== 'unbuilt' },
+    { id: 'prime', label: 'Prime', desc: 'Apply primer spray (black, grey, or white depending on scheme)', icon: 'skull', done: ['primed', 'wip', 'painted', 'based'].includes(model.status) },
+    { id: 'base_coat', label: 'Base Coat', desc: 'Apply main colours to all areas — armour, cloth, skin, metals', icon: 'paints', done: ['painted', 'based'].includes(model.status) },
+    { id: 'shade', label: 'Shade / Wash', desc: 'Apply washes to add depth — Nuln Oil for metals, Agrax for warm tones', icon: 'chalice', done: ['painted', 'based'].includes(model.status) },
+    { id: 'highlight', label: 'Highlight', desc: 'Edge highlight or drybrush raised areas for definition', icon: 'lightning', done: ['painted', 'based'].includes(model.status) },
+    { id: 'details', label: 'Details', desc: 'Eyes, lenses, purity seals, small details that bring it to life', icon: 'lens', done: ['painted', 'based'].includes(model.status) },
+    { id: 'base', label: 'Base', desc: 'Apply texture paint, drybrush, add tufts or static grass', icon: 'bases', done: model.status === 'based' },
+    { id: 'varnish', label: 'Varnish', desc: 'Protect with matte varnish spray — your model is complete!', icon: 'shield-check', done: false },
   ];
   return steps;
 }
 
 function getMotivation(): string {
   const msgs = [
-    "Every painted model is a victory against the grey pile! 🏆",
-    "The Emperor protects... but only painted models. 🪖",
-    "Two thin coats and you're halfway there! 🖌️",
-    "Progress, not perfection. Get it on the table! ⚔️",
-    "A painted army is a happy army. Let's go! 💪",
-    "The pile won't paint itself. But you've got this! 🔥",
-    "One model at a time. That's how legends are built. 🌟",
+    "Every painted model is a victory against the grey pile!",
+    "The Emperor protects... but only painted models.",
+    "Two thin coats and you're halfway there!",
+    "Progress, not perfection. Get it on the table!",
+    "A painted army is a happy army. Let's go!",
+    "The pile won't paint itself. But you've got this!",
+    "One model at a time. That's how legends are built.",
   ];
   return msgs[Math.floor(Math.random() * msgs.length)];
 }
@@ -204,7 +205,7 @@ export default function ProjectGenerator() {
       {allProjects.length > 0 && !project && (
         <div className="project-list-section">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h3>📋 My Projects ({allProjects.length})</h3>
+            <h3><GoldIcon name="scroll" size={18} /> My Projects ({allProjects.length})</h3>
             <button className="btn btn-sm btn-ghost" onClick={() => setShowList(!showList)}>{showList ? 'Hide' : 'Show'}</button>
           </div>
           {showList && (
@@ -217,7 +218,7 @@ export default function ProjectGenerator() {
                   <div key={i} className="project-list-item" onClick={() => loadProject(ap)}>
                     <div className="project-list-info">
                       <div className="project-list-name">{ap.project.model.name}</div>
-                      <div className="project-list-meta">{ap.project.model.faction} · ×{ap.project.model.quantity} · {SIZE_CONFIG[ap.project.size].icon} {SIZE_CONFIG[ap.project.size].label}</div>
+                      <div className="project-list-meta">{ap.project.model.faction} · ×{ap.project.model.quantity} · <GoldIcon name={SIZE_CONFIG[ap.project.size].icon} size={14} /> {SIZE_CONFIG[ap.project.size].label}</div>
                     </div>
                     <div className="project-list-progress">
                       <div className="project-list-bar"><div className="project-list-fill" style={{ width: `${pctDone}%` }} /></div>
@@ -234,26 +235,26 @@ export default function ProjectGenerator() {
 
       {!project ? (
         <div className="project-picker">
-          <h3>🎲 Project Generator</h3>
+          <h3><GoldIcon name="target" size={18} /> Project Generator</h3>
           <p className="settings-desc">Pick a project size and we'll choose a random model from your pile with a step-by-step plan.</p>
           <div className="project-sizes">
             {(['small', 'medium', 'big'] as ProjectSize[]).map(s => (
               <button key={s} className={`project-size-btn ${size === s ? 'active' : ''}`} onClick={() => { setSize(s); localStorage.setItem('grimdeck_project_size', s); }}>
-                <span className="project-size-icon">{SIZE_CONFIG[s].icon}</span>
+                <span className="project-size-icon"><GoldIcon name={SIZE_CONFIG[s].icon} size={18} /></span>
                 <span className="project-size-label">{SIZE_CONFIG[s].label}</span>
                 <span className="project-size-desc">{SIZE_CONFIG[s].desc}</span>
               </button>
             ))}
           </div>
           <button className="btn btn-primary btn-lg" onClick={generate} disabled={unpainted.length === 0} style={{ marginTop: 16, width: '100%' }}>
-            {unpainted.length > 0 ? `🎲 Generate ${SIZE_CONFIG[size].label} Project` : 'No unpainted models!'}
+            {unpainted.length > 0 ? <>Generate {SIZE_CONFIG[size].label} Project</> : 'No unpainted models!'}
           </button>
         </div>
       ) : (
         <div className="project-active">
           <div className="project-header">
             <div>
-              <span className="project-size-badge">{SIZE_CONFIG[project.size].icon} {SIZE_CONFIG[project.size].label}</span>
+              <span className="project-size-badge"><GoldIcon name={SIZE_CONFIG[project.size].icon} size={14} /> {SIZE_CONFIG[project.size].label}</span>
               <h3 className="project-model-name">{project.model.name}</h3>
               <p className="project-model-meta">{project.model.faction} · ×{project.model.quantity}</p>
             </div>
@@ -272,9 +273,9 @@ export default function ProjectGenerator() {
           <div className="project-steps">
             {project.steps.map(step => (
               <div key={step.id} className={`project-step ${checkedSteps.has(step.id) ? 'done' : ''}`} onClick={() => toggleStep(step.id)}>
-                <div className="project-step-check">{checkedSteps.has(step.id) ? '✅' : '⬜'}</div>
+                <div className="project-step-check">{checkedSteps.has(step.id) ? <GoldIcon name="medal" size={16} /> : '○'}</div>
                 <div className="project-step-content">
-                  <div className="project-step-label">{step.icon} {step.label}</div>
+                  <div className="project-step-label"><GoldIcon name={step.icon} size={16} /> {step.label}</div>
                   <div className="project-step-desc">{step.desc}</div>
                 </div>
               </div>
@@ -282,7 +283,7 @@ export default function ProjectGenerator() {
           </div>
 
           <div className="project-tips">
-            <h4>🎨 Suggested Paint Recipes for {project.model.faction}</h4>
+            <h4><GoldIcon name="paints" size={16} /> Suggested Paint Recipes for {project.model.faction}</h4>
             {(FACTION_RECIPES[project.model.faction] || []).length > 0 ? (
               <div className="project-recipes">
                 {(FACTION_RECIPES[project.model.faction] || []).map((recipe, i) => (
@@ -308,7 +309,7 @@ export default function ProjectGenerator() {
           </div>
 
           <div className="project-tips">
-            <h4>💡 Tips</h4>
+            <h4><GoldIcon name="lightning" size={16} /> Tips</h4>
             {project.tips.map((t, i) => <p key={i}>{t}</p>)}
           </div>
 

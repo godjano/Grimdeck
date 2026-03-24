@@ -1,3 +1,4 @@
+import GoldIcon from '../components/GoldIcon';
 import { useState, useEffect } from 'react';
 import { signUp, signIn, signOut, getUser, pushToCloud, pullFromCloud, getCloudSyncInfo, onAuthChange } from '../db/cloud-sync';
 import type { User } from '@supabase/supabase-js';
@@ -27,24 +28,24 @@ export default function Account() {
     try {
       if (mode === 'signup') {
         await signUp(email, password);
-        setStatus('✅ Check your email to confirm your account!');
+        setStatus('Check your email to confirm your account!');
       } else {
         await signIn(email, password);
-        setStatus('✅ Logged in!');
+        setStatus('Logged in!');
       }
     } catch (e: any) { setStatus(`❌ ${e.message}`); }
   };
 
   const handlePush = async () => {
     setSyncing(true); setStatus('⏳ Pushing to cloud...');
-    try { await pushToCloud(); setStatus('✅ Data saved to cloud!'); getCloudSyncInfo().then(i => setLastSync(i.lastSync)); }
+    try { await pushToCloud(); setStatus('Data saved to cloud!'); getCloudSyncInfo().then(i => setLastSync(i.lastSync)); }
     catch (e: any) { setStatus(`❌ ${e.message}`); }
     setSyncing(false);
   };
 
   const handlePull = async () => {
     setSyncing(true); setStatus('⏳ Loading from cloud...');
-    try { await pullFromCloud(); setStatus('✅ Data loaded! Refresh to see changes.'); }
+    try { await pullFromCloud(); setStatus('Data loaded! Refresh to see changes.'); }
     catch (e: any) { setStatus(`❌ ${e.message}`); }
     setSyncing(false);
   };
@@ -57,13 +58,13 @@ export default function Account() {
 
   return (
     <div>
-      <div className="page-header" style={{ paddingTop: 48 }}><h2>☁️ Account & Cloud Sync</h2></div>
+      <div className="page-header" style={{ paddingTop: 48 }}><h2><GoldIcon name="aquila" size={22} /> Account & Cloud Sync</h2></div>
 
       {status && <div className="status-banner">{status}</div>}
 
       {!user ? (
         <div className="settings-section">
-          <h3 className="settings-title">{mode === 'signin' ? '🔑 Sign In' : '📝 Create Account'}</h3>
+          <h3 className="settings-title"><>{mode === 'signin' ? <><GoldIcon name="campaigns" size={16} /> Sign In</> : <><GoldIcon name="scroll" size={16} /> Create Account</>}</></h3>
           <p className="settings-desc">Sign in to sync your collection across devices. Your data is stored securely in the cloud.</p>
 
           <div className="form-grid" style={{ maxWidth: 400 }}>
@@ -97,11 +98,11 @@ export default function Account() {
           </div>
 
           <div className="settings-section">
-            <h3 className="settings-title">☁️ Cloud Sync</h3>
+            <h3 className="settings-title"><GoldIcon name="aquila" size={18} /> Cloud Sync</h3>
             <p className="settings-desc">Push your local data to the cloud or pull from the cloud to this device.</p>
             {lastSync && <p style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: 12 }}>Last synced: {new Date(lastSync).toLocaleString()}</p>}
             <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn btn-primary" onClick={handlePush} disabled={syncing}>☁️ Push to Cloud</button>
+              <button className="btn btn-primary" onClick={handlePush} disabled={syncing}><GoldIcon name="aquila" size={14} /> Push to Cloud</button>
               <button className="btn btn-ghost" onClick={handlePull} disabled={syncing}>📥 Pull from Cloud</button>
             </div>
             <p className="settings-desc" style={{ marginTop: 12 }}>

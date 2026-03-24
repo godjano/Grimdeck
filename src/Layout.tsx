@@ -9,7 +9,7 @@ import './app.css';
 
 export default function Layout() {
   const { pathname } = useLocation();
-  const { theme, toggle } = useTheme();
+  const { toggle } = useTheme();
   const [user, setUser] = useState<User | null>(null);
   const [showMore, setShowMore] = useState(false);
 
@@ -46,19 +46,19 @@ export default function Layout() {
             <div className={`nav-more ${showMore ? 'open' : ''}`}>
               <button className="nav-more-btn" onClick={() => setShowMore(!showMore)}>More ▾</button>
               <div className="nav-dropdown" onClick={() => setShowMore(false)}>
-                <NavLink to="/army-list">📋 Army List</NavLink>
-                <NavLink to="/suggestions">📖 Guides</NavLink>
-                <NavLink to="/inspiration">🖌️ Reference</NavLink>
+                <NavLink to="/army-list"><GoldIcon name="scroll" size={14} /> Army List</NavLink>
+                <NavLink to="/suggestions"><GoldIcon name="guides" size={14} /> Guides</NavLink>
+                <NavLink to="/inspiration"><GoldIcon name="brushes" size={14} /> Reference</NavLink>
                 <NavLink to="/tools">🧰 Tools</NavLink>
-                <NavLink to="/start">🎉 Getting Started</NavLink>
-                <NavLink to="/data-manager">🔧 Data Manager</NavLink>
-                <NavLink to="/settings">⚙️ Settings</NavLink>
-                <NavLink to="/account">☁️ Account</NavLink>
+                <NavLink to="/start"><GoldIcon name="medal" size={14} /> Getting Started</NavLink>
+                <NavLink to="/data-manager"><GoldIcon name="settings" size={14} /> Data Manager</NavLink>
+                <NavLink to="/settings"><GoldIcon name="settings" size={14} /> Settings</NavLink>
+                <NavLink to="/account"><GoldIcon name="aquila" size={14} /> Account</NavLink>
               </div>
             </div>
-            <button className="theme-toggle" onClick={toggle} title="Toggle theme">{theme === 'dark' ? '☀️' : '🌙'}</button>
+            <button className="theme-toggle" onClick={toggle} title="Toggle theme"><GoldIcon name="sunburst" size={16} /></button>
             <NavLink to="/account" className="nav-user" title={user ? user.email || 'Account' : 'Sign in'}>
-              {user ? '👤' : '🔒'}
+              <GoldIcon name="aquila" size={14} />
             </NavLink>
           </nav>
         </div>

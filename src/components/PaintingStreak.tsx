@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import GoldIcon from './GoldIcon';
 
 interface StreakData {
   dates: string[]; // YYYY-MM-DD of days painted
@@ -80,13 +81,13 @@ export default function PaintingStreak() {
     <div className="streak-card">
       <div className="streak-header">
         <div>
-          <div className="streak-fire">{data.currentStreak > 0 ? '🔥' : '❄️'} {data.currentStreak || 0} day streak</div>
+          <div className="streak-fire">{data.currentStreak > 0 ? <GoldIcon name="flame-skull" size={18} /> : <GoldIcon name="skull" size={18} />} {data.currentStreak || 0} day streak</div>
           <div className="streak-best">Best: {data.longestStreak || 0} days · {data.dates?.length || 0} total sessions</div>
         </div>
         {!paintedToday && (
           <button className="btn btn-sm btn-primary" onClick={handleLog}>✓ I painted today</button>
         )}
-        {paintedToday && <span className="streak-done">✅ Logged today!</span>}
+        {paintedToday && <span className="streak-done"><GoldIcon name="medal" size={14} /> Logged today!</span>}
       </div>
 
       <div className="streak-calendar">

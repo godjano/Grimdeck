@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
 import { PAINTING_GUIDES, ADVANCED_GUIDES, MORE_GUIDES } from '../db/painting-guides';
+import GoldIcon from './GoldIcon';
 
 // ─── Paint Timer ───
 export function PaintTimer() {
@@ -25,7 +26,7 @@ export function PaintTimer() {
 
   return (
     <div className="tool-card">
-      <h3>⏱️ Paint Timer</h3>
+      <h3><GoldIcon name="winged-hour" size={18} /> Paint Timer</h3>
       <input value={modelName} onChange={e => { setModelName(e.target.value); localStorage.setItem('grimdeck_timer_model', e.target.value); }} placeholder="What are you painting?" className="tool-input" />
       <div className="timer-display">{fmt(seconds)}</div>
       <div className="tool-actions">
@@ -51,7 +52,7 @@ export function RandomPicker() {
 
   return (
     <div className="tool-card">
-      <h3>🎲 What Should I Paint?</h3>
+      <h3><GoldIcon name="target" size={18} /> What Should I Paint?</h3>
       <p className="settings-desc">Can't decide? Let fate choose from your {unpainted.length} unpainted models.</p>
       <button className="btn btn-primary" onClick={pick} disabled={unpainted.length === 0}>Pick for me!</button>
       {picked && (
@@ -102,7 +103,7 @@ export function ShoppingList() {
                   <div className="recipe-paint-name">{p.name}</div>
                 </div>
               ))}
-              <button className="btn btn-sm btn-ghost" onClick={copyList} style={{ marginTop: 8 }}>📋 Copy list</button>
+              <button className="btn btn-sm btn-ghost" onClick={copyList} style={{ marginTop: 8 }}><GoldIcon name="scroll" size={14} /> Copy list</button>
             </>
           )}
         </div>
@@ -143,7 +144,7 @@ export function CsvImport() {
       });
       count++;
     }
-    setStatus(`✅ Imported ${count} models!`);
+    setStatus(`Imported ${count} models!`);
   };
 
   return (
@@ -170,7 +171,7 @@ export function ShareCollection() {
     const pts = models.filter(m => !m.wishlist).reduce((s, m) => s + (m.points || 0), 0);
 
     const text = [
-      `🛡️ My Grimdeck Collection`,
+      `My Grimdeck Collection`,
       `${total} models · ${painted} painted · ${pts}pts`,
       '',
       ...Object.entries(factions).sort((a, b) => b[1] - a[1]).map(([f, n]) => `${f}: ${n} models`),
@@ -187,7 +188,7 @@ export function ShareCollection() {
     <div className="tool-card">
       <h3>📤 Share Collection</h3>
       <p className="settings-desc">Copy a summary of your collection to share on Reddit, Discord, or with friends.</p>
-      <button className="btn btn-sm btn-primary" onClick={share}>{copied ? '✓ Copied!' : '📋 Copy Summary'}</button>
+      <button className="btn btn-sm btn-primary" onClick={share}>{copied ? '✓ Copied!' : <><GoldIcon name="scroll" size={14} /> Copy Summary</>}</button>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import GoldIcon from '../components/GoldIcon';
 import { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
@@ -29,8 +30,8 @@ export default function ArmyList() {
   return (
     <div>
       <div className="page-header" style={{ paddingTop: 48 }}>
-        <h2>📋 Army List</h2>
-        <button className="btn btn-ghost btn-sm" onClick={copyList}>📋 Copy List</button>
+        <h2><GoldIcon name="scroll" size={22} /> Army List</h2>
+        <button className="btn btn-ghost btn-sm" onClick={copyList}><GoldIcon name="scroll" size={14} /> Copy List</button>
       </div>
 
       <div className="filters">
@@ -65,7 +66,7 @@ export default function ArmyList() {
       ))}
 
       {armyModels.length === 0 && (
-        <div className="empty"><span className="empty-icon">📋</span><p className="empty-text">No models{faction ? ` for ${faction}` : ''}. Add some from the Models page.</p></div>
+        <div className="empty"><span className="empty-icon"><GoldIcon name="scroll" size={40} /></span><p className="empty-text">No models{faction ? ` for ${faction}` : ''}. Add some from the Models page.</p></div>
       )}
     </div>
   );

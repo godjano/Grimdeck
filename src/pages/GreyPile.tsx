@@ -173,9 +173,9 @@ export default function GreyPile() {
                       <div className="card-sub">{m.faction}{m.unitType ? ` · ${m.unitType}` : ''}</div>
                     </div>
                     <div className="promote-buttons">
-                      {m.status === 'unbuilt' && <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'built'); }}>✂️</button>}
-                      {(m.status === 'unbuilt' || m.status === 'built') && <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'primed'); }}>🫧</button>}
-                      <button className="btn btn-sm btn-primary" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'wip'); }}>🎨</button>
+                      {m.status === 'unbuilt' && <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'built'); }}><GoldIcon name="campaigns" size={12} /></button>}
+                      {(m.status === 'unbuilt' || m.status === 'built') && <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'primed'); }}><GoldIcon name="skull" size={12} /></button>}
+                      <button className="btn btn-sm btn-primary" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'wip'); }}><GoldIcon name="paints" size={12} /></button>
                     </div>
                   </div>
                 ))
@@ -186,9 +186,9 @@ export default function GreyPile() {
           {/* Motivational footer */}
           <div className="grey-motivation">
             {totalGrey <= 10 ? "Almost there! You can see the finish line! 🏁" :
-             totalGrey <= 30 ? "Solid progress. Keep the momentum going! 💪" :
-             totalGrey <= 100 ? "A worthy challenge. One model at a time. ⚔️" :
-             "The pile is vast... but so is your determination. 🪖"}
+             totalGrey <= 30 ? "Solid progress. Keep the momentum going! " :
+             totalGrey <= 100 ? "A worthy challenge. One model at a time. " :
+             "The pile is vast... but so is your determination. "}
           </div>
         </>
       )}

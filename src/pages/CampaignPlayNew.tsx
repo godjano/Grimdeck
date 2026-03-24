@@ -101,10 +101,10 @@ export default function CampaignPlay() {
                 <div className="difficulty-name">{cfg.name}</div>
                 <div className="difficulty-desc">{cfg.desc}</div>
                 <div className="difficulty-features">
-                  {cfg.rerolls > 0 && <span>🎲 {cfg.rerolls} reroll{cfg.rerolls > 1 ? 's' : ''}</span>}
+                  {cfg.rerolls > 0 && <span><GoldIcon name="target" size={12} /> {cfg.rerolls} reroll{cfg.rerolls > 1 ? 's' : ''}</span>}
                   {cfg.playsObjectives && <span><GoldIcon name="crosshair" size={12} /> Plays objectives</span>}
                   {cfg.seeksCover && <span><GoldIcon name="shield-check" size={12} /> Uses cover</span>}
-                  {cfg.focusFire && <span>🔥 Focus fire</span>}
+                  {cfg.focusFire && <span><GoldIcon name="flame-skull" size={12} /> Focus fire</span>}
                   {cfg.leaderBonus > 0 && <span><GoldIcon name="skull-bones" size={12} /> +{cfg.leaderBonus} leader wounds</span>}
                 </div>
               </div>
@@ -186,7 +186,7 @@ export default function CampaignPlay() {
         <div className="mission-panel">
           <div className="mission-header">
             <span className={`mission-type type-${mission.type}`}>{mission.type}</span>
-            <span className="mission-diff">{'⚡'.repeat(mission.difficulty)}</span>
+            <span className="mission-diff"><>{Array.from({length: mission.difficulty}).map((_,i) => <GoldIcon key={i} name="lightning" size={12} />)}</></span>
           </div>
           <h3 className="mission-title">{mission.title}</h3>
           <p className="mission-briefing">{fill(mission.briefing)}</p>
@@ -196,7 +196,7 @@ export default function CampaignPlay() {
       )}
 
       {/* Roster */}
-      <h3 className="section-title">👥 Your Kill Team</h3>
+      <h3 className="section-title"><GoldIcon name="community" size={18} /> Your Kill Team</h3>
       {operatives.filter(o => o.status !== 'dead').map(op => (
         <div className="card" key={op.id}>
           <div className="card-body">
@@ -208,7 +208,7 @@ export default function CampaignPlay() {
       ))}
       {operatives.filter(o => o.status === 'dead').length > 0 && (
         <>
-          <h4 style={{ color: 'var(--danger)', marginTop: 12, fontSize: '0.85rem' }}>☠ Fallen</h4>
+          <h4 style={{ color: 'var(--danger)', marginTop: 12, fontSize: '0.85rem' }}><GoldIcon name="chaos-skull" size={14} /> Fallen</h4>
           {operatives.filter(o => o.status === 'dead').map(op => (
             <div className="card" key={op.id} style={{ opacity: 0.4 }}>
               <div className="card-body">

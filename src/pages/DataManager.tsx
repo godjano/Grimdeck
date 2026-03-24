@@ -1,3 +1,4 @@
+import GoldIcon from '../components/GoldIcon';
 import { useState } from 'react';
 import { db } from '../db';
 import { ALL_PAINT_PRESETS } from '../db/paint-presets';
@@ -9,10 +10,10 @@ export default function DataManager() {
   const [tab, setTab] = useState<Tab>('overview');
   return (
     <div>
-      <div className="page-header" style={{ paddingTop: 48 }}><h2>🔧 Data Manager</h2></div>
+      <div className="page-header" style={{ paddingTop: 48 }}><h2><GoldIcon name="settings" size={22} /> Data Manager</h2></div>
       <p className="settings-desc">Manage preset databases. Add new models/paints, import from external sources, or export code.</p>
       <div className="game-tabs" style={{ marginBottom: 24 }}>
-        {([['overview','📊 Overview'],['add-models','🛡️ Add Models'],['add-paints','🎨 Add Paints'],['import-json','📥 Import JSON'],['export-code','📤 Export Code']] as [Tab,string][]).map(([t,l]) => (
+        {([['overview','Overview'],['add-models','Add Models'],['add-paints','Add Paints'],['import-json','Import JSON'],['export-code','Export Code']] as [Tab,string][]).map(([t,l]) => (
           <button key={t} className={`game-tab ${tab===t?'active':''}`} onClick={()=>setTab(t)}>{l}</button>
         ))}
       </div>
@@ -77,7 +78,7 @@ function AddModels() {
         <button className="btn btn-sm btn-primary" onClick={add}>Add to Collection</button>
         <button className="btn btn-sm btn-ghost" onClick={gen}>Generate Code</button>
       </div>
-      {code && <div className="dm-code"><pre>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}>📋 Copy</button></div>}
+      {code && <div className="dm-code"><pre>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}><GoldIcon name="scroll" size={12} /> Copy</button></div>}
     </div>
   );
 }
@@ -113,7 +114,7 @@ function AddPaints() {
         <button className="btn btn-sm btn-primary" onClick={add}>Add to Collection</button>
         <button className="btn btn-sm btn-ghost" onClick={gen}>Generate Code</button>
       </div>
-      {code && <div className="dm-code"><pre>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}>📋 Copy</button></div>}
+      {code && <div className="dm-code"><pre>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}><GoldIcon name="scroll" size={12} /> Copy</button></div>}
     </div>
   );
 }
@@ -121,8 +122,8 @@ function AddPaints() {
 function ImportJson() {
   const [json,setJson] = useState('');
   const [status,setStatus] = useState('');
-  const importModels = async () => {try{const d=JSON.parse(json);const items=Array.isArray(d)?d:d.models||d.items||[];let c=0;for(const m of items){if(m.name){await db.models.add({name:m.name,faction:m.faction||'Unknown',unitType:m.unitType||'',quantity:m.quantity||1,status:'unbuilt',notes:'',photoUrl:'',createdAt:Date.now(),manufacturer:'Games Workshop',gameSystem:'Warhammer 40K',countsAs:'',pricePaid:0,wishlist:false,points:m.points||0,forceOrg:m.forceOrg||'Other'});c++;}}setStatus(`✅ Imported ${c} models`);}catch(e){setStatus(`❌ ${e}`);}};
-  const importPaints = async () => {try{const d=JSON.parse(json);const items=Array.isArray(d)?d:d.paints||d.items||[];let c=0;for(const p of items){if(p.name){await db.paints.add({name:p.name,brand:p.brand||'Unknown',range:p.range||'',type:p.type||'base',hexColor:p.hex||p.hexColor||'#888',owned:true,quantity:1,notes:''});c++;}}setStatus(`✅ Imported ${c} paints`);}catch(e){setStatus(`❌ ${e}`);}};
+  const importModels = async () => {try{const d=JSON.parse(json);const items=Array.isArray(d)?d:d.models||d.items||[];let c=0;for(const m of items){if(m.name){await db.models.add({name:m.name,faction:m.faction||'Unknown',unitType:m.unitType||'',quantity:m.quantity||1,status:'unbuilt',notes:'',photoUrl:'',createdAt:Date.now(),manufacturer:'Games Workshop',gameSystem:'Warhammer 40K',countsAs:'',pricePaid:0,wishlist:false,points:m.points||0,forceOrg:m.forceOrg||'Other'});c++;}}setStatus(`Imported ${c} models`);}catch(e){setStatus(`❌ ${e}`);}};
+  const importPaints = async () => {try{const d=JSON.parse(json);const items=Array.isArray(d)?d:d.paints||d.items||[];let c=0;for(const p of items){if(p.name){await db.paints.add({name:p.name,brand:p.brand||'Unknown',range:p.range||'',type:p.type||'base',hexColor:p.hex||p.hexColor||'#888',owned:true,quantity:1,notes:''});c++;}}setStatus(`Imported ${c} paints`);}catch(e){setStatus(`❌ ${e}`);}};
   return (
     <div className="settings-section">
       <h3 className="settings-title">Import from JSON</h3>
@@ -156,7 +157,7 @@ function ExportCode() {
           {(type==='models'?factions:brands).map(f=><option key={f} value={f}>{f}</option>)}
         </select>
       </div>
-      <div className="dm-code"><pre style={{maxHeight:300,overflow:'auto'}}>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}>📋 Copy</button></div>
+      <div className="dm-code"><pre style={{maxHeight:300,overflow:'auto'}}>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}><GoldIcon name="scroll" size={12} /> Copy</button></div>
     </div>
   );
 }

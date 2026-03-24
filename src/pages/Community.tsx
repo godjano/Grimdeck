@@ -1,3 +1,5 @@
+import GoldIcon from '../components/GoldIcon';
+import PageBanner from '../components/PageBanner';
 import { useState, useEffect } from 'react';
 import { getGallery, shareModel, likeModel, unlikeModel, deleteSharedModel, getMyProfile, saveCreatorProfile, type SharedModel, type CreatorProfile } from '../db/community';
 import { getUser } from '../db/cloud-sync';
@@ -41,11 +43,12 @@ export default function Community() {
   return (
     <div>
       <div className="page-header" style={{ paddingTop: 48 }}>
-        <h2>🌍 Community</h2>
+        <PageBanner title="Community" subtitle="Share your work and get inspired" icon="community" />
+        <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
       </div>
 
       <div className="game-tabs" style={{ marginBottom: 20 }}>
-        <button className={`game-tab ${tab === 'gallery' ? 'active' : ''}`} onClick={() => setTab('gallery')}>🖼️ Gallery</button>
+        <button className={`game-tab ${tab === 'gallery' ? 'active' : ''}`} onClick={() => setTab('gallery')}><GoldIcon name="lens" size={14} /> Gallery</button>
         <button className={`game-tab ${tab === 'share' ? 'active' : ''}`} onClick={() => setTab('share')}>📤 Share</button>
         <button className={`game-tab ${tab === 'profile' ? 'active' : ''}`} onClick={() => setTab('profile')}>👤 Profile</button>
       </div>
@@ -67,7 +70,7 @@ export default function Community() {
           {loading ? <div className="empty">Loading gallery...</div> :
            gallery.length === 0 ? (
             <div className="empty">
-              <span className="empty-icon">🖼️</span>
+              <span className="empty-icon"><GoldIcon name="lens" size={40} /></span>
               <p className="empty-text">No shared models yet. Be the first to share!</p>
             </div>
           ) : (
@@ -141,7 +144,7 @@ function ShareForm({ user, onShared, setStatus }: { user: User | null; onShared:
         description: desc.trim() || undefined,
         tags: tags.trim() ? tags.split(',').map(t => t.trim()) : undefined,
       });
-      setStatus('✅ Model shared to gallery!');
+      setStatus('Model shared to gallery!');
       setSelectedId(''); setDesc(''); setTags('');
       onShared();
     } catch (e: any) { setStatus(`❌ ${e.message}`); }
@@ -190,7 +193,7 @@ function ProfileForm({ user, setStatus }: { user: User | null; setStatus: (s: st
   const save = async () => {
     try {
       await saveCreatorProfile({ display_name: name.trim(), bio: bio.trim(), youtube_url: youtube.trim(), instagram_url: instagram.trim(), specialty: specialty.trim() });
-      setStatus('✅ Profile saved!');
+      setStatus('Profile saved!');
     } catch (e: any) { setStatus(`❌ ${e.message}`); }
   };
 

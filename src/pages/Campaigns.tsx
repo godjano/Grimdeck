@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import PageBanner from '../components/PageBanner';
+import GoldIcon from '../components/GoldIcon';
 import { getRoster, ALL_KT_FACTIONS } from '../db/killteam-data';
 import { FACTION_ART } from '../db/faction-art';
 
@@ -29,7 +30,7 @@ export default function Campaigns() {
 
       {campaigns.length === 0 ? (
         <div className="empty">
-          <span className="empty-icon">⚔️</span>
+          <span className="empty-icon"><GoldIcon name="campaigns" size={40} /></span>
           <p className="empty-text">No campaigns yet. Start your first narrative campaign!</p>
         </div>
       ) : (

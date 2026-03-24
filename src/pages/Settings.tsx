@@ -1,3 +1,5 @@
+import GoldIcon from '../components/GoldIcon';
+import PageBanner from '../components/PageBanner';
 import { useState, useRef } from 'react';
 import { exportAllData, importAllData, downloadJson, saveToGist, loadFromGist, getGistToken, setGistToken, getGistId, clearGistConfig, verifyToken } from '../db/sync';
 
@@ -12,7 +14,7 @@ export default function Settings() {
     try {
       const json = await exportAllData();
       downloadJson(json, `grimdeck-backup-${new Date().toISOString().slice(0, 10)}.json`);
-      setStatus('✅ Data exported successfully!');
+      setStatus('Data exported successfully!');
     } catch (e) { setStatus(`❌ Export failed: ${e}`); }
   };
 
@@ -22,7 +24,7 @@ export default function Settings() {
     try {
       const json = await file.text();
       await importAllData(json);
-      setStatus('✅ Data imported successfully! Refresh to see changes.');
+      setStatus('Data imported successfully! Refresh to see changes.');
     } catch (err) { setStatus(`❌ Import failed: ${err}`); }
   };
 
@@ -50,7 +52,7 @@ export default function Settings() {
     try {
       setStatus('⏳ Loading from GitHub...');
       await loadFromGist();
-      setStatus('✅ Data loaded from GitHub! Refresh to see changes.');
+      setStatus('Data loaded from GitHub! Refresh to see changes.');
     } catch (err) { setStatus(`❌ Load failed: ${err}`); }
   };
 
@@ -65,7 +67,8 @@ export default function Settings() {
   return (
     <div>
       <div className="page-header" style={{ paddingTop: 48 }}>
-        <h2>⚙️ Settings & Backup</h2>
+        <PageBanner title="Settings & Backup" subtitle="Export, import, and sync your data" icon="settings" />
+        <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
       </div>
 
       {status && <div className="status-banner">{status}</div>}
@@ -83,7 +86,7 @@ export default function Settings() {
 
       {/* GitHub Gist Sync */}
       <section className="settings-section">
-        <h3 className="settings-title">🔄 GitHub Cloud Sync</h3>
+        <h3 className="settings-title"><GoldIcon name="aquila" size={18} /> GitHub Cloud Sync</h3>
         <p className="settings-desc">
           Sync your data across devices using a private GitHub Gist. Your data is stored in your own GitHub account.
         </p>
@@ -111,11 +114,11 @@ export default function Settings() {
         ) : (
           <div>
             <div className="sync-status">
-              <span>✅ Connected{ghUser ? ` as ${ghUser}` : ''}</span>
+              <span><GoldIcon name="medal" size={14} /> Connected{ghUser ? ` as ${ghUser}` : ''}</span>
               {getGistId() && <span className="gist-id">Gist: {getGistId()?.slice(0, 12)}...</span>}
             </div>
             <div className="settings-actions">
-              <button className="btn btn-primary" onClick={doSave}>☁️ Save to GitHub</button>
+              <button className="btn btn-primary" onClick={doSave}><GoldIcon name="aquila" size={14} /> Save to GitHub</button>
               <button className="btn btn-ghost" onClick={doLoad}>📥 Load from GitHub</button>
               <button className="btn btn-danger btn-sm" onClick={disconnect}>Disconnect</button>
             </div>
@@ -125,7 +128,7 @@ export default function Settings() {
 
       {/* Info */}
       <section className="settings-section">
-        <h3 className="settings-title">ℹ️ About</h3>
+        <h3 className="settings-title"><GoldIcon name="guides" size={18} /> About</h3>
         <p className="settings-desc">
           Grimdeck is a free, open-source miniature hobby companion. Your data is stored locally in your browser by default.
           No tracking, no ads, no server costs. Built with React, TypeScript, and Dexie.js.

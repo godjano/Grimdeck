@@ -1,3 +1,4 @@
+import GoldIcon from './GoldIcon';
 import { useRef } from 'react';
 import { db } from '../db';
 
@@ -32,11 +33,11 @@ export function PhotoUpload({ modelId, currentPhoto }: { modelId: number; curren
       {currentPhoto ? (
         <div className="photo-preview">
           <img src={currentPhoto} alt="Model" />
-          <button className="btn btn-sm btn-ghost" onClick={() => inputRef.current?.click()}>📷 Change</button>
+          <button className="btn btn-sm btn-ghost" onClick={() => inputRef.current?.click()}><GoldIcon name="lens" size={12} /> Change</button>
           <button className="btn btn-sm btn-danger" onClick={() => db.models.update(modelId, { photoUrl: '' })}>✕</button>
         </div>
       ) : (
-        <button className="btn btn-sm btn-ghost" onClick={() => inputRef.current?.click()}>📷 Add Photo</button>
+        <button className="btn btn-sm btn-ghost" onClick={() => inputRef.current?.click()}><GoldIcon name="lens" size={12} /> Add Photo</button>
       )}
       <input ref={inputRef} type="file" accept="image/*" capture="environment" onChange={handleFile} style={{ display: 'none' }} />
     </div>

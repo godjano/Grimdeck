@@ -49,7 +49,7 @@ export default function Home() {
       {/* New user banner */}
       {isNew && (
         <div className="onboarding-banner" onClick={() => nav('/start')}>
-          <div className="onboarding-icon">🎉</div>
+          <div className="onboarding-icon"><GoldIcon name="medal" size={32} /></div>
           <div>
             <div style={{ fontWeight: 600, marginBottom: 4 }}>New here? Let's get you set up!</div>
             <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>We'll help you add your first models and paints in under a minute.</div>

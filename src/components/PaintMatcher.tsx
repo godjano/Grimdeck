@@ -1,3 +1,4 @@
+import GoldIcon from './GoldIcon';
 import { ALL_PAINT_PRESETS } from '../db/paint-presets';
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -39,7 +40,7 @@ export default function PaintMatcher() {
 
   return (
     <div className="tool-card">
-      <h3>🔄 Paint Matcher</h3>
+      <h3><GoldIcon name="settings" size={18} /> Paint Matcher</h3>
       <p className="settings-desc">Find equivalent paints across brands. Type a paint name to see matches.</p>
       <div style={{ display: 'flex', gap: 8 }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="e.g. Mephiston Red" className="tool-input" style={{ marginBottom: 0 }} onKeyDown={e => e.key === 'Enter' && doSearch()} />

@@ -254,7 +254,7 @@ export default function Progress() {
               const earned = tierTrophies.filter(t => t.check(stats));
               return (
                 <div key={tier}>
-                  <div className="trophy-tier-header" style={{ color: TIER_COLORS[tier] }}>🤫 Secret ({earned.length}/{tierTrophies.length})</div>
+                  <div className="trophy-tier-header" style={{ color: TIER_COLORS[tier] }}><GoldIcon name="skull" size={14} /> Secret ({earned.length}/{tierTrophies.length})</div>
                   <button className="btn btn-sm btn-ghost" onClick={() => setShowSecret(true)}>Reveal secret trophies</button>
                 </div>
               );
@@ -262,7 +262,7 @@ export default function Progress() {
             return (
               <div key={tier}>
                 <div className="trophy-tier-header" style={{ color: TIER_COLORS[tier] }}>
-                  {tier === 'platinum' ? '💎' : tier === 'gold' ? '🥇' : tier === 'silver' ? '🥈' : tier === 'bronze' ? '🥉' : '🤫'} {tier.charAt(0).toUpperCase() + tier.slice(1)}
+                  <GoldIcon name="medal" size={14} /> {tier.charAt(0).toUpperCase() + tier.slice(1)}
                 </div>
                 <div className="trophy-grid">
                   {tierTrophies.map(t => {
@@ -296,7 +296,7 @@ export default function Progress() {
               </div>
               <div className="faction-bar-wrap"><div className="faction-bar" style={{ width: `${f.pct}%` }} /></div>
               <div className="faction-card-nums">{f.painted} painted / {f.total} total</div>
-              {f.pct === 100 && <div className="faction-card-complete">🏆 COMPLETE</div>}
+              {f.pct === 100 && <div className="faction-card-complete"><GoldIcon name="progress" size={14} /> COMPLETE</div>}
             </div>
           ))}
         </div>

@@ -18,7 +18,7 @@ export default function Tools() {
     await clearHachette();
     setHachetteStatus('⏳ Adding fresh...');
     const count = await addHachetteCollection();
-    setHachetteStatus(`✅ Added ${count} models (old duplicates cleared)`);
+    setHachetteStatus(`Added ${count} models (old duplicates cleared)`);
   };
 
   return (

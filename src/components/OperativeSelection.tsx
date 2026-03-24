@@ -92,7 +92,7 @@ export default function OperativeSelection({ faction, onConfirm, onBack }: Props
       {/* Available operatives */}
       {leaders.length > 0 && (
         <div className="selection-section">
-          <h3 className="section-title">👑 Leaders (pick {rule?.leaderSlots || 1})</h3>
+          <h3 className="section-title"><GoldIcon name="crown" size={18} /> Leaders (pick {rule?.leaderSlots || 1})</h3>
           <div className="selection-options">
             {leaders.map((op, i) => {
               const count = selected.filter(s => s.name === op.name).length;

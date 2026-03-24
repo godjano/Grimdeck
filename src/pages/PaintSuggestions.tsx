@@ -1,3 +1,4 @@
+import GoldIcon from '../components/GoldIcon';
 import { useState, useEffect, useRef } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
@@ -109,11 +110,11 @@ export default function PaintSuggestions() {
   return (
     <div>
       <div className="page-header" style={{ paddingTop: 48 }}>
-        <h2>💡 Paint Suggestions</h2>
+        <h2><GoldIcon name="paints" size={22} /> Paint Suggestions</h2>
       </div>
 
       <div className="game-tabs" style={{ marginBottom: 24 }}>
-        {([['creators', '⭐ Creator Recipes'], ['guides', '📖 Guides'], ['paintalong', '🎨 Paint Along'], ['wheel', '🎡 Colour Wheel'], ['builder', '🔧 Builder'], ['auto', '⚡ Auto'], ['inspiration', '📸 Inspiration']] as [Tab, string][]).map(([t, label]) => (
+        {([['creators', 'Creator Recipes'], ['guides', 'Guides'], ['paintalong', 'Paint Along'], ['wheel', 'Colour Wheel'], ['builder', 'Builder'], ['auto', 'Auto'], ['inspiration', 'Inspiration']] as [Tab, string][]).map(([t, label]) => (
           <button key={t} className={`game-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>{label}</button>
         ))}
       </div>
@@ -222,7 +223,7 @@ export default function PaintSuggestions() {
             <h3 className="settings-title">Auto Suggestions</h3>
             <p className="settings-desc">Schemes generated from your {paints.length} owned paints.</p>
             {paints.length < 2 ? (
-              <div className="empty"><span className="empty-icon">🎨</span><p className="empty-text">Add at least 2 paints to get suggestions.</p></div>
+              <div className="empty"><span className="empty-icon"><GoldIcon name="paints" size={40} /></span><p className="empty-text">Add at least 2 paints to get suggestions.</p></div>
             ) : (
               <AutoSchemes paints={paints} />
             )}
@@ -234,7 +235,7 @@ export default function PaintSuggestions() {
       {tab === 'inspiration' && (
         <div>
           <div className="settings-section">
-            <h3 className="settings-title">📸 Instagram Inspiration</h3>
+            <h3 className="settings-title"><GoldIcon name="lens" size={18} /> Instagram Inspiration</h3>
             <p className="settings-desc">Browse the best miniature painting on Instagram. Click a tag to open it in a new tab.</p>
             <div className="insta-grid">
               {INSTA_TAGS.map(t => (
@@ -416,7 +417,7 @@ function GuidesTab({ paints }: { paints: Paint[] }) {
           <div className="guide-step-instructions">{step.instructions}</div>
 
           {step.tip && (
-            <div className="guide-step-tip">💡 <strong>Tip:</strong> {step.tip}</div>
+            <div className="guide-step-tip"><GoldIcon name="lightning" size={14} /> <strong>Tip:</strong> {step.tip}</div>
           )}
         </div>
 
@@ -433,7 +434,7 @@ function GuidesTab({ paints }: { paints: Paint[] }) {
           {activeStep < totalSteps - 1 ? (
             <button className="btn btn-primary" onClick={() => setActiveStep(activeStep + 1)}>Next Step →</button>
           ) : (
-            <button className="btn btn-primary" onClick={() => { setSelectedGuide(null); setActiveStep(0); }}>🏆 Complete!</button>
+            <button className="btn btn-primary" onClick={() => { setSelectedGuide(null); setActiveStep(0); }}><GoldIcon name="progress" size={14} /> Complete!</button>
           )}
         </div>
       </div>
@@ -443,7 +444,7 @@ function GuidesTab({ paints }: { paints: Paint[] }) {
   return (
     <div>
       <div className="settings-section">
-        <h3 className="settings-title">📖 Step-by-Step Painting Guides</h3>
+        <h3 className="settings-title"><GoldIcon name="guides" size={18} /> Step-by-Step Painting Guides</h3>
         <p className="settings-desc">Detailed tutorials with techniques, paints, and tips. Checks which paints you already own.</p>
         <div className="harmony-buttons" style={{ marginBottom: 16 }}>
           <button className={`btn btn-sm ${!diffFilter ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setDiffFilter('')}>All ({allGuides.length})</button>
@@ -487,7 +488,7 @@ function CreatorRecipesTab({ paints }: { paints: Paint[] }) {
   return (
     <div>
       <div className="settings-section">
-        <h3 className="settings-title">⭐ Creator-Approved Recipes</h3>
+        <h3 className="settings-title"><GoldIcon name="star-shield2" size={18} /> Creator-Approved Recipes</h3>
         <p className="settings-desc">Paint recipes inspired by top YouTube creators. Click to see steps, then watch their video for the full tutorial.</p>
 
         <div className="creator-chips">
@@ -571,7 +572,7 @@ function PaintAlongTab() {
   if (!guide) {
     return (
       <div className="settings-section">
-        <h3 className="settings-title">🎨 Paint Along Mode</h3>
+        <h3 className="settings-title"><GoldIcon name="paints" size={18} /> Paint Along Mode</h3>
         <p className="settings-desc">Select a guide, prop your phone/tablet at your desk, and follow along step by step with a built-in timer.</p>
         <select value={selectedId} onChange={e => setSelectedId(e.target.value)} className="tool-input" style={{ maxWidth: 400 }}>
           <option value="">Choose a painting guide...</option>
@@ -612,7 +613,7 @@ function PaintAlongTab() {
         </div>
 
         <div className="paintalong-instructions">{step.instructions}</div>
-        {step.tip && <div className="guide-step-tip">💡 <strong>Tip:</strong> {step.tip}</div>}
+        {step.tip && <div className="guide-step-tip"><GoldIcon name="lightning" size={14} /> <strong>Tip:</strong> {step.tip}</div>}
       </div>
 
       <div className="paintalong-nav">
@@ -620,7 +621,7 @@ function PaintAlongTab() {
         {!isLast ? (
           <button className="btn btn-primary btn-lg" onClick={() => setActiveStep(activeStep + 1)}>Next →</button>
         ) : (
-          <button className="btn btn-primary btn-lg" onClick={() => { setSelectedId(''); setActiveStep(0); setTimerRunning(false); }}>🏆 Done! ({fmt(seconds)})</button>
+          <button className="btn btn-primary btn-lg" onClick={() => { setSelectedId(''); setActiveStep(0); setTimerRunning(false); }}><GoldIcon name="progress" size={14} /> Done! ({fmt(seconds)})</button>
         )}
       </div>
     </div>
