@@ -45,7 +45,7 @@ export default function OperativeSelection({ faction, onConfirm, onBack }: Props
 
       {rule && (
         <div className="selection-rules">
-          <div className="selection-rules-title">📋 {faction} Team Rules</div>
+          <div className="selection-rules-title">< GoldIcon name="guides" size={14} /> {faction} Team Rules</div>
           <div className="selection-rules-text">{rule.notes}</div>
         </div>
       )}
@@ -122,7 +122,7 @@ export default function OperativeSelection({ faction, onConfirm, onBack }: Props
       )}
 
       <div className="selection-section">
-        <h3 className="section-title">⚔️ Operatives (pick {rule?.regularSlots || 5})</h3>
+        <h3 className="section-title"><GoldIcon name="campaigns" size={16} /> Operatives (pick {rule?.regularSlots || 5})</h3>
         <div className="selection-options">
           {regulars.map((op, i) => {
             const count = selected.filter(s => s.name === op.name).length;

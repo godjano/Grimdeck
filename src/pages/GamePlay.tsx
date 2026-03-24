@@ -156,7 +156,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
       <div className="game-tabs">
         {(['board', 'your', 'enemy', 'rules'] as const).map(t => (
           <button key={t} className={`game-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
-            {t === 'board' ? '🗺️ Board' : t === 'your' ? '🛡️ Your Team' : t === 'enemy' ? '💀 Enemy' : '📖 Rules'}
+            {t === 'board' ? <><GoldIcon name="scroll" size={14} /> Board</> : t === 'your' ? <><GoldIcon name="shield-check" size={14} /> Your Team</> : t === 'enemy' ? <><GoldIcon name="skull-bones" size={14} /> Enemy</> : <><GoldIcon name="guides" size={14} /> Rules</>}
           </button>
         ))}
       </div>
@@ -182,6 +182,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
             </div>
           </div>
 
+          <div className="board-container" style={{ position: 'relative', width: 'fit-content', margin: '0 auto' }}>
           <div className="board-grid" style={{ gridTemplateColumns: `repeat(${game.map.cols}, 20px)` }}>
             {game.map.grid.map((row, y) => row.map((cell, x) => {
               const pOp = game.operatives.find(o => o.team === 'player' && o.x === x && o.y === y && o.status !== 'incapacitated');
@@ -235,10 +236,26 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                     </div>
                   ) : cell === 'objective' ? (
                     <span className="cell-obj-marker">◎</span>
-                  ) : cell === 'heavy' ? '█' : cell === 'light' ? '░' : cell === 'vantage' ? '▲' : ''}
+                  ) : ''}
                 </div>
               );
             }))}
+          </div>
+          {/* Terrain image overlays */}
+          {game.map.terrain.map((t, i) => {
+            const b = import.meta.env.BASE_URL;
+            const terrainImgs: Record<string, Record<string, string>> = {
+              heavy: { Ruins: 'terrain-ruins.jpg', Wall: 'terrain-wall.jpg', Building: 'terrain-building.jpg' },
+              light: { Barricade: 'terrain-barricade.jpg', Crates: 'terrain-crates.jpg', Pipes: 'terrain-pipes.jpg' },
+              vantage: { Tower: 'terrain-tower.jpg', Platform: 'terrain-platform.jpg' },
+            };
+            const src = terrainImgs[t.type]?.[t.label];
+            if (!src) return null;
+            return <img key={i} src={`${b}decor/${src}`} alt={t.label} style={{
+              position: 'absolute', left: t.x * 20, top: t.y * 20, width: t.w * 20, height: t.h * 20,
+              objectFit: 'cover', borderRadius: 2, opacity: 0.7, pointerEvents: 'none', zIndex: 1,
+            }} />;
+          })}
           </div>
 
           <div className="board-legend">
@@ -261,7 +278,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
             ))}
           </div>
           <div className="terrain-list">
-            <strong>🏗️ Terrain to place on your board:</strong>
+            <strong><GoldIcon name="models" size={14} /> Terrain to place on your board:</strong>
             {game.map.terrain.map((t, i) => (
               <span key={i} className="terrain-tag">{t.label} ({t.w}×{t.h}") at col {t.x}, row {t.y}</span>
             ))}
@@ -343,8 +360,8 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                 </div>
                 <div className="action-buttons">
                   <button className={`btn btn-sm ${actionMode === 'move' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('move')}>🏃 Move (1AP)</button>
-                  <button className={`btn btn-sm ${actionMode === 'shoot' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('shoot')}>🎯 Shoot (1AP)</button>
-                  <button className={`btn btn-sm ${actionMode === 'fight' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('fight')}>⚔️ Fight (2AP)</button>
+                  <button className={`btn btn-sm ${actionMode === 'shoot' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('shoot')}><GoldIcon name="crosshair" size={14} /> Shoot (1AP)</button>
+                  <button className={`btn btn-sm ${actionMode === 'fight' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('fight')}><GoldIcon name="fist2" size={14} /> Fight (2AP)</button>
                   <button className="btn btn-sm btn-ghost" onClick={endActivation}>✓ End</button>
                 </div>
 
@@ -411,7 +428,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
 
         {game.phase === 'end' && (
           <button className="btn btn-primary" onClick={endGame}>
-            {game.playerScore > game.enemyScore ? '🏆 Claim Victory' : game.playerScore < game.enemyScore ? '💀 Accept Defeat' : '🤝 Accept Draw'} →
+            {game.playerScore > game.enemyScore ? '<GoldIcon name="victory" size={16} /> Claim Victory' : game.playerScore < game.enemyScore ? '<GoldIcon name="defeat" size={16} /> Accept Defeat' : '<GoldIcon name="handshake" size={16} /> Accept Draw'} →
           </button>
         )}
       </div>
@@ -473,7 +490,7 @@ function OpCard({ op, selected, onSelect }: { op: OpState; idx: number; selected
 function RulesReference() {
   return (
     <div className="rules-ref">
-      <h3>📖 Kill Team Quick Reference</h3>
+      <h3><GoldIcon name="guides" size={18} /> Kill Team Quick Reference</h3>
 
       <h4>Turn Sequence</h4>
       <ol>
@@ -500,7 +517,7 @@ function RulesReference() {
         <li>Normal hits deal normal damage. Critical hits deal crit damage.</li>
       </ol>
 
-      <h4>⚔️ Fighting Sequence (Melee Combat)</h4>
+      <h4><GoldIcon name="fist2" size={16} /> Fighting Sequence (Melee Combat)</h4>
       <ol>
         <li><strong>Both players roll simultaneously</strong> — attacker rolls their melee weapon's A dice, defender rolls their melee weapon's A dice.</li>
         <li><strong>Check successes</strong> — each die ≥ weapon's WS = success. Die = 6 = critical success.</li>

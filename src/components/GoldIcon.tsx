@@ -44,6 +44,16 @@ const ICONS: Record<string, string> = {
   grenade: 'icon-grenade.png',
   scope: 'icon-scope.png',
   fist: 'icon-fist.png',
+  // Game action icons
+  crosshair: 'icon-crosshair.png',
+  fist2: 'icon-fist2.png',
+  boots: 'icon-boots.png',
+  scroll: 'icon-scroll.png',
+  'shield-check': 'icon-shield-check.png',
+  'skull-bones': 'icon-skull-bones.png',
+  victory: 'icon-victory.png',
+  defeat: 'icon-defeat.png',
+  handshake: 'icon-handshake.png',
 };
 
 export default function GoldIcon({ name, size = 20 }: { name: keyof typeof ICONS | string; size?: number }) {

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { getMission, fillNarrative, CAMPAIGN_MISSIONS } from '../db/campaign-engine';
+import GoldIcon from '../components/GoldIcon';
 import GamePlay from './GamePlay';
 
 import { AI_CONFIGS, type AIDifficulty } from '../db/killteam-ai-v2';
@@ -101,10 +102,10 @@ export default function CampaignPlay() {
                 <div className="difficulty-desc">{cfg.desc}</div>
                 <div className="difficulty-features">
                   {cfg.rerolls > 0 && <span>🎲 {cfg.rerolls} reroll{cfg.rerolls > 1 ? 's' : ''}</span>}
-                  {cfg.playsObjectives && <span>🎯 Plays objectives</span>}
-                  {cfg.seeksCover && <span>🛡️ Uses cover</span>}
+                  {cfg.playsObjectives && <span><GoldIcon name="crosshair" size={12} /> Plays objectives</span>}
+                  {cfg.seeksCover && <span><GoldIcon name="shield-check" size={12} /> Uses cover</span>}
                   {cfg.focusFire && <span>🔥 Focus fire</span>}
-                  {cfg.leaderBonus > 0 && <span>💀 +{cfg.leaderBonus} leader wounds</span>}
+                  {cfg.leaderBonus > 0 && <span><GoldIcon name="skull-bones" size={12} /> +{cfg.leaderBonus} leader wounds</span>}
                 </div>
               </div>
             );
@@ -112,7 +113,7 @@ export default function CampaignPlay() {
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20 }}>
           <button className="btn btn-ghost" onClick={() => setMode('campaign')}>← Back</button>
-          <button className="btn btn-primary btn-lg" onClick={() => setMode('selecting')}>⚔️ Select Operatives ({AI_CONFIGS[difficulty].name})</button>
+          <button className="btn btn-primary btn-lg" onClick={() => setMode('selecting')}><GoldIcon name="campaigns" size={16} /> Select Operatives ({AI_CONFIGS[difficulty].name})</button>
         </div>
       </div>
     );
@@ -128,7 +129,7 @@ export default function CampaignPlay() {
       <div>
         <div className="page-header"><h2>{campaign.name}</h2></div>
         <div className="rank-card">
-          <div className="rank-icon">{campaign.status === 'won' ? '🏆' : campaign.status === 'lost' ? '💀' : '🏳️'}</div>
+          <div className="rank-icon">{campaign.status === 'won' ? <GoldIcon name="victory" size={24} /> : campaign.status === 'lost' ? <GoldIcon name="defeat" size={24} /> : <GoldIcon name="handshake" size={24} />}</div>
           <div className="rank-info">
             <div className="rank-title">{campaign.status === 'won' ? 'Victory!' : campaign.status === 'lost' ? 'Defeat' : 'Abandoned'}</div>
             <div className="rank-desc">{campaign.playerFaction} vs {campaign.enemyFaction} · {campaign.wins}W / {campaign.losses}L</div>
@@ -190,7 +191,7 @@ export default function CampaignPlay() {
           <h3 className="mission-title">{mission.title}</h3>
           <p className="mission-briefing">{fill(mission.briefing)}</p>
           <div className="mission-objective"><strong>Objective:</strong> {mission.objectiveText}</div>
-          <button className="btn btn-primary" onClick={() => setMode('difficulty')}>⚔️ Launch Game on Board →</button>
+          <button className="btn btn-primary" onClick={() => setMode('difficulty')}><GoldIcon name="campaigns" size={16} /> Launch Game on Board →</button>
         </div>
       )}
 
