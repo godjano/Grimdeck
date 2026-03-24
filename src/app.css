@@ -2671,14 +2671,14 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 
 /* Paint rack — physical shelf look */
 .pr-rack {
-  background: url('/tex-wood.jpg') center/200px !important;
+  background: linear-gradient(180deg, #1a120a 0%, #0e0a06 100%) !important;
   background-blend-mode: normal !important;
-  border: 2px solid #8b5a2b;
+  border: 2px solid #6b4420;
   border-radius: 16px;
   padding: 12px 16px 0;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 0 30px rgba(0,0,0,0.5), 0 4px 20px rgba(0,0,0,0.6);
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 0 4px 20px rgba(0,0,0,0.6);
   width: fit-content;
   max-width: 100%;
   margin: 0 auto;
@@ -2686,7 +2686,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 /* Side rails */
 .pr-rack::before, .pr-rack::after {
   content: ''; position: absolute; top: 0; bottom: 0; width: 10px;
-  background: url('/tex-wood.jpg') center/100px !important;
+  background: url('/tex-wood.jpg') center/cover !important;
   z-index: 2;
   box-shadow: inset -2px 0 4px rgba(0,0,0,0.4), 2px 0 6px rgba(0,0,0,0.3);
 }
@@ -2701,8 +2701,8 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 }
 /* The shelf board */
 .pr-shelf-board {
-  height: 12px;
-  background: url('/tex-wood.jpg') center/150px !important;
+  height: 14px;
+  background: url('/tex-wood.jpg') center/cover !important;
   border-radius: 3px;
   margin: 0 -6px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.6), 0 1px 0 rgba(200,160,90,0.4) inset, 0 -1px 0 rgba(0,0,0,0.5);
