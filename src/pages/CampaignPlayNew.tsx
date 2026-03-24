@@ -97,7 +97,7 @@ export default function CampaignPlay() {
             const cfg = AI_CONFIGS[d];
             return (
               <div key={d} className={`difficulty-card ${difficulty === d ? 'selected' : ''}`} onClick={() => setDifficulty(d)}>
-                <div className="difficulty-icon">{cfg.icon}</div>
+                <div className="difficulty-icon">{d === 'easy' ? <GoldIcon name="shield-check" size={32} /> : d === 'normal' ? <GoldIcon name="crosshair" size={32} /> : <GoldIcon name="flame-skull" size={32} />}</div>
                 <div className="difficulty-name">{cfg.name}</div>
                 <div className="difficulty-desc">{cfg.desc}</div>
                 <div className="difficulty-features">

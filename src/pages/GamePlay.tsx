@@ -145,7 +145,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
       {/* Header */}
       <div className="game-header">
         <div>TP {game.turningPoint}/{game.maxTurningPoints}</div>
-        <div>{AI_CONFIGS[difficulty].icon} {AI_CONFIGS[difficulty].name}</div>
+        <div><GoldIcon name={difficulty === 'easy' ? 'shield-check' : difficulty === 'normal' ? 'crosshair' : 'flame-skull'} size={14} /> {AI_CONFIGS[difficulty].name}</div>
         <div>Score: You {game.playerScore} - {game.enemyScore} Enemy</div>
         <div className={`status status-${game.activeTeam === 'player' ? 'painted' : 'unbuilt'}`}>
           {game.phase === 'setup' ? 'SETUP' : game.phase === 'end' ? 'GAME OVER' : `${game.activeTeam === 'player' ? 'YOUR' : 'ENEMY'} TURN`}
@@ -474,7 +474,7 @@ function OpCard({ op, selected, onSelect }: { op: OpState; idx: number; selected
       </div>
       {op.op.abilities.length > 0 && <div className="op-card-abilities">✦ {op.op.abilities.join(' · ')}</div>}
       <div className="op-card-footer">
-        <span>📍 ({op.x}, {op.y}) {dead ? '💀 INCAPACITATED' : op.activated ? '✓ Activated' : ''}</span>
+        <span><GoldIcon name="crosshair" size={12} /> ({op.x}, {op.y}) {dead ? <><GoldIcon name="skull-bones" size={12} /> INCAPACITATED</> : op.activated ? '✓ Activated' : ''}</span>
         {!dead && (
           <div className="ap-pips">
             {Array.from({ length: op.op.apl }, (_, i) => (
