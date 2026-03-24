@@ -114,8 +114,8 @@ export default function PaintSuggestions() {
       </div>
 
       <div className="game-tabs" style={{ marginBottom: 24 }}>
-        {([['creators', 'Creator Recipes'], ['guides', 'Guides'], ['paintalong', 'Paint Along'], ['wheel', 'Colour Wheel'], ['builder', 'Builder'], ['auto', 'Auto'], ['inspiration', 'Inspiration']] as [Tab, string][]).map(([t, label]) => (
-          <button key={t} className={`game-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>{label}</button>
+        {([['creators', 'Creator Recipes', 'star-shield2'], ['guides', 'Guides', 'guides'], ['paintalong', 'Paint Along', 'paints'], ['wheel', 'Colour Wheel', 'settings'], ['builder', 'Builder', 'hammer'], ['auto', 'Auto', 'lightning'], ['inspiration', 'Inspiration', 'lens']] as [Tab, string, string][]).map(([t, label, icon]) => (
+          <button key={t} className={`game-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}><GoldIcon name={icon} size={14} /> {label}</button>
         ))}
       </div>
 

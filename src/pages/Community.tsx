@@ -49,8 +49,8 @@ export default function Community() {
 
       <div className="game-tabs" style={{ marginBottom: 20 }}>
         <button className={`game-tab ${tab === 'gallery' ? 'active' : ''}`} onClick={() => setTab('gallery')}><GoldIcon name="lens" size={14} /> Gallery</button>
-        <button className={`game-tab ${tab === 'share' ? 'active' : ''}`} onClick={() => setTab('share')}>📤 Share</button>
-        <button className={`game-tab ${tab === 'profile' ? 'active' : ''}`} onClick={() => setTab('profile')}>👤 Profile</button>
+        <button className={`game-tab ${tab === 'share' ? 'active' : ''}`} onClick={() => setTab('share')}><GoldIcon name="aquila" size={14} /> Share</button>
+        <button className={`game-tab ${tab === 'profile' ? 'active' : ''}`} onClick={() => setTab('profile')}><GoldIcon name="crown" size={14} /> Profile</button>
       </div>
 
       {status && <div className="status-banner">{status}</div>}
@@ -94,7 +94,7 @@ export default function Community() {
                     )}
                     <div className="gallery-actions">
                       <button className={`gallery-like ${m.liked ? 'liked' : ''}`} onClick={() => handleLike(m)}>
-                        {m.liked ? '❤️' : '🤍'} {m.likes || 0}
+                        <GoldIcon name={m.liked ? 'flame-skull' : 'skull'} size={14} /> {m.likes || 0}
                       </button>
                       {user && m.user_id === user.id && (
                         <button className="btn btn-danger btn-sm" onClick={() => handleDelete(m.id)}>🗑</button>
@@ -154,7 +154,7 @@ function ShareForm({ user, onShared, setStatus }: { user: User | null; onShared:
 
   return (
     <div className="settings-section">
-      <h3 className="settings-title">📤 Share a Painted Model</h3>
+      <h3 className="settings-title"><GoldIcon name="aquila" size={18} /> Share a Painted Model</h3>
       <p className="settings-desc">Share your work with the community. Only painted/based models can be shared.</p>
       <div className="form-grid" style={{ maxWidth: 500 }}>
         <div className="field full-width">
@@ -201,7 +201,7 @@ function ProfileForm({ user, setStatus }: { user: User | null; setStatus: (s: st
 
   return (
     <div className="settings-section">
-      <h3 className="settings-title">👤 Creator Profile</h3>
+      <h3 className="settings-title"><GoldIcon name="crown" size={18} /> Creator Profile</h3>
       <p className="settings-desc">Set up your profile to be recognised in the community.</p>
       <div className="form-grid" style={{ maxWidth: 500 }}>
         <div className="field full-width"><label>Display Name *</label><input value={name} onChange={e => setName(e.target.value)} placeholder="Your painter name" /></div>
