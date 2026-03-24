@@ -121,14 +121,14 @@ export default function Home() {
         <h2 className="section-heading">Everything you need</h2>
         <div className="feature-grid">
           {(() => { const b = import.meta.env.BASE_URL; return [
-            { to: '/models', img: 'icon-shield.png', title: 'Collection', desc: 'Track every miniature by faction and status', color: '#3b82f6' },
-            { to: '/paints', img: 'icon-palette.png', title: 'Paint Rack', desc: 'Catalog paints across all major brands', color: '#a855f7' },
-            { to: '/grey-pile', img: 'icon-skull.png', title: 'Pile of Grey', desc: 'Face your shame — promote through the pipeline', color: '#6b7280' },
-            { to: '/progress', img: 'icon-trophy.png', title: 'Progress', desc: 'Ranks, trophies, and painting streaks', color: '#f59e0b' },
-            { to: '/campaigns', img: 'icon-sword.png', title: 'Campaigns', desc: 'Solo Kill Team narrative missions', color: '#ef4444' },
-            { to: '/suggestions', img: 'icon-book.png', title: 'Paint Guides', desc: 'Step-by-step tutorials and recipes', color: '#10b981' },
-            { to: '/inspiration', img: 'icon-grimoire.png', title: 'Inspiration', desc: 'Techniques, tips, and pro recipes', color: '#ec4899' },
-            { to: '/community', img: 'icon-star-shield.png', title: 'Community', desc: 'Share models and browse the gallery', color: '#06b6d4' },
+            { to: '/models', img: 'icon-figurine.png', title: 'Collection', desc: 'Track every miniature by faction and status', color: '#3b82f6' },
+            { to: '/paints', img: 'icon-palette2.png', title: 'Paint Rack', desc: 'Catalog paints across all major brands', color: '#a855f7' },
+            { to: '/grey-pile', img: 'icon-skull2.png', title: 'Pile of Grey', desc: 'Face your shame — promote through the pipeline', color: '#6b7280' },
+            { to: '/progress', img: 'icon-trophy2.png', title: 'Progress', desc: 'Ranks, trophies, and painting streaks', color: '#f59e0b' },
+            { to: '/campaigns', img: 'icon-swords2.png', title: 'Campaigns', desc: 'Solo Kill Team narrative missions', color: '#ef4444' },
+            { to: '/suggestions', img: 'icon-book2.png', title: 'Paint Guides', desc: 'Step-by-step tutorials and recipes', color: '#10b981' },
+            { to: '/inspiration', img: 'icon-eagle-shield.png', title: 'Inspiration', desc: 'Techniques, tips, and pro recipes', color: '#ec4899' },
+            { to: '/community', img: 'icon-compass.png', title: 'Community', desc: 'Share models and browse the gallery', color: '#06b6d4' },
           ].map(f => (
             <div key={f.to} className="feature-card" onClick={() => nav(f.to)} style={{ '--feat-color': f.color } as React.CSSProperties}>
               <div className="feature-icon"><img src={`${b}decor/${f.img}`} alt="" width={44} height={44} /></div>
