@@ -10,6 +10,7 @@ const ICONS: Record<string, string> = {
   guides: 'icon-book2.png',
   inspiration: 'icon-eagle-shield.png',
   community: 'icon-eagle-shield.png',
+  'eagle-shield': 'icon-eagle-shield.png',
   settings: 'icon-gear2.png',
   aquila: 'icon-aquila.png',
   medal: 'icon-medal.png',
@@ -36,6 +37,13 @@ const ICONS: Record<string, string> = {
   hammer: 'icon-hammer.png',
   'chain-skull': 'icon-chain-skull.png',
   sunburst: 'icon-sunburst.png',
+  // Weapon icons
+  pistol: 'icon-pistol.png',
+  sword2: 'icon-sword2.png',
+  'round-shield': 'icon-round-shield.png',
+  grenade: 'icon-grenade.png',
+  scope: 'icon-scope.png',
+  fist: 'icon-fist.png',
 };
 
 export default function GoldIcon({ name, size = 20 }: { name: keyof typeof ICONS | string; size?: number }) {

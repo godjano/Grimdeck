@@ -11,6 +11,7 @@ export default function Layout() {
   const { pathname } = useLocation();
   const { theme, toggle } = useTheme();
   const [user, setUser] = useState<User | null>(null);
+  const [showMore, setShowMore] = useState(false);
 
   useEffect(() => {
     getUser().then(u => setUser(u));
@@ -18,6 +19,7 @@ export default function Layout() {
     return () => data.subscription.unsubscribe();
   }, []);
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [pathname]);
+  useEffect(() => { setShowMore(false); }, [pathname]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -41,9 +43,9 @@ export default function Layout() {
             <NavLink to="/progress">Progress</NavLink>
             <NavLink to="/campaigns">Campaigns</NavLink>
             <NavLink to="/community">Community</NavLink>
-            <div className="nav-more">
-              <button className="nav-more-btn">More ▾</button>
-              <div className="nav-dropdown">
+            <div className={`nav-more ${showMore ? 'open' : ''}`}>
+              <button className="nav-more-btn" onClick={() => setShowMore(!showMore)}>More ▾</button>
+              <div className="nav-dropdown" onClick={() => setShowMore(false)}>
                 <NavLink to="/army-list">📋 Army List</NavLink>
                 <NavLink to="/suggestions">📖 Guides</NavLink>
                 <NavLink to="/inspiration">🖌️ Reference</NavLink>
@@ -78,7 +80,7 @@ export default function Layout() {
         <NavLink to="/grey-pile"><GoldIcon name="skull" size={22} /></NavLink>
         <NavLink to="/progress"><GoldIcon name="progress" size={22} /></NavLink>
         <NavLink to="/campaigns"><GoldIcon name="campaigns" size={22} /></NavLink>
-        <NavLink to="/community"><GoldIcon name="community" size={22} /></NavLink>
+        <NavLink to="/account"><GoldIcon name="eagle-shield" size={22} /></NavLink>
         <NavLink to="/settings"><GoldIcon name="settings" size={22} /></NavLink>
       </nav>
       <FloatingTimer />

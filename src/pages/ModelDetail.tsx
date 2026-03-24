@@ -196,7 +196,7 @@ export default function ModelDetail() {
                     <h3 className="md-section-title"><GoldIcon name="campaigns" size={16} /> Weapons</h3>
                     {datacard.weapons.map(w => (
                       <div key={w.name} className="md-weapon">
-                        <div className="md-weapon-name">{w.type === 'ranged' ? '🔫' : '⚔️'} {w.name}</div>
+                        <div className="md-weapon-name">{w.type === 'ranged' ? <GoldIcon name="pistol" size={16} /> : <GoldIcon name="sword2" size={16} />} {w.name}</div>
                         <div className="md-weapon-stats">
                           <span>{w.attacks}A</span><span>BS {w.skill}+</span><span>{w.normalDmg}/{w.critDmg} dmg</span>
                         </div>

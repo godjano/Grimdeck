@@ -3,6 +3,7 @@ import { getRoster } from '../db/killteam-data';
 import type { Weapon } from '../db/killteam-data';
 import { generateMap, CELL_LEGEND } from '../db/map-generator';
 import { createGameState, rollInitiative, resolveShoot, resolveFight, applyDamage, checkTurnEnd, rollDice, type GameState, type OpState } from '../db/killteam-game';
+import GoldIcon from '../components/GoldIcon';
 import { aiActivationV2, AI_CONFIGS, type AIDifficulty } from '../db/killteam-ai-v2';
 import { formatProbability, expectedHits, expectedDamage } from '../db/dice-math';
 import { rollRandomEvent, type RandomEvent } from '../db/random-events';
@@ -442,7 +443,7 @@ function OpCard({ op, selected, onSelect }: { op: OpState; idx: number; selected
       <div className="op-card-weapons">
         {op.op.weapons.map(w => (
           <div key={w.name} className="weapon-line">
-            <span className="weapon-icon">{w.type === 'ranged' ? '🔫' : '⚔️'}</span>
+            <span className="weapon-icon">{w.type === 'ranged' ? <GoldIcon name="pistol" size={14} /> : <GoldIcon name="sword2" size={14} />}</span>
             <div className="weapon-info">
               <span className="weapon-name">{w.name}</span>
               <div className="weapon-stats">

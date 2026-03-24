@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { KTOperative } from '../db/killteam-data';
 import { FACTION_ROSTERS } from '../db/killteam-data';
 import { TEAM_RULES, validateTeam, getAvailableOperatives } from '../db/team-selection';
+import GoldIcon from './GoldIcon';
 
 interface Props {
   faction: string;
@@ -107,7 +108,7 @@ export default function OperativeSelection({ faction, onConfirm, onBack }: Props
                   <div className="selection-op-stats">M:{op.movement}" · APL:{op.apl} · SV:{op.save}+ · W:{op.wounds}</div>
                   <div className="selection-op-weapons">
                     {op.weapons.map(w => (
-                      <div key={w.name} className="selection-op-weapon">{w.type === 'ranged' ? '🔫' : '⚔️'} {w.name} ({w.attacks}A {w.skill}+ {w.normalDmg}/{w.critDmg})</div>
+                      <div key={w.name} className="selection-op-weapon">{w.type === 'ranged' ? <GoldIcon name="pistol" size={12} /> : <GoldIcon name="sword2" size={12} />} {w.name} ({w.attacks}A {w.skill}+ {w.normalDmg}/{w.critDmg})</div>
                     ))}
                   </div>
                   {op.abilities.length > 0 && (
@@ -139,7 +140,7 @@ export default function OperativeSelection({ faction, onConfirm, onBack }: Props
                 <div className="selection-op-stats">M:{op.movement}" · APL:{op.apl} · SV:{op.save}+ · W:{op.wounds}</div>
                 <div className="selection-op-weapons">
                   {op.weapons.slice(0, 2).map(w => (
-                    <div key={w.name} className="selection-op-weapon">{w.type === 'ranged' ? '🔫' : '⚔️'} {w.name} ({w.attacks}A {w.skill}+ {w.normalDmg}/{w.critDmg})</div>
+                    <div key={w.name} className="selection-op-weapon">{w.type === 'ranged' ? <GoldIcon name="pistol" size={12} /> : <GoldIcon name="sword2" size={12} />} {w.name} ({w.attacks}A {w.skill}+ {w.normalDmg}/{w.critDmg})</div>
                   ))}
                   {op.weapons.length > 2 && <div className="selection-op-weapon">+{op.weapons.length - 2} more weapons</div>}
                 </div>
