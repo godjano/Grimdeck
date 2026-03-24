@@ -214,7 +214,7 @@ export default function ModelDetail() {
               </div>
             )}
             {/* Decorative skull divider */}
-            <div className="md-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
+            <div className="md-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" loading="lazy" /></div>
           </div>
         )}
 

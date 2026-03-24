@@ -102,7 +102,7 @@ export default function Account() {
             <p className="settings-desc">Push your local data to the cloud or pull from the cloud to this device.</p>
             {lastSync && <p style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: 12 }}>Last synced: {new Date(lastSync).toLocaleString()}</p>}
             <div style={{ display: 'flex', gap: 10 }}>
-              <button className="btn btn-primary" onClick={handlePush} disabled={syncing}><GoldIcon name="aquila" size={14} /> Push to Cloud</button>
+              <button className="btn btn-primary" onClick={handlePush} disabled={syncing}>Push to Cloud</button>
               <button className="btn btn-ghost" onClick={handlePull} disabled={syncing}>📥 Pull from Cloud</button>
             </div>
             <p className="settings-desc" style={{ marginTop: 12 }}>

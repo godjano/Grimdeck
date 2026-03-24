@@ -1616,6 +1616,9 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
   padding: 120px 0 100px !important;
   position: relative;
   text-align: center;
+  background: linear-gradient(rgba(10,10,14,0.7), rgba(10,10,14,0.85)), url('/decor/empty-workstation.jpg') center/cover no-repeat;
+  border-radius: 16px;
+  margin-bottom: 24px;
 }
 /* hero::before — handled at line 72 */
 .hero::after {

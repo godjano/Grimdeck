@@ -73,5 +73,5 @@ const ICONS: Record<string, string> = {
 export default function GoldIcon({ name, size = 20 }: { name: keyof typeof ICONS | string; size?: number }) {
   const file = ICONS[name];
   if (!file) return null;
-  return <img src={`${b}decor/${file}`} alt="" width={size} height={size} style={{ objectFit: 'contain' }} />;
+  return <img src={`${b}decor/${file}`} alt="" width={size} height={size} loading="lazy" style={{ objectFit: 'contain' }} />;
 }

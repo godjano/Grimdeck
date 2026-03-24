@@ -180,7 +180,6 @@ export default function Inspiration() {
     <div>
       <div className="page-header" style={{ paddingTop: 48 }}>
         <PageBanner title="Inspiration & Reference" subtitle="Techniques, recipes, and tips" icon="inspiration" />
-        <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
       </div>
 
       <div className="game-tabs" style={{ marginBottom: 20 }}>

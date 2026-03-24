@@ -19,7 +19,6 @@ export default function Campaigns() {
   return (
     <div>
       <PageBanner title="Solo Campaigns" subtitle="Kill Team narrative missions" icon="campaigns" />
-      <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
       <div className="page-header">
         <button className="btn btn-primary" onClick={() => setShowCreate(!showCreate)}>
           {showCreate ? '✕ Cancel' : '+ New Campaign'}

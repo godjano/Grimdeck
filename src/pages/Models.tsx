@@ -77,7 +77,7 @@ export default function Models() {
   return (
     <div>
       <PageBanner title="My Models" subtitle="Track every miniature by faction and status" icon="models" />
-      <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
+      <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" loading="lazy" /></div>
       {/* ─── Header ─── */}
       <div className="page-header">
         <div style={{ display: 'flex', gap: 8 }}>
@@ -236,7 +236,7 @@ function ModelCard({ m, nav, openMenu, setOpenMenu, updateStatus, deleteModel }:
             {MODEL_STATUSES.map(s => (
               <button key={s} className={m.status === s ? 'active' : ''} onClick={() => { updateStatus(m.id!, s as ModelStatus); setOpenMenu(null); }}>{s}</button>
             ))}
-            <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
+            <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" loading="lazy" /></div>
             <a href={getGWSearchUrl(m.name)} target="_blank" rel="noreferrer" onClick={() => setOpenMenu(null)}>
               <ExternalLink size={12} /> GW Store
             </a>

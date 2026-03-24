@@ -44,7 +44,6 @@ export default function Community() {
     <div>
       <div className="page-header" style={{ paddingTop: 48 }}>
         <PageBanner title="Community" subtitle="Share your work and get inspired" icon="community" />
-        <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
       </div>
 
       <div className="game-tabs" style={{ marginBottom: 20 }}>

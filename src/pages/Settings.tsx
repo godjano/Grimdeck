@@ -68,7 +68,6 @@ export default function Settings() {
     <div>
       <div className="page-header" style={{ paddingTop: 48 }}>
         <PageBanner title="Settings & Backup" subtitle="Export, import, and sync your data" icon="settings" />
-        <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
       </div>
 
       {status && <div className="status-banner">{status}</div>}
@@ -118,7 +117,7 @@ export default function Settings() {
               {getGistId() && <span className="gist-id">Gist: {getGistId()?.slice(0, 12)}...</span>}
             </div>
             <div className="settings-actions">
-              <button className="btn btn-primary" onClick={doSave}><GoldIcon name="aquila" size={14} /> Save to GitHub</button>
+              <button className="btn btn-primary" onClick={doSave}>Save to GitHub</button>
               <button className="btn btn-ghost" onClick={doLoad}>📥 Load from GitHub</button>
               <button className="btn btn-danger btn-sm" onClick={disconnect}>Disconnect</button>
             </div>

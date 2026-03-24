@@ -434,7 +434,7 @@ function GuidesTab({ paints }: { paints: Paint[] }) {
           {activeStep < totalSteps - 1 ? (
             <button className="btn btn-primary" onClick={() => setActiveStep(activeStep + 1)}>Next Step →</button>
           ) : (
-            <button className="btn btn-primary" onClick={() => { setSelectedGuide(null); setActiveStep(0); }}><GoldIcon name="progress" size={14} /> Complete!</button>
+            <button className="btn btn-primary" onClick={() => { setSelectedGuide(null); setActiveStep(0); }}>Complete!</button>
           )}
         </div>
       </div>
@@ -621,7 +621,7 @@ function PaintAlongTab() {
         {!isLast ? (
           <button className="btn btn-primary btn-lg" onClick={() => setActiveStep(activeStep + 1)}>Next →</button>
         ) : (
-          <button className="btn btn-primary btn-lg" onClick={() => { setSelectedId(''); setActiveStep(0); setTimerRunning(false); }}><GoldIcon name="progress" size={14} /> Done! ({fmt(seconds)})</button>
+          <button className="btn btn-primary btn-lg" onClick={() => { setSelectedId(''); setActiveStep(0); setTimerRunning(false); }}>Done! ({fmt(seconds)})</button>
         )}
       </div>
     </div>

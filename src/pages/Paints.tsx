@@ -98,7 +98,6 @@ export default function Paints() {
   return (
     <div>
       <PageBanner title="Paint Rack" subtitle="Catalog paints across all major brands" icon="paints" />
-      <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
       <div className="page-header">
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn btn-ghost btn-sm" onClick={() => { setShowBulk(!showBulk); setShowForm(false); }}>

@@ -78,7 +78,7 @@ function AddModels() {
         <button className="btn btn-sm btn-primary" onClick={add}>Add to Collection</button>
         <button className="btn btn-sm btn-ghost" onClick={gen}>Generate Code</button>
       </div>
-      {code && <div className="dm-code"><pre>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}><GoldIcon name="scroll" size={12} /> Copy</button></div>}
+      {code && <div className="dm-code"><pre>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}>Copy</button></div>}
     </div>
   );
 }
@@ -114,7 +114,7 @@ function AddPaints() {
         <button className="btn btn-sm btn-primary" onClick={add}>Add to Collection</button>
         <button className="btn btn-sm btn-ghost" onClick={gen}>Generate Code</button>
       </div>
-      {code && <div className="dm-code"><pre>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}><GoldIcon name="scroll" size={12} /> Copy</button></div>}
+      {code && <div className="dm-code"><pre>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}>Copy</button></div>}
     </div>
   );
 }
@@ -157,7 +157,7 @@ function ExportCode() {
           {(type==='models'?factions:brands).map(f=><option key={f} value={f}>{f}</option>)}
         </select>
       </div>
-      <div className="dm-code"><pre style={{maxHeight:300,overflow:'auto'}}>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}><GoldIcon name="scroll" size={12} /> Copy</button></div>
+      <div className="dm-code"><pre style={{maxHeight:300,overflow:'auto'}}>{code}</pre><button className="btn btn-sm btn-ghost" onClick={()=>navigator.clipboard.writeText(code)}>Copy</button></div>
     </div>
   );
 }

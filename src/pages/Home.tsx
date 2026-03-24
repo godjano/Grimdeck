@@ -18,7 +18,7 @@ export default function Home() {
   const wip = models.filter(m => m.status === 'wip');
   const recent = [...models].sort((a, b) => b.createdAt - a.createdAt).slice(0, 5);
 
-  const divider = <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>;
+  const divider = <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" loading="lazy" /></div>;
 
   return (
     <div>
@@ -67,8 +67,7 @@ export default function Home() {
       )}
 
       {/* Currently Painting */}
-      {wip.length > 0 && (<>
-        {divider}
+      {wip.length > 0 && (
         <section className="section">
           <p className="section-eyebrow">On the desk</p>
           <h2 className="section-heading">Currently Painting</h2>
@@ -88,11 +87,10 @@ export default function Home() {
           </div>
           {wip.length > 4 && <p className="home-more" onClick={() => nav('/grey-pile')}>+{wip.length - 4} more on the desk →</p>}
         </section>
-      </>)}
+      )}
 
       {/* Recently Added */}
-      {recent.length > 0 && (<>
-        {divider}
+      {recent.length > 0 && (
         <section className="section">
           <p className="section-eyebrow">Latest</p>
           <h2 className="section-heading">Recently Added</h2>
@@ -111,7 +109,7 @@ export default function Home() {
             ))}
           </div>
         </section>
-      </>)}
+      )}
 
       {divider}
 

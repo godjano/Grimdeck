@@ -127,11 +127,9 @@ export default function Progress() {
 
   const byTier = (tier: TrophyTier) => TROPHIES.filter(t => t.tier === tier);
 
-  const b = import.meta.env.BASE_URL;
   return (
     <div>
       <PageBanner title="Progress" subtitle="Track your hobby journey and achievements" icon="progress" />
-      <div className="gold-divider"><img src={`${b}decor/divider-gold.png`} alt="" /></div>
       {/* ─── Player Card (PSN Profile style) ─── */}
       <div className="player-card">
         <div className="player-card-bg" />

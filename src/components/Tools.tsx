@@ -103,7 +103,7 @@ export function ShoppingList() {
                   <div className="recipe-paint-name">{p.name}</div>
                 </div>
               ))}
-              <button className="btn btn-sm btn-ghost" onClick={copyList} style={{ marginTop: 8 }}><GoldIcon name="scroll" size={14} /> Copy list</button>
+              <button className="btn btn-sm btn-ghost" onClick={copyList} style={{ marginTop: 8 }}>Copy list</button>
             </>
           )}
         </div>
@@ -188,7 +188,7 @@ export function ShareCollection() {
     <div className="tool-card">
       <h3>📤 Share Collection</h3>
       <p className="settings-desc">Copy a summary of your collection to share on Reddit, Discord, or with friends.</p>
-      <button className="btn btn-sm btn-primary" onClick={share}>{copied ? '✓ Copied!' : <><GoldIcon name="scroll" size={14} /> Copy Summary</>}</button>
+      <button className="btn btn-sm btn-primary" onClick={share}>{copied ? '✓ Copied!' : 'Copy Summary'}</button>
     </div>
   );
 }

@@ -53,7 +53,6 @@ export default function GreyPile() {
   return (
     <div>
       <PageBanner title="The Pile of Grey" subtitle="Face your shame — promote through the pipeline" icon="skull" />
-      <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" /></div>
 
       {totalGrey === 0 && totalWip === 0 ? (
         <div className="empty">
@@ -173,9 +172,9 @@ export default function GreyPile() {
                       <div className="card-sub">{m.faction}{m.unitType ? ` · ${m.unitType}` : ''}</div>
                     </div>
                     <div className="promote-buttons">
-                      {m.status === 'unbuilt' && <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'built'); }}><GoldIcon name="campaigns" size={12} /></button>}
-                      {(m.status === 'unbuilt' || m.status === 'built') && <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'primed'); }}><GoldIcon name="skull" size={12} /></button>}
-                      <button className="btn btn-sm btn-primary" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'wip'); }}><GoldIcon name="paints" size={12} /></button>
+                      {m.status === 'unbuilt' && <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'built'); }}>Build</button>}
+                      {(m.status === 'unbuilt' || m.status === 'built') && <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'primed'); }}>Prime</button>}
+                      <button className="btn btn-sm btn-primary" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'wip'); }}>Paint</button>
                     </div>
                   </div>
                 ))
