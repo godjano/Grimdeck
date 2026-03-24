@@ -10,6 +10,8 @@ import { VALLEJO_XPRESS, CITADEL_MISSING } from './paints-latest';
 import { SPEED_PAINT_V1 } from './primarchs-and-sp1';
 import { SPEED_PAINT_MISSING } from './paints-speedpaint-extra';
 
+import { KIMERA, TURBO_DORK, GREEN_STUFF_WORLD, PRO_ACRYL_EXP } from './paints-new-ranges';
+
 export const ALL_PAINT_PRESETS = [
   ...CITADEL_BASE,
   ...CITADEL_LAYER,
@@ -31,4 +33,8 @@ export const ALL_PAINT_PRESETS = [
   ...PROACRYL,
   ...SCALE75,
   ...AK_INTERACTIVE,
+  ...KIMERA,
+  ...TURBO_DORK,
+  ...GREEN_STUFF_WORLD,
+  ...PRO_ACRYL_EXP,
 ];

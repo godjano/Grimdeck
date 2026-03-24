@@ -1,4 +1,5 @@
 import { EXTRA_ROSTERS } from './killteam-data-extra';
+import { MORE_ROSTERS } from './killteam-data-more';
 
 export interface Weapon {
   name: string;
@@ -294,9 +295,9 @@ export const FACTION_ROSTERS: Record<string, KTOperative[]> = {
 };
 
 export function getRoster(faction: string): KTOperative[] {
-  const allRosters = { ...FACTION_ROSTERS, ...EXTRA_ROSTERS };
+  const allRosters = { ...FACTION_ROSTERS, ...EXTRA_ROSTERS, ...MORE_ROSTERS };
   const base = allRosters[faction] || FACTION_ROSTERS['Space Marines'];
   return base.map((op, i) => ({ ...op, id: `op_${i}` }));
 }
 
-export const ALL_KT_FACTIONS = [...Object.keys(FACTION_ROSTERS), ...Object.keys(EXTRA_ROSTERS)];
+export const ALL_KT_FACTIONS = [...Object.keys(FACTION_ROSTERS), ...Object.keys(EXTRA_ROSTERS), ...Object.keys(MORE_ROSTERS)];
