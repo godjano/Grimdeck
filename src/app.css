@@ -1032,7 +1032,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .nav-more-btn { background:none; border:none; color:var(--text-dim); font-size:0.82rem; font-weight:500; font-family:inherit; padding:8px 14px; cursor:pointer; transition:var(--transition); border-radius:8px; }
 .nav-more-btn:hover { color:var(--text-secondary); }
 .nav-dropdown { display:none; position:absolute; top:100%; right:0; background:rgba(14,14,18,0.98); border:1px solid var(--border); border-radius:var(--radius); padding:6px; min-width:200px; box-shadow:0 8px 32px rgba(0,0,0,0.6); z-index:9999; margin-top:4px; }
-.nav-more:hover .nav-dropdown, .nav-more.open .nav-dropdown { display:block; }
+.nav-more.open .nav-dropdown { display:block; }
 .nav-dropdown a { display:block; padding:10px 14px; color:var(--text-secondary); text-decoration:none; font-size:0.82rem; border-radius:6px; transition:var(--transition); }
 .nav-dropdown a:hover { background:var(--surface2); color:var(--text); }
 .nav-dropdown a.active { color:var(--gold); background:var(--gold-glow); }
