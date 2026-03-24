@@ -1031,7 +1031,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .nav-more { position:relative; }
 .nav-more-btn { background:none; border:none; color:var(--text-dim); font-size:0.82rem; font-weight:500; font-family:inherit; padding:8px 14px; cursor:pointer; transition:var(--transition); border-radius:8px; }
 .nav-more-btn:hover { color:var(--text-secondary); }
-.nav-dropdown { display:none; position:absolute; top:100%; right:0; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:6px; min-width:200px; box-shadow:var(--shadow-lg); z-index:9999; margin-top:4px; }
+.nav-dropdown { display:none; position:absolute; top:100%; right:0; background:rgba(14,14,18,0.98); border:1px solid var(--border); border-radius:var(--radius); padding:6px; min-width:200px; box-shadow:0 8px 32px rgba(0,0,0,0.6); z-index:9999; margin-top:4px; }
 .nav-more:hover .nav-dropdown, .nav-more.open .nav-dropdown { display:block; }
 .nav-dropdown a { display:block; padding:10px 14px; color:var(--text-secondary); text-decoration:none; font-size:0.82rem; border-radius:6px; transition:var(--transition); }
 .nav-dropdown a:hover { background:var(--surface2); color:var(--text); }
@@ -1554,7 +1554,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .trophy-card.earned { clip-path: var(--clip-card-sm); }
 
 /* Gothic nav dropdown */
-.nav-dropdown { clip-path: var(--clip-card); border: 1px solid var(--gold-dim) !important; }
+.nav-dropdown { clip-path: none !important; border: 1px solid var(--gold-dim) !important; }
 
 /* Gothic mobile nav */
 .mobile-nav { border-top: 2px solid var(--gold-dim) !important; background: rgba(10,10,14,0.95) !important; }
@@ -1885,7 +1885,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
   background-size: cover; opacity: 0.08;
   pointer-events: none;
 }
-.site-header { position: relative; }
+.site-header { position: sticky; z-index: 9000; }
 
 /* Daemon crest on footer */
 .site-footer::before {
