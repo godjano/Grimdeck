@@ -69,7 +69,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
    HERO
    ═══════════════════════════════════════ */
 .hero { text-align:center; padding:100px 0 80px; max-width:680px; margin:0 auto; position:relative; }
-.hero::before { content:''; position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:800px; height:500px; background:url('/sci-fi-frames.jpg') no-repeat center; background-size:contain; opacity:0.06; pointer-events:none; z-index:0; }
+.hero::before { content:''; position:absolute; inset:0; background:url('/hero-bg.jpg') center/cover no-repeat; opacity:0.35; pointer-events:none; z-index:0; }
 .hero > * { position:relative; z-index:1; }
 .hero-eyebrow { font-size:0.7rem; text-transform:uppercase; letter-spacing:4px; color:var(--gold); margin-bottom:24px; font-weight:600; }
 .hero-title { font-family:'Cinzel',serif; font-size:4rem; font-weight:900; line-height:1.05; margin-bottom:24px; letter-spacing:1px; }
@@ -810,13 +810,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .hero-title::after { content:''; display:block; width:80px; height:2px; background:linear-gradient(90deg, #40e0d0, transparent); margin:16px auto 0; }
 
 /* Hero HUD frame - pure CSS */
-.hero::before {
-  content:''; position:absolute; top:20px; left:50%; transform:translateX(-50%);
-  width:500px; height:360px; pointer-events:none; z-index:0; opacity:0.06;
-  border:2px solid #40e0d0; border-radius:4px;
-  clip-path:polygon(0 8%, 4% 0, 96% 0, 100% 8%, 100% 92%, 96% 100%, 4% 100%, 0 92%);
-  box-shadow:inset 0 0 30px rgba(64,224,208,0.1), 0 0 15px rgba(64,224,208,0.05);
-}
+/* hero::before — handled at line 72 */
 .hero::after {
   content:''; position:absolute; top:24px; left:50%; transform:translateX(-50%);
   width:496px; height:356px; pointer-events:none; z-index:0; opacity:0.04;
@@ -1623,11 +1617,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
   position: relative;
   text-align: center;
 }
-.hero::before {
-  content: ''; position: absolute; inset: -60px -200px;
-  background: radial-gradient(ellipse at 50% 60%, rgba(196,100,20,0.12) 0%, rgba(138,8,8,0.06) 40%, transparent 70%);
-  pointer-events: none; z-index: 0;
-}
+/* hero::before — handled at line 72 */
 .hero::after {
   content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
   width: 200px; height: 1px;
@@ -1784,15 +1774,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
    STEAMPUNK DECORATIVE ELEMENTS
    ═══════════════════════════════════════ */
 
-/* Wings behind hero title */
-.hero::before {
-  background-image: url('/decor/wings.png') !important;
-  background-repeat: no-repeat !important;
-  background-position: center 60% !important;
-  background-size: 500px auto !important;
-  opacity: 0.04 !important;
-  inset: -40px -100px !important;
-}
+/* hero::before — handled at line 72 */
 
 /* Gear on progress/rank card */
 .rank-card::before { content: ''; position: absolute; top: -20px; right: -20px; width: 150px; height: 150px; background: url('/decor/gear.png') no-repeat center; background-size: contain; opacity: 0.04; pointer-events: none; z-index: 0; }
@@ -1817,16 +1799,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 /* Metal texture on site background */
 /* site bg handled by body */
 
-/* Daemon crest as hero background */
-.hero::before {
-  background-image: url('/decor/skull2.jpg') !important;
-  background-repeat: no-repeat !important;
-  background-position: center center !important;
-  background-size: 350px !important;
-  opacity: 0.05 !important;
-  filter: invert(1);
-  inset: -20px !important;
-}
+/* hero::before — handled at line 72 */
 
 /* Ornate frame around the stats band */
 .stats-band {
@@ -2003,9 +1976,9 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 }
 .hero::before {
   content: '' !important; position: absolute; inset: 0;
-  background: url('/faction-art/wolf-scouts-10-0.jpeg') no-repeat center center !important;
+  background: url('/hero-bg.jpg') no-repeat center center !important;
   background-size: cover !important;
-  opacity: 0.2 !important;
+  opacity: 0.35 !important;
   filter: none !important;
 }
 .hero::after {
