@@ -2,12 +2,14 @@
   "name": "Grimdeck",
   "short_name": "Grimdeck",
   "description": "Your Warhammer hobby companion — track, paint, conquer.",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#0a0a0e",
   "theme_color": "#d4af37",
+  "orientation": "any",
   "icons": [
-    { "src": "/decor/aquila.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/decor/aquila.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "./decor/icon-aquila.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./decor/icon-aquila.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }

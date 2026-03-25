@@ -370,9 +370,13 @@ export default function ModelDetail() {
             {showAddPaint && (
               <div className="md-add-paint">
                 <PaintAutocomplete value={paintSearch} onChange={setPaintSearch} onSelect={async (preset: PaintPreset) => {
-                  const paint = await db.paints.where('name').equals(preset.name).first();
+                  let paint = await db.paints.where('name').equals(preset.name).first();
+                  if (!paint) {
+                    const id = await db.paints.add({ name: preset.name, brand: preset.brand, range: preset.range, type: preset.type as any, hexColor: preset.hex, owned: false, quantity: 0, notes: '' });
+                    paint = await db.paints.get(id);
+                  }
                   if (paint?.id) await addPaintToRecipe(paint.id);
-                  else setPaintSearch(preset.name);
+                  setPaintSearch('');
                 }} />
                 <input value={usageNote} onChange={e => setUsageNote(e.target.value)} placeholder="Usage (e.g. base coat armour)" className="md-usage-input" />
               </div>
