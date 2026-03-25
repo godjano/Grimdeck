@@ -12,6 +12,71 @@ import GoldIcon from '../components/GoldIcon';
 
 const STATUS_FLOW: ModelStatus[] = ['unbuilt', 'built', 'primed', 'wip', 'painted', 'based'];
 
+// ─── 40K stat profiles (10th Edition style) ───
+interface W40KProfile { m: string; t: number; sv: string; w: number; ld: string; oc: number; inv?: string; }
+const W40K_PROFILES: Record<string, W40KProfile> = {
+  'Space Marines':       { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Intercessors':        { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 2 },
+  'Terminators':         { m: '5"', t: 5, sv: '2+', w: 3, ld: '6+', oc: 1, inv: '4+' },
+  'Assault Intercessors':{ m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 2 },
+  'Hellblasters':        { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Eradicators':         { m: '6"', t: 6, sv: '3+', w: 3, ld: '6+', oc: 1 },
+  'Bladeguard Veterans': { m: '6"', t: 4, sv: '3+', w: 3, ld: '6+', oc: 1, inv: '4+' },
+  'Sternguard Veterans': { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Aggressors':          { m: '5"', t: 6, sv: '3+', w: 3, ld: '6+', oc: 1 },
+  'Devastators':         { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Scouts':              { m: '6"', t: 4, sv: '4+', w: 2, ld: '6+', oc: 1 },
+  'Dreadnought':         { m: '6"', t: 9, sv: '2+', w: 8, ld: '6+', oc: 3 },
+  'Redemptor Dreadnought':{ m: '8"', t: 10, sv: '2+', w: 12, ld: '6+', oc: 4 },
+  'Captain':             { m: '6"', t: 4, sv: '3+', w: 5, ld: '6+', oc: 1, inv: '4+' },
+  'Librarian':           { m: '6"', t: 4, sv: '3+', w: 4, ld: '6+', oc: 1 },
+  'Chaplain':            { m: '6"', t: 4, sv: '3+', w: 4, ld: '6+', oc: 1, inv: '4+' },
+  'Lieutenant':          { m: '6"', t: 4, sv: '3+', w: 4, ld: '6+', oc: 1 },
+  'Astra Militarum':     { m: '6"', t: 3, sv: '5+', w: 1, ld: '7+', oc: 2 },
+  'Leman Russ':          { m: '10"', t: 11, sv: '2+', w: 13, ld: '7+', oc: 3 },
+  'Sentinel':            { m: '8"', t: 7, sv: '3+', w: 7, ld: '7+', oc: 2 },
+  'Orks':                { m: '6"', t: 5, sv: '5+', w: 1, ld: '7+', oc: 2 },
+  'Meganobz':            { m: '5"', t: 6, sv: '2+', w: 3, ld: '7+', oc: 1 },
+  'Warboss':             { m: '6"', t: 5, sv: '4+', w: 6, ld: '6+', oc: 1, inv: '5+' },
+  'Necrons':             { m: '5"', t: 4, sv: '4+', w: 1, ld: '7+', oc: 2, inv: '4+' },
+  'Necron Warriors':     { m: '5"', t: 4, sv: '4+', w: 1, ld: '7+', oc: 2 },
+  'Lychguard':           { m: '5"', t: 5, sv: '3+', w: 2, ld: '7+', oc: 1, inv: '4+' },
+  'Tyranids':            { m: '6"', t: 4, sv: '5+', w: 2, ld: '8+', oc: 2 },
+  'Hive Tyrant':         { m: '8"', t: 10, sv: '2+', w: 10, ld: '7+', oc: 4, inv: '4+' },
+  'Carnifex':            { m: '8"', t: 9, sv: '3+', w: 8, ld: '8+', oc: 3 },
+  'Genestealers':        { m: '8"', t: 4, sv: '5+', w: 2, ld: '8+', oc: 1, inv: '5+' },
+  'Termagants':          { m: '6"', t: 3, sv: '5+', w: 1, ld: '8+', oc: 2 },
+  'Hormagaunts':         { m: '8"', t: 3, sv: '5+', w: 1, ld: '8+', oc: 2 },
+  'Chaos Space Marines': { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Death Guard':         { m: '5"', t: 5, sv: '3+', w: 2, ld: '6+', oc: 2 },
+  'Plague Marines':      { m: '5"', t: 5, sv: '3+', w: 2, ld: '6+', oc: 2 },
+  'Thousand Sons':       { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 2, inv: '5+' },
+  'World Eaters':        { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Berzerkers':          { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Aeldari':             { m: '7"', t: 3, sv: '4+', w: 1, ld: '6+', oc: 1 },
+  'Craftworlds':         { m: '7"', t: 3, sv: '4+', w: 1, ld: '6+', oc: 1 },
+  'Wraithguard':         { m: '5"', t: 7, sv: '2+', w: 3, ld: '6+', oc: 1 },
+  'Drukhari':            { m: '8"', t: 3, sv: '4+', w: 1, ld: '6+', oc: 1, inv: '6+' },
+  "T'au Empire":         { m: '6"', t: 4, sv: '4+', w: 2, ld: '7+', oc: 1 },
+  'Crisis Suits':        { m: '10"', t: 5, sv: '3+', w: 4, ld: '7+', oc: 2 },
+  'Adepta Sororitas':    { m: '6"', t: 3, sv: '3+', w: 1, ld: '6+', oc: 1, inv: '6+' },
+  'Adeptus Mechanicus':  { m: '6"', t: 4, sv: '4+', w: 1, ld: '7+', oc: 1 },
+  'Adeptus Custodes':    { m: '6"', t: 6, sv: '2+', w: 3, ld: '6+', oc: 2, inv: '4+' },
+  'Grey Knights':        { m: '6"', t: 4, sv: '2+', w: 2, ld: '6+', oc: 1 },
+  'Imperial Knights':    { m: '10"', t: 12, sv: '3+', w: 22, ld: '6+', oc: 10, inv: '5+' },
+  'Genestealer Cults':   { m: '6"', t: 3, sv: '5+', w: 1, ld: '7+', oc: 2 },
+  'Leagues of Votann':   { m: '5"', t: 5, sv: '4+', w: 1, ld: '7+', oc: 2 },
+};
+
+function get40KProfile(name: string, faction: string): W40KProfile | null {
+  // Try exact unit name first, then faction fallback
+  const lower = name.toLowerCase();
+  for (const [key, val] of Object.entries(W40K_PROFILES)) {
+    if (lower.includes(key.toLowerCase())) return val;
+  }
+  return W40K_PROFILES[faction] || null;
+}
+
 // Map faction names to faction-art filenames
 const FACTION_ART_MAP: Record<string, string> = {
   'Angels of Death': 'angels-of-death-13-1.jpeg', 'Battleclade': 'battleclade-10-2.jpeg',
@@ -37,6 +102,20 @@ const FACTION_ART_MAP: Record<string, string> = {
   'Drukhari': 'mandrakes-0-31.jpeg', 'Chaos Space Marines': 'nemesis-claw-0-30.jpeg',
   'Death Guard': 'plague-marines-10-2.jpeg', 'Inquisition': 'inquisitorial-agents-0-31.jpeg',
   'Leagues of Votann': 'hearthkyn-salvagers-14-18.jpeg',
+  // More 40K factions → closest visual match
+  'Orks': 'farstalker-kinband-0-32.jpeg', 'Tyranids': 'brood-brothers-0-32.jpeg',
+  'Aeldari': 'mandrakes-0-31.jpeg', 'Craftworlds': 'mandrakes-0-31.jpeg', 'Eldar': 'mandrakes-0-31.jpeg',
+  'Harlequins': 'mandrakes-0-31.jpeg', 'Ynnari': 'mandrakes-0-31.jpeg',
+  'Thousand Sons': 'nemesis-claw-0-30.jpeg', 'World Eaters': 'nemesis-claw-0-30.jpeg',
+  'Chaos Daemons': 'nemesis-claw-0-30.jpeg', 'Chaos Knights': 'nemesis-claw-0-30.jpeg',
+  'Adeptus Custodes': 'sanctifiers-0-30.jpeg', 'Custodes': 'sanctifiers-0-30.jpeg',
+  'Grey Knights': 'sanctifiers-0-30.jpeg', 'Imperial Knights': 'imperial-navy-breachers-14-1.jpeg',
+  'Agents of the Imperium': 'inquisitorial-agents-0-31.jpeg',
+  'Black Templars': 'angels-of-death-13-1.jpeg', 'Ultramarines': 'angels-of-death-13-1.jpeg',
+  'Salamanders': 'angels-of-death-13-1.jpeg', 'Iron Hands': 'angels-of-death-13-1.jpeg',
+  'Raven Guard': 'scout-squad-0-32.jpeg', 'White Scars': 'scout-squad-0-32.jpeg',
+  'Imperial Fists': 'angels-of-death-13-1.jpeg', 'Crimson Fists': 'angels-of-death-13-1.jpeg',
+  'Votann': 'hearthkyn-salvagers-14-18.jpeg', 'Kroot': 'farstalker-kinband-0-32.jpeg',
 };
 
 function getFactionArt(faction: string): string | null {
@@ -83,6 +162,7 @@ export default function ModelDetail() {
   const factionArt = getFactionArt(model.faction);
   const roster = FACTION_ROSTERS[model.faction];
   const datacard = roster?.find(op => model.name.toLowerCase().includes(op.name.toLowerCase().split(' ')[0]));
+  const w40k = !datacard ? get40KProfile(model.name, model.faction) : null;
 
   const addPaintToRecipe = async (paintId: number) => {
     await db.modelPaintLinks.add({ modelId, paintId, usageNote: usageNote.trim() });
@@ -204,6 +284,23 @@ export default function ModelDetail() {
                     ))}
                   </div>
                 )}
+              </>
+            ) : w40k ? (
+              <>
+                <div className="md-stat-grid">
+                  <div className="md-stat-card"><div className="md-stat-label">Move</div><div className="md-stat-value">{w40k.m}</div></div>
+                  <div className="md-stat-card"><div className="md-stat-label">T</div><div className="md-stat-value">{w40k.t}</div></div>
+                  <div className="md-stat-card"><div className="md-stat-label">Sv</div><div className="md-stat-value">{w40k.sv}</div></div>
+                  <div className="md-stat-card md-stat-wounds"><div className="md-stat-label">W</div><div className="md-stat-value">{w40k.w}</div></div>
+                  <div className="md-stat-card"><div className="md-stat-label">Ld</div><div className="md-stat-value">{w40k.ld}</div></div>
+                  <div className="md-stat-card"><div className="md-stat-label">OC</div><div className="md-stat-value">{w40k.oc}</div></div>
+                  {w40k.inv && <div className="md-stat-card"><div className="md-stat-label">Inv</div><div className="md-stat-value">{w40k.inv}</div></div>}
+                </div>
+                <div className="md-stat-grid" style={{ marginTop: 8 }}>
+                  <div className="md-stat-card"><div className="md-stat-label">Quantity</div><div className="md-stat-value">{model.quantity}</div></div>
+                  <div className="md-stat-card"><div className="md-stat-label">Status</div><div className="md-stat-value md-stat-text">{model.status}</div></div>
+                </div>
+                <p style={{ color: 'var(--gold-dim)', fontSize: 11, textAlign: 'center', marginTop: 8, opacity: 0.6 }}>Approximate 40K 10th Ed. profile</p>
               </>
             ) : (
               <div className="md-stat-grid">
