@@ -47,5 +47,8 @@ export const PRIMARCH_MODELS: ModelPreset[] = [
   { name: 'Vulkan (Primarch)', faction: 'Salamanders', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
   { name: 'Corvus Corax', faction: 'Raven Guard', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
   // The Emperor
-  { name: 'The Emperor of Mankind', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'The Emperor of Mankind', faction: 'Imperium', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  // The Lost Primarchs
+  { name: 'The Forgotten (II)', faction: 'II Legion', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'The Purged (XI)', faction: 'XI Legion', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
 ];

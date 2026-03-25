@@ -53,6 +53,9 @@ const PRIMARCHS: Record<string, { title: string; legion: string; numeral: string
   'Magnus the Red': { title: 'The Crimson King', legion: 'XV Legion — Thousand Sons', numeral: 'XV' },
   'Angron': { title: 'The Red Angel', legion: 'XII Legion — World Eaters', numeral: 'XII' },
   'The Emperor of Mankind': { title: 'Master of Mankind', legion: 'The Imperium of Man', numeral: '∞' },
+  // The Lost Primarchs
+  'The Forgotten': { title: '[REDACTED BY ORDER OF THE SIGILLITE]', legion: 'II Legion — [EXPUNGED]', numeral: 'II' },
+  'The Purged': { title: '[REDACTED BY ORDER OF THE SIGILLITE]', legion: 'XI Legion — [EXPUNGED]', numeral: 'XI' },
 };
 function getPrimarch(name: string) {
   for (const [key, val] of Object.entries(PRIMARCHS)) {
