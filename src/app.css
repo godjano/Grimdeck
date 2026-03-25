@@ -3155,6 +3155,9 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 }
 
 /* ═══ PRIMARCH DISPLAY ═══ */
-.md-primarch-numeral { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 4px; color: var(--faction-accent, var(--gold)); opacity: 0.6; text-transform: uppercase; margin-bottom: 2px; }
-.md-primarch-name { font-size: 1.6rem !important; letter-spacing: 2px; text-shadow: 0 0 30px var(--faction-accent, var(--gold)), 0 0 60px rgba(0,0,0,0.8); }
-.md-primarch-title { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--faction-accent, var(--gold)); font-style: italic; opacity: 0.8; margin: 2px 0 4px; letter-spacing: 1px; }
+.md-primarch-numeral { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 4px; color: #fff; opacity: 0.9; text-transform: uppercase; margin-bottom: 2px; text-shadow: 0 1px 6px rgba(0,0,0,0.8); }
+.md-primarch-name { font-size: 1.6rem !important; letter-spacing: 2px; color: #fff !important; text-shadow: 0 0 20px var(--faction-accent, var(--gold)), 0 2px 8px rgba(0,0,0,0.9); }
+.md-primarch-title { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--gold-bright, #d4af37); font-style: italic; margin: 4px 0 6px; letter-spacing: 1px; text-shadow: 0 1px 6px rgba(0,0,0,0.9); }
+
+.md-primarch-name ~ .md-primarch-title ~ .md-faction,
+.md-primarch-title + .md-faction { color: rgba(255,255,255,0.85) !important; text-shadow: 0 1px 6px rgba(0,0,0,0.9); font-weight: 500; }
