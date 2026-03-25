@@ -81,6 +81,7 @@ export default function Layout() {
   const [showMore, setShowMore] = useState(false);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const [pageKey, setPageKey] = useState(0);
 
   useEffect(() => {
@@ -96,6 +97,8 @@ export default function Layout() {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); setShowSearch(true); }
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); setShowShortcuts(s => !s); }
+      if (e.key === '+' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); setShowQuickAdd(true); }
       if (e.key === '/' && !e.ctrlKey) { e.preventDefault(); document.querySelector<HTMLInputElement>('.filter-search')?.focus(); }
     };
     document.addEventListener('keydown', handler);
@@ -172,6 +175,16 @@ export default function Layout() {
       <button className="fab" onClick={() => setShowQuickAdd(true)} title="Quick add model">+</button>
       {showQuickAdd && <QuickAdd onClose={() => setShowQuickAdd(false)} />}
       {showSearch && <CmdPalette onClose={() => setShowSearch(false)} />}
+      {showShortcuts && (
+        <div className="shortcuts-overlay" onClick={() => setShowShortcuts(false)}>
+          <div className="shortcuts-panel" onClick={e => e.stopPropagation()}>
+            <h3>Keyboard Shortcuts</h3>
+            {[['Ctrl + K', 'Search everything'], ['/', 'Focus filter/search'], ['?', 'Show this panel'], ['+', 'Quick add model']].map(([key, desc]) => (
+              <div key={key} className="shortcut-row"><span>{desc}</span><span className="shortcut-key">{key}</span></div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

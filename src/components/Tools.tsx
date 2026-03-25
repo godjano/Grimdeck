@@ -250,3 +250,4 @@ export function Glossary() {
     </div>
   );
 }
+

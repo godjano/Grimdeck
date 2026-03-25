@@ -12,6 +12,30 @@ import GoldIcon from '../components/GoldIcon';
 
 const STATUS_FLOW: ModelStatus[] = ['unbuilt', 'built', 'primed', 'wip', 'painted', 'based'];
 
+// Faction accent colors
+const FACTION_COLORS: Record<string, string> = {
+  'Space Marines': '#3b6bb5', 'Ultramarines': '#0046ad', 'Blood Angels': '#9b1b1b',
+  'Dark Angels': '#2a5a2a', 'Space Wolves': '#6e8ca0', 'Salamanders': '#2d8a4e',
+  'Imperial Fists': '#d4a017', 'Iron Hands': '#4a4a4a', 'Raven Guard': '#1a1a2e',
+  'White Scars': '#c0c0c0', 'Black Templars': '#1a1a1a', 'Crimson Fists': '#1a3a7a',
+  'Astra Militarum': '#5a6a3a', 'Imperial Guard': '#5a6a3a', 'Death Korps': '#4a5a3a',
+  'Orks': '#3a7a2a', 'Tyranids': '#6a2a6a', 'Necrons': '#2a8a5a',
+  'Aeldari': '#1a5a8a', 'Craftworlds': '#1a5a8a', 'Drukhari': '#4a1a5a',
+  "T'au Empire": '#c07020', 'Tau': '#c07020', 'Adepta Sororitas': '#8a1a2a',
+  'Sisters of Battle': '#8a1a2a', 'Adeptus Mechanicus': '#8a2a1a', 'Adeptus Custodes': '#b8860b',
+  'Grey Knights': '#6a6a8a', 'Chaos Space Marines': '#5a1a1a', 'Death Guard': '#5a6a3a',
+  'Thousand Sons': '#1a4a7a', 'World Eaters': '#8a1a1a', 'Genestealer Cults': '#5a3a6a',
+  'Leagues of Votann': '#8a6a3a', 'Imperial Knights': '#7a7a7a',
+};
+function getFactionColor(faction: string): string | null {
+  if (FACTION_COLORS[faction]) return FACTION_COLORS[faction];
+  const lower = faction.toLowerCase();
+  for (const [key, val] of Object.entries(FACTION_COLORS)) {
+    if (lower.includes(key.toLowerCase().split(' ')[0])) return val;
+  }
+  return null;
+}
+
 // ─── 40K stat profiles (10th Edition style) ───
 interface W40KProfile { m: string; t: number; sv: string; w: number; ld: string; oc: number; inv?: string; }
 const W40K_PROFILES: Record<string, W40KProfile> = {
@@ -170,6 +194,7 @@ export default function ModelDetail() {
   };
   const currentIdx = STATUS_FLOW.indexOf(model.status);
   const factionArt = getFactionArt(model.faction);
+  const factionColor = getFactionColor(model.faction);
   const roster = FACTION_ROSTERS[model.faction];
   const datacard = roster?.find(op => model.name.toLowerCase().includes(op.name.toLowerCase().split(' ')[0]));
   const w40k = !datacard ? get40KProfile(model.name, model.faction) : null;
@@ -228,7 +253,7 @@ export default function ModelDetail() {
   ];
 
   return (
-    <div className="model-detail-v2">
+    <div className="model-detail-v2" style={factionColor ? { '--faction-accent': factionColor } as React.CSSProperties : {}}>
       {/* ─── HERO BANNER with faction art ─── */}
       <div className={`md-hero ${factionArt ? '' : 'md-hero-frame'}`} style={factionArt ? { backgroundImage: `url(${factionArt})` } : {}}>
         <div className="md-hero-overlay" />
@@ -391,6 +416,18 @@ export default function ModelDetail() {
                   ctx.fillStyle = '#555'; ctx.font = '11px sans-serif'; ctx.fillText('Made with Grimdeck', 24, 385);
                   c.toBlob(blob => { if (!blob) return; const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `${model.name}-recipe.png`; a.click(); URL.revokeObjectURL(url); });
                 }}><Image size={14} /> Save as image</button>
+                <button className="btn btn-sm btn-ghost" style={{ marginTop: 4 }} onClick={async () => {
+                  const name = prompt('Apply this recipe to which model? (enter name)');
+                  if (!name) return;
+                  const target = (await db.models.toArray()).find(m => m.name.toLowerCase().includes(name.toLowerCase()));
+                  if (!target?.id) { alert('Model not found'); return; }
+                  for (const { link, paint } of linkedPaints) {
+                    if (!paint.id) continue;
+                    const exists = await db.modelPaintLinks.where({ modelId: target.id, paintId: paint.id }).first();
+                    if (!exists) await db.modelPaintLinks.add({ modelId: target.id, paintId: paint.id, usageNote: link.usageNote });
+                  }
+                  alert(`Recipe applied to ${target.name}`);
+                }}><Copy size={14} /> Apply to another model</button>
               </>
             )}
           </div>

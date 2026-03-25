@@ -13,7 +13,7 @@ export default function GreyPile() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
   const nav = useNavigate();
   const [sortBy, setSortBy] = useState<'status' | 'faction' | 'date'>('status');
-  const [view, setView] = useState<'cards' | 'compact'>('compact');
+  const [view, setView] = useState<'cards' | 'compact' | 'kanban'>('compact');
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
 
   const allModels = models.filter(m => !m.wishlist);
@@ -141,11 +141,35 @@ export default function GreyPile() {
             <div className="view-toggle">
               <button className={`view-btn ${view === 'cards' ? 'active' : ''}`} onClick={() => setView('cards')}>☰</button>
               <button className={`view-btn ${view === 'compact' ? 'active' : ''}`} onClick={() => setView('compact')}>▤</button>
+              <button className={`view-btn ${view === 'kanban' ? 'active' : ''}`} onClick={() => setView('kanban')}>▥</button>
             </div>
           </div>
 
           {/* Model Groups */}
-          {groups.map(group => group.models.length > 0 && (
+          {view === 'kanban' ? (
+            <div className="kanban">
+              {(['unbuilt', 'built', 'primed', 'wip'] as const).map(status => {
+                const col = models.filter(m => m.status === status);
+                return (
+                  <div key={status} className="kanban-col">
+                    <div className="kanban-col-title">{status} ({col.length})</div>
+                    {col.map(m => (
+                      <div key={m.id} className="kanban-card" onClick={() => nav(`/model/${m.id}`)}>
+                        <div className="kanban-card-name">{m.name}</div>
+                        <div className="kanban-card-faction">{m.faction}</div>
+                        <button className="btn btn-sm btn-ghost" style={{ width: '100%', marginTop: 4, fontSize: '0.7rem' }} onClick={e => {
+                          e.stopPropagation();
+                          const next = status === 'unbuilt' ? 'built' : status === 'built' ? 'primed' : 'wip';
+                          updateStatus(m.id!, next);
+                        }}>→ {status === 'unbuilt' ? 'built' : status === 'built' ? 'primed' : status === 'primed' ? 'wip' : 'painted'}</button>
+                      </div>
+                    ))}
+                    {col.length === 0 && <div className="kanban-count">Empty</div>}
+                  </div>
+                );
+              })}
+            </div>
+          ) : groups.map(group => group.models.length > 0 && (
             <div key={group.label} className="grey-section">
               <div className="group-header" onClick={() => setExpandedGroup(expandedGroup === group.label ? null : group.label)} style={{ cursor: 'pointer' }}>
                 <span style={{ color: 'var(--text-dim)', fontSize: '0.7rem', marginRight: 6 }}>{expandedGroup === group.label ? '▾' : '▸'}</span>

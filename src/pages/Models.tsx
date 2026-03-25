@@ -11,6 +11,28 @@ import { getGWSearchUrl } from '../db/external-links';
 import { Plus, Package, Search, Filter, ChevronDown, ChevronRight, Grid3X3, List, LayoutGrid, MoreVertical, Trash2, ExternalLink, Star, Camera, X } from 'lucide-react';
 import PageBanner from '../components/PageBanner';
 
+const FACTION_THUMBS: Record<string, string> = {
+  'Space Marines': 'angels-of-death-13-1.jpeg', 'Blood Angels': 'angels-of-death-13-1.jpeg',
+  'Dark Angels': 'murderwing-11-2.jpeg', 'Space Wolves': 'wolf-scouts-10-0.jpeg',
+  'Astra Militarum': 'death-korps-0-31.jpeg', 'Necrons': 'canoptek-circle-0-22.jpeg',
+  'Orks': 'farstalker-kinband-0-32.jpeg', 'Tyranids': 'brood-brothers-0-32.jpeg',
+  'Chaos Space Marines': 'nemesis-claw-0-30.jpeg', 'Death Guard': 'plague-marines-10-2.jpeg',
+  'Adepta Sororitas': 'celestian-insidiants-10-2.jpeg', 'Adeptus Mechanicus': 'hunter-clade-14-8.jpeg',
+  "T'au Empire": 'pathfinders-0-32.jpeg', 'Drukhari': 'mandrakes-0-31.jpeg',
+  'Aeldari': 'mandrakes-0-31.jpeg', 'Adeptus Custodes': 'sanctifiers-0-30.jpeg',
+  'Grey Knights': 'sanctifiers-0-30.jpeg', 'Thousand Sons': 'nemesis-claw-0-30.jpeg',
+  'World Eaters': 'nemesis-claw-0-30.jpeg', 'Genestealer Cults': 'brood-brothers-0-32.jpeg',
+  'Leagues of Votann': 'hearthkyn-salvagers-14-18.jpeg',
+};
+function getFactionThumb(faction: string): string | null {
+  if (FACTION_THUMBS[faction]) return `/faction-art/${FACTION_THUMBS[faction]}`;
+  const lower = faction.toLowerCase();
+  for (const [key, val] of Object.entries(FACTION_THUMBS)) {
+    if (lower.includes(key.toLowerCase().split(' ')[0])) return `/faction-art/${val}`;
+  }
+  return null;
+}
+
 type ViewMode = 'list' | 'grid' | 'grouped';
 
 export default function Models() {
@@ -170,7 +192,7 @@ export default function Models() {
           {filtered.map(m => (
             <div key={m.id} className="ml-tile" onClick={() => nav(`/model/${m.id}`)}>
               <div className="ml-tile-img">
-                {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <div className="ml-tile-placeholder"><Camera size={24} strokeWidth={1} /></div>}
+                {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : getFactionThumb(m.faction) ? <img src={getFactionThumb(m.faction)!} alt={m.faction} style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: 0.5 }} /> : <div className="ml-tile-placeholder"><Camera size={24} strokeWidth={1} /></div>}
                 <span className={`ml-tile-status status-${m.status}`}>{m.status}</span>
               </div>
               <div className="ml-tile-info">
@@ -225,7 +247,7 @@ function ModelCard({ m, nav, openMenu, setOpenMenu, updateStatus, deleteModel }:
       {m.photoUrl ? (
         <img src={m.photoUrl} alt={m.name} className="ml-card-photo" />
       ) : (
-        <div className="ml-card-photo-empty"><Camera size={16} strokeWidth={1} /></div>
+        <div className="ml-card-photo-empty">{getFactionThumb(m.faction) ? <img src={getFactionThumb(m.faction)!} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.5, borderRadius: 8 }} /> : <Camera size={16} strokeWidth={1} />}</div>
       )}
       <div className="ml-card-body">
         <div className="ml-card-name">{m.name} {m.quantity > 1 && <span className="qty-badge">×{m.quantity}</span>}</div>
