@@ -23,6 +23,14 @@ const FACTION_THUMBS: Record<string, string> = {
   'Grey Knights': 'sanctifiers-0-30.jpeg', 'Thousand Sons': 'nemesis-claw-0-30.jpeg',
   'World Eaters': 'nemesis-claw-0-30.jpeg', 'Genestealer Cults': 'brood-brothers-0-32.jpeg',
   'Leagues of Votann': 'hearthkyn-salvagers-14-18.jpeg',
+  // Traitor Legions & Chapters
+  'Alpha Legion': 'nemesis-claw-0-30.jpeg', 'Night Lords': 'nemesis-claw-0-30.jpeg',
+  'Word Bearers': 'nemesis-claw-0-30.jpeg', 'Iron Warriors': 'nemesis-claw-0-30.jpeg',
+  "Emperor's Children": 'nemesis-claw-0-30.jpeg', 'Sons of Horus': 'nemesis-claw-0-30.jpeg',
+  'Black Legion': 'nemesis-claw-0-30.jpeg', 'Ultramarines': 'angels-of-death-13-1.jpeg',
+  'Salamanders': 'angels-of-death-13-1.jpeg', 'Iron Hands': 'angels-of-death-13-1.jpeg',
+  'Raven Guard': 'scout-squad-0-32.jpeg', 'White Scars': 'scout-squad-0-32.jpeg',
+  'Imperial Fists': 'angels-of-death-13-1.jpeg', 'Crimson Fists': 'angels-of-death-13-1.jpeg',
 };
 function getFactionThumb(faction: string): string | null {
   if (FACTION_THUMBS[faction]) return `/faction-art/${FACTION_THUMBS[faction]}`;

@@ -26,7 +26,47 @@ const FACTION_COLORS: Record<string, string> = {
   'Grey Knights': '#6a6a8a', 'Chaos Space Marines': '#5a1a1a', 'Death Guard': '#5a6a3a',
   'Thousand Sons': '#1a4a7a', 'World Eaters': '#8a1a1a', 'Genestealer Cults': '#5a3a6a',
   'Leagues of Votann': '#8a6a3a', 'Imperial Knights': '#7a7a7a',
+  // Traitor Legions
+  'Alpha Legion': '#2a6a6a', 'Night Lords': '#1a2a5a', 'Word Bearers': '#6a1a2a',
+  'Iron Warriors': '#5a5a5a', "Emperor's Children": '#7a2a6a', 'Sons of Horus': '#3a5a4a',
+  'Black Legion': '#2a2a2a',
 };
+
+// Primarch data — name, title, legion
+const PRIMARCHS: Record<string, { title: string; legion: string; numeral: string }> = {
+  'Roboute Guilliman': { title: 'Lord of Ultramar', legion: 'XIII Legion — Ultramarines', numeral: 'XIII' },
+  "Lion El'Jonson": { title: 'The First', legion: 'I Legion — Dark Angels', numeral: 'I' },
+  'Leman Russ': { title: 'The Wolf King', legion: 'VI Legion — Space Wolves', numeral: 'VI' },
+  'Jaghatai Khan': { title: 'The Warhawk', legion: 'V Legion — White Scars', numeral: 'V' },
+  'Rogal Dorn': { title: 'The Praetorian', legion: 'VII Legion — Imperial Fists', numeral: 'VII' },
+  'Sanguinius': { title: 'The Angel', legion: 'IX Legion — Blood Angels', numeral: 'IX' },
+  'Ferrus Manus': { title: 'The Gorgon', legion: 'X Legion — Iron Hands', numeral: 'X' },
+  'Vulkan': { title: 'Lord of Drakes', legion: 'XVIII Legion — Salamanders', numeral: 'XVIII' },
+  'Corvus Corax': { title: 'The Raven Lord', legion: 'XIX Legion — Raven Guard', numeral: 'XIX' },
+  'Horus Lupercal': { title: 'The Warmaster', legion: 'XVI Legion — Sons of Horus', numeral: 'XVI' },
+  'Fulgrim': { title: 'The Phoenician', legion: 'III Legion — Emperor\'s Children', numeral: 'III' },
+  'Perturabo': { title: 'The Lord of Iron', legion: 'IV Legion — Iron Warriors', numeral: 'IV' },
+  'Konrad Curze': { title: 'The Night Haunter', legion: 'VIII Legion — Night Lords', numeral: 'VIII' },
+  'Lorgar': { title: 'Bearer of the Word', legion: 'XVII Legion — Word Bearers', numeral: 'XVII' },
+  'Alpharius': { title: 'The Last / The First', legion: 'XX Legion — Alpha Legion', numeral: 'XX' },
+  'Mortarion': { title: 'The Death Lord', legion: 'XIV Legion — Death Guard', numeral: 'XIV' },
+  'Magnus the Red': { title: 'The Crimson King', legion: 'XV Legion — Thousand Sons', numeral: 'XV' },
+  'Angron': { title: 'The Red Angel', legion: 'XII Legion — World Eaters', numeral: 'XII' },
+  'The Emperor of Mankind': { title: 'Master of Mankind', legion: 'The Imperium of Man', numeral: '∞' },
+};
+function getPrimarch(name: string) {
+  for (const [key, val] of Object.entries(PRIMARCHS)) {
+    if (name.toLowerCase().includes(key.toLowerCase().split(' ')[0]) && name.toLowerCase().includes(key.toLowerCase().split(' ').slice(-1)[0])) return val;
+  }
+  // Partial match for names like "Leman Russ (Primarch)" or "Vulkan (Primarch)"
+  for (const [key, val] of Object.entries(PRIMARCHS)) {
+    if (name.toLowerCase().startsWith(key.toLowerCase().split(' ')[0].toLowerCase())) {
+      const parts = key.toLowerCase().split(' ');
+      if (parts.length === 1 || name.toLowerCase().includes(parts[0])) return val;
+    }
+  }
+  return null;
+}
 function getFactionColor(faction: string): string | null {
   if (FACTION_COLORS[faction]) return FACTION_COLORS[faction];
   const lower = faction.toLowerCase();
@@ -90,6 +130,24 @@ const W40K_PROFILES: Record<string, W40KProfile> = {
   'Imperial Knights':    { m: '10"', t: 12, sv: '3+', w: 22, ld: '6+', oc: 10, inv: '5+' },
   'Genestealer Cults':   { m: '6"', t: 3, sv: '5+', w: 1, ld: '7+', oc: 2 },
   'Leagues of Votann':   { m: '5"', t: 5, sv: '4+', w: 1, ld: '7+', oc: 2 },
+  // Traitor Legions (use CSM baseline)
+  'Alpha Legion':        { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Night Lords':         { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Word Bearers':        { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Iron Warriors':       { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  "Emperor's Children":  { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Sons of Horus':       { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  'Black Legion':        { m: '6"', t: 4, sv: '3+', w: 2, ld: '6+', oc: 1 },
+  // Primarchs
+  'Guilliman':           { m: '8"', t: 6, sv: '2+', w: 10, ld: '5+', oc: 4, inv: '3+' },
+  'Angron':              { m: '12"', t: 11, sv: '2+', w: 16, ld: '6+', oc: 5, inv: '4+' },
+  'Mortarion':           { m: '10"', t: 11, sv: '2+', w: 16, ld: '6+', oc: 5, inv: '4+' },
+  'Magnus':              { m: '12"', t: 11, sv: '2+', w: 16, ld: '6+', oc: 5, inv: '4+' },
+  'Lion':                { m: '8"', t: 6, sv: '2+', w: 10, ld: '5+', oc: 4, inv: '3+' },
+  'Alpharius':           { m: '7"', t: 6, sv: '2+', w: 7, ld: '5+', oc: 3, inv: '4+' },
+  'Horus':               { m: '8"', t: 7, sv: '2+', w: 10, ld: '5+', oc: 5, inv: '3+' },
+  'Fulgrim':             { m: '8"', t: 6, sv: '2+', w: 9, ld: '5+', oc: 4, inv: '3+' },
+  'Sanguinius':          { m: '14"', t: 6, sv: '2+', w: 10, ld: '5+', oc: 4, inv: '3+' },
 };
 
 function get40KProfile(name: string, faction: string): W40KProfile | null {
@@ -140,6 +198,11 @@ const FACTION_ART_MAP: Record<string, string> = {
   'Raven Guard': 'scout-squad-0-32.jpeg', 'White Scars': 'scout-squad-0-32.jpeg',
   'Imperial Fists': 'angels-of-death-13-1.jpeg', 'Crimson Fists': 'angels-of-death-13-1.jpeg',
   'Votann': 'hearthkyn-salvagers-14-18.jpeg', 'Kroot': 'farstalker-kinband-0-32.jpeg',
+  // Traitor Legions
+  'Alpha Legion': 'nemesis-claw-0-30.jpeg', 'Night Lords': 'nemesis-claw-0-30.jpeg',
+  'Word Bearers': 'nemesis-claw-0-30.jpeg', 'Iron Warriors': 'nemesis-claw-0-30.jpeg',
+  "Emperor's Children": 'nemesis-claw-0-30.jpeg', 'Sons of Horus': 'nemesis-claw-0-30.jpeg',
+  'Black Legion': 'nemesis-claw-0-30.jpeg',
 };
 
 function getFactionArt(faction: string): string | null {
@@ -195,6 +258,7 @@ export default function ModelDetail() {
   const currentIdx = STATUS_FLOW.indexOf(model.status);
   const factionArt = getFactionArt(model.faction);
   const factionColor = getFactionColor(model.faction);
+  const primarch = getPrimarch(model.name);
   const roster = FACTION_ROSTERS[model.faction];
   const datacard = roster?.find(op => model.name.toLowerCase().includes(op.name.toLowerCase().split(' ')[0]));
   const w40k = !datacard ? get40KProfile(model.name, model.faction) : null;
@@ -266,8 +330,16 @@ export default function ModelDetail() {
             <input ref={photoRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
           </div>
           <div className="md-hero-info">
-            <h1 className="md-name">{model.name}</h1>
-            <div className="md-faction">{model.faction}{model.points ? ` · ${model.points}pts` : ''}</div>
+            {primarch && <div className="md-primarch-numeral">{primarch.numeral}</div>}
+            <h1 className={`md-name ${primarch ? 'md-primarch-name' : ''}`}>{model.name}</h1>
+            {primarch ? (
+              <>
+                <div className="md-primarch-title">{primarch.title}</div>
+                <div className="md-faction">{primarch.legion}{model.points ? ` · ${model.points}pts` : ''}</div>
+              </>
+            ) : (
+              <div className="md-faction">{model.faction}{model.points ? ` · ${model.points}pts` : ''}</div>
+            )}
             <div className="md-status-row">
               {STATUS_FLOW.map((s, i) => (
                 <button key={s} className={`md-status-pip ${model.status === s ? 'active' : i < currentIdx ? 'done' : ''}`} onClick={() => setStatus(s)} title={s}>

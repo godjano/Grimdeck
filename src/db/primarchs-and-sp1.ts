@@ -26,26 +26,26 @@ export const SPEED_PAINT_V1: PaintPreset[] = [
 // Primarch models (Forge World + plastic)
 export const PRIMARCH_MODELS: ModelPreset[] = [
   // Loyalist Primarchs
-  { name: 'Roboute Guilliman', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 350, forceOrg: 'Lord of War' },
-  { name: 'Lion El\'Jonson', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 380, forceOrg: 'Lord of War' },
+  { name: 'Roboute Guilliman', faction: 'Ultramarines', unitType: 'Character', defaultQty: 1, points: 350, forceOrg: 'Lord of War' },
+  { name: 'Lion El\'Jonson', faction: 'Dark Angels', unitType: 'Character', defaultQty: 1, points: 380, forceOrg: 'Lord of War' },
   // Traitor Primarchs
   { name: 'Mortarion', faction: 'Death Guard', unitType: 'Character', defaultQty: 1, points: 370, forceOrg: 'Lord of War' },
   { name: 'Magnus the Red', faction: 'Thousand Sons', unitType: 'Character', defaultQty: 1, points: 380, forceOrg: 'Lord of War' },
   { name: 'Angron', faction: 'World Eaters', unitType: 'Character', defaultQty: 1, points: 415, forceOrg: 'Lord of War' },
   // Horus Heresy Primarchs (Forge World resin)
-  { name: 'Horus Lupercal', faction: 'Chaos Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Fulgrim', faction: 'Chaos Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Perturabo', faction: 'Chaos Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Konrad Curze', faction: 'Chaos Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Lorgar', faction: 'Chaos Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Alpharius', faction: 'Chaos Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Leman Russ (Primarch)', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Jaghatai Khan', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Rogal Dorn', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Sanguinius', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Ferrus Manus', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Vulkan (Primarch)', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
-  { name: 'Corvus Corax', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Horus Lupercal', faction: 'Sons of Horus', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Fulgrim', faction: "Emperor's Children", unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Perturabo', faction: 'Iron Warriors', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Konrad Curze', faction: 'Night Lords', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Lorgar', faction: 'Word Bearers', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Alpharius', faction: 'Alpha Legion', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Leman Russ (Primarch)', faction: 'Space Wolves', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Jaghatai Khan', faction: 'White Scars', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Rogal Dorn', faction: 'Imperial Fists', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Sanguinius', faction: 'Blood Angels', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Ferrus Manus', faction: 'Iron Hands', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Vulkan (Primarch)', faction: 'Salamanders', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
+  { name: 'Corvus Corax', faction: 'Raven Guard', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
   // The Emperor
   { name: 'The Emperor of Mankind', faction: 'Space Marines', unitType: 'Character', defaultQty: 1, points: 0, forceOrg: 'Lord of War' },
 ];
