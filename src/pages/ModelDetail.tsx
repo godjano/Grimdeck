@@ -57,6 +57,19 @@ const PRIMARCHS: Record<string, { title: string; legion: string; numeral: string
   'The Forgotten': { title: '[REDACTED BY ORDER OF THE SIGILLITE]', legion: 'II Legion — [EXPUNGED]', numeral: 'II' },
   'The Purged': { title: '[REDACTED BY ORDER OF THE SIGILLITE]', legion: 'XI Legion — [EXPUNGED]', numeral: 'XI' },
 };
+const PRIMARCH_ART: Record<string, string> = {
+  'Roboute Guilliman': 'primarch-guilliman.png',
+  "Lion El'Jonson": 'primarch-lion.png', 'Lion': 'primarch-lion.png',
+  'Sanguinius': 'primarch-sanguinius.png',
+  'Leman Russ': 'primarch-russ.png',
+  'Rogal Dorn': 'primarch-dorn.png',
+};
+function getPrimarchArt(name: string): string | null {
+  for (const [key, val] of Object.entries(PRIMARCH_ART)) {
+    if (name.toLowerCase().includes(key.toLowerCase().split(' ')[0]) && name.toLowerCase().includes(key.toLowerCase().split(' ').slice(-1)[0])) return `/faction-art/${val}`;
+  }
+  return null;
+}
 function getPrimarch(name: string) {
   for (const [key, val] of Object.entries(PRIMARCHS)) {
     if (name.toLowerCase().includes(key.toLowerCase().split(' ')[0]) && name.toLowerCase().includes(key.toLowerCase().split(' ').slice(-1)[0])) return val;
@@ -259,7 +272,7 @@ export default function ModelDetail() {
     if (status === 'painted') { setConfetti(true); setTimeout(() => setConfetti(false), 1500); }
   };
   const currentIdx = STATUS_FLOW.indexOf(model.status);
-  const factionArt = getFactionArt(model.faction);
+  const factionArt = getPrimarchArt(model.name) || getFactionArt(model.faction);
   const factionColor = getFactionColor(model.faction);
   const primarch = getPrimarch(model.name);
   const roster = FACTION_ROSTERS[model.faction];
