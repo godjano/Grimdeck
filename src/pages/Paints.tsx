@@ -176,9 +176,10 @@ export default function Paints() {
               <div key={ri} className="pr-shelf">
                 <div className="pr-shelf-pots">
                   {row.map(p => (
-                    <div key={p.id} className="pr-pot" title={`${p.name}\n${p.brand} · ${p.range} · ${p.type}`}>
+                    <div key={p.id} className={`pr-pot ${p.quantity <= 1 ? 'paint-low' : ''}`} title={`${p.name}\n${p.brand} · ${p.range} · ${p.type}${p.quantity <= 1 ? '\n⚠ Low stock' : ''}`}>
                       <div className="pr-pot-cap" style={{ background: p.hexColor || '#555' }}>
                         <div className="pr-pot-shine" />
+                        {p.quantity <= 1 && <div className="paint-low-badge">LOW</div>}
                       </div>
                       <div className="pr-pot-body">
                         <div className="pr-pot-name">{p.name}</div>

@@ -27,8 +27,11 @@ export default function Models() {
   const [openMenu, setOpenMenu] = useState<number | null>(null);
 
   const nav = useNavigate();
-  const models = useLiveQuery(() => db.models.orderBy('createdAt').reverse().toArray()) ?? [];
+  const modelsRaw = useLiveQuery(() => db.models.orderBy('createdAt').reverse().toArray());
+  const models = modelsRaw ?? [];
   const factions = [...new Set(models.map(m => m.faction))].sort();
+
+  const isLoading = modelsRaw === undefined;
 
   const allCollapsed = collapsed.has('__ALL_COLLAPSED__');
 
@@ -153,8 +156,10 @@ export default function Models() {
         )}
       </div>
 
-      {/* ─── Empty state ─── */}
-      {filtered.length === 0 ? (
+      {/* ─── Loading skeleton ─── */}
+      {isLoading ? (
+        <div style={{ padding: '20px 0' }}>{Array.from({ length: 5 }, (_, i) => <div key={i} className="skeleton skeleton-card" />)}</div>
+      ) : filtered.length === 0 ? (
         <div className="md-empty-tab" style={{ marginTop: 40 }}>
           <img src={`${import.meta.env.BASE_URL}decor/empty-workstation.jpg`} alt="" className="md-empty-icon" style={{ width: 200, height: 'auto', borderRadius: 12, opacity: 0.6 }} />
           <p>{models.length === 0 ? 'Add your first model to begin.' : 'No models match your filters.'}</p>

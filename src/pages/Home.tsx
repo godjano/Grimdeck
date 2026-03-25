@@ -18,6 +18,13 @@ export default function Home() {
   const wip = models.filter(m => m.status === 'wip');
   const recent = [...models].sort((a, b) => b.createdAt - a.createdAt).slice(0, 5);
 
+  // Monthly goal
+  const now = new Date();
+  const thisMonth = models.filter(m => (m.status === 'painted' || m.status === 'based') && m.createdAt && new Date(m.createdAt).getMonth() === now.getMonth() && new Date(m.createdAt).getFullYear() === now.getFullYear());
+  const monthlyPainted = thisMonth.reduce((s, m) => s + m.quantity, 0);
+  const monthlyGoal = 5;
+  const goalPct = Math.min(100, Math.round((monthlyPainted / monthlyGoal) * 100));
+
   const divider = <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" loading="lazy" /></div>;
 
   return (
@@ -63,6 +70,17 @@ export default function Home() {
         <section className="section">
           <PaintingStreak />
           <SessionPlanner />
+          <div className="goal-ring">
+            <svg width="56" height="56" viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="24" fill="none" stroke="var(--surface)" strokeWidth="5" />
+              <circle cx="28" cy="28" r="24" fill="none" stroke="var(--gold)" strokeWidth="5" strokeDasharray={`${goalPct * 1.508} 151`} strokeLinecap="round" transform="rotate(-90 28 28)" />
+              <text x="28" y="32" textAnchor="middle" fill="var(--gold)" fontSize="14" fontWeight="bold">{monthlyPainted}</text>
+            </svg>
+            <div className="goal-ring-info">
+              <div className="goal-ring-title">Monthly Goal</div>
+              <div className="goal-ring-sub">{monthlyPainted} of {monthlyGoal} models painted this month</div>
+            </div>
+          </div>
         </section>
       )}
 

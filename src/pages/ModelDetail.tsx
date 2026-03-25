@@ -135,8 +135,10 @@ export default function ModelDetail() {
   const nav = useNavigate();
   const modelId = Number(id);
   const [tab, setTab] = useState<Tab>('stats');
+  const [confetti, setConfetti] = useState(false);
 
   const model = useLiveQuery(() => db.models.get(modelId), [modelId]);
+  const allModels = useLiveQuery(() => db.models.orderBy('createdAt').reverse().toArray()) ?? [];
   const linkedPaints = useLiveQuery(() =>
     db.modelPaintLinks.where('modelId').equals(modelId).toArray().then(async links => {
       const results = [];
@@ -155,9 +157,17 @@ export default function ModelDetail() {
   const photoRef = useRef<HTMLInputElement>(null);
   const logPhotoRef = useRef<HTMLInputElement>(null);
 
+  // Prev/Next navigation
+  const modelIdx = allModels.findIndex(m => m.id === modelId);
+  const prevModel = modelIdx > 0 ? allModels[modelIdx - 1] : null;
+  const nextModel = modelIdx < allModels.length - 1 ? allModels[modelIdx + 1] : null;
+
   if (!model) return <div className="empty">Loading...</div>;
 
-  const setStatus = async (status: ModelStatus) => { await db.models.update(modelId, { status }); };
+  const setStatus = async (status: ModelStatus) => {
+    await db.models.update(modelId, { status });
+    if (status === 'painted') { setConfetti(true); setTimeout(() => setConfetti(false), 1500); }
+  };
   const currentIdx = STATUS_FLOW.indexOf(model.status);
   const factionArt = getFactionArt(model.faction);
   const roster = FACTION_ROSTERS[model.faction];
@@ -247,6 +257,15 @@ export default function ModelDetail() {
           <ExternalLink size={14} /> GW Store
         </a>
       </div>
+
+      {/* Prev / Next navigation */}
+      <div className="md-nav">
+        {prevModel ? <button onClick={() => nav(`/model/${prevModel.id}`)}>← {prevModel.name}</button> : <span />}
+        {nextModel ? <button onClick={() => nav(`/model/${nextModel.id}`)}>{nextModel.name} →</button> : <span />}
+      </div>
+
+      {/* Confetti burst on painted */}
+      {confetti && <div className="confetti-burst">{Array.from({ length: 20 }, (_, i) => <span key={i} style={{ left: (Math.random() - 0.5) * 200, background: ['#d4af37','#c0392b','#2ecc71','#3498db','#9b59b6'][i % 5], animationDelay: `${Math.random() * 0.4}s` }} />)}</div>}
 
       {/* ─── TAB BAR ─── */}
       <div className="md-tabs">
@@ -345,7 +364,7 @@ export default function ModelDetail() {
                     <div key={link.id} className="md-recipe-item">
                       <div className="md-swatch" style={{ background: paint.hexColor || '#555' }} />
                       <div className="md-recipe-info">
-                        <div className="md-recipe-name">{paint.name}</div>
+                        <div className="md-recipe-name">{paint.name}{!paint.owned && <span className="paint-low-badge">NOT OWNED</span>}{paint.owned && paint.quantity <= 1 && <span className="paint-low-badge">LOW</span>}</div>
                         <div className="md-recipe-note">{link.usageNote || `${paint.brand} · ${paint.type}`}</div>
                       </div>
                       <button className="btn-icon-sm" onClick={() => removePaint(link.id!)}><Trash2 size={14} /></button>
@@ -356,6 +375,22 @@ export default function ModelDetail() {
                   const text = `Paint recipe for ${model.name} (${model.faction}):\n` + linkedPaints.map(({ link, paint }) => `• ${paint.name} (${paint.brand}) — ${link.usageNote || paint.type}`).join('\n');
                   navigator.clipboard.writeText(text);
                 }}><Copy size={14} /> Copy recipe</button>
+                <button className="btn btn-sm btn-ghost" style={{ marginTop: 4 }} onClick={() => {
+                  const c = document.createElement('canvas'); c.width = 600; c.height = 400;
+                  const ctx = c.getContext('2d')!;
+                  ctx.fillStyle = '#0a0a0e'; ctx.fillRect(0, 0, 600, 400);
+                  ctx.fillStyle = '#d4af37'; ctx.font = 'bold 22px serif'; ctx.fillText(model.name, 24, 40);
+                  ctx.fillStyle = '#888'; ctx.font = '14px sans-serif'; ctx.fillText(model.faction, 24, 62);
+                  ctx.fillStyle = '#d4af37'; ctx.fillRect(24, 76, 552, 1);
+                  linkedPaints.forEach(({ paint, link }, i) => {
+                    const y = 100 + i * 32;
+                    ctx.fillStyle = paint.hexColor || '#555'; ctx.beginPath(); ctx.arc(40, y + 6, 8, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#eee'; ctx.font = '14px sans-serif'; ctx.fillText(paint.name, 58, y + 11);
+                    ctx.fillStyle = '#888'; ctx.font = '12px sans-serif'; ctx.fillText(link.usageNote || paint.type, 58, y + 26);
+                  });
+                  ctx.fillStyle = '#555'; ctx.font = '11px sans-serif'; ctx.fillText('Made with Grimdeck', 24, 385);
+                  c.toBlob(blob => { if (!blob) return; const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `${model.name}-recipe.png`; a.click(); URL.revokeObjectURL(url); });
+                }}><Image size={14} /> Save as image</button>
               </>
             )}
           </div>
@@ -378,7 +413,17 @@ export default function ModelDetail() {
                 <p>No entries yet. Track your progress here.</p>
               </div>
             ) : (
-              <div className="md-journal-list">
+              <>
+                {(() => { const photos = logs.filter(l => l.photoUrl); return photos.length >= 2 ? (
+                  <div style={{ marginBottom: 16 }}>
+                    <h4 style={{ color: 'var(--gold-dim)', fontSize: '0.8rem', marginBottom: 8, fontFamily: "'Cinzel', serif" }}>Before & After</h4>
+                    <div className="ba-container">
+                      <div style={{ position: 'relative', flex: 1 }}><img src={photos[photos.length - 1].photoUrl} alt="Before" /><div className="ba-label">Before</div></div>
+                      <div style={{ position: 'relative', flex: 1 }}><img src={photos[0].photoUrl} alt="After" /><div className="ba-label">After</div></div>
+                    </div>
+                  </div>
+                ) : null; })()}
+                <div className="md-journal-list">
                 {logs.map(log => (
                   <div key={log.id} className="md-journal-entry">
                     <div className="md-journal-time">{new Date(log.timestamp).toLocaleDateString()}</div>
@@ -387,6 +432,7 @@ export default function ModelDetail() {
                   </div>
                 ))}
               </div>
+              </>
             )}
           </div>
         )}
