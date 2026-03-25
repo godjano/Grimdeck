@@ -364,7 +364,7 @@ export default function ModelDetail() {
                     <div key={link.id} className="md-recipe-item">
                       <div className="md-swatch" style={{ background: paint.hexColor || '#555' }} />
                       <div className="md-recipe-info">
-                        <div className="md-recipe-name">{paint.name}{!paint.owned && <span className="paint-low-badge">NOT OWNED</span>}{paint.owned && paint.quantity <= 1 && <span className="paint-low-badge">LOW</span>}</div>
+                        <div className="md-recipe-name">{paint.name}</div>
                         <div className="md-recipe-note">{link.usageNote || `${paint.brand} · ${paint.type}`}</div>
                       </div>
                       <button className="btn-icon-sm" onClick={() => removePaint(link.id!)}><Trash2 size={14} /></button>
