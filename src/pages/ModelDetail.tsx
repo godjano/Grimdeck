@@ -63,6 +63,11 @@ const PRIMARCH_ART: Record<string, string> = {
   'Sanguinius': 'primarch-sanguinius.png',
   'Leman Russ': 'primarch-russ.png',
   'Rogal Dorn': 'primarch-dorn.png',
+  'Alpharius': 'primarch-alpharius.png',
+  'Horus Lupercal': 'primarch-horus.png', 'Horus': 'primarch-horus.png',
+  'Fulgrim': 'primarch-fulgrim.png',
+  'Mortarion': 'primarch-mortarion.png',
+  'Magnus': 'primarch-magnus.png',
 };
 function getPrimarchArt(name: string): string | null {
   for (const [key, val] of Object.entries(PRIMARCH_ART)) {
@@ -201,15 +206,15 @@ const FACTION_ART_MAP: Record<string, string> = {
   'Necrons': 'canoptek-circle-0-22.jpeg', 'Adepta Sororitas': 'celestian-insidiants-10-2.jpeg',
   'Sisters of Battle': 'celestian-insidiants-10-2.jpeg', 'Adeptus Mechanicus': 'hunter-clade-14-8.jpeg',
   "T'au Empire": 'pathfinders-0-32.jpeg', 'Tau': 'pathfinders-0-32.jpeg',
-  'Drukhari': 'mandrakes-0-31.jpeg', 'Chaos Space Marines': 'nemesis-claw-0-30.jpeg',
-  'Death Guard': 'plague-marines-10-2.jpeg', 'Inquisition': 'inquisitorial-agents-0-31.jpeg',
+  'Drukhari': 'mandrakes-0-31.jpeg', 'Chaos Space Marines': 'primarch-horus.png',
+  'Death Guard': 'primarch-mortarion.png', 'Inquisition': 'inquisitorial-agents-0-31.jpeg',
   'Leagues of Votann': 'hearthkyn-salvagers-14-18.jpeg',
   // More 40K factions → closest visual match
   'Orks': 'farstalker-kinband-0-32.jpeg', 'Tyranids': 'brood-brothers-0-32.jpeg',
   'Aeldari': 'mandrakes-0-31.jpeg', 'Craftworlds': 'mandrakes-0-31.jpeg', 'Eldar': 'mandrakes-0-31.jpeg',
   'Harlequins': 'mandrakes-0-31.jpeg', 'Ynnari': 'mandrakes-0-31.jpeg',
-  'Thousand Sons': 'nemesis-claw-0-30.jpeg', 'World Eaters': 'nemesis-claw-0-30.jpeg',
-  'Chaos Daemons': 'nemesis-claw-0-30.jpeg', 'Chaos Knights': 'nemesis-claw-0-30.jpeg',
+  'Thousand Sons': 'primarch-magnus.png', 'World Eaters': 'nemesis-claw-0-30.jpeg',
+  'Chaos Daemons': 'primarch-horus.png', 'Chaos Knights': 'primarch-horus.png',
   'Adeptus Custodes': 'sanctifiers-0-30.jpeg', 'Custodes': 'sanctifiers-0-30.jpeg',
   'Grey Knights': 'sanctifiers-0-30.jpeg', 'Imperial Knights': 'imperial-navy-breachers-14-1.jpeg',
   'Agents of the Imperium': 'inquisitorial-agents-0-31.jpeg',
@@ -217,10 +222,10 @@ const FACTION_ART_MAP: Record<string, string> = {
   'Raven Guard': 'scout-squad-0-32.jpeg', 'White Scars': 'scout-squad-0-32.jpeg',
   'Votann': 'hearthkyn-salvagers-14-18.jpeg', 'Kroot': 'farstalker-kinband-0-32.jpeg',
   // Traitor Legions
-  'Alpha Legion': 'nemesis-claw-0-30.jpeg', 'Night Lords': 'nemesis-claw-0-30.jpeg',
+  'Alpha Legion': 'primarch-alpharius.png', 'Night Lords': 'nemesis-claw-0-30.jpeg',
   'Word Bearers': 'nemesis-claw-0-30.jpeg', 'Iron Warriors': 'nemesis-claw-0-30.jpeg',
-  "Emperor's Children": 'nemesis-claw-0-30.jpeg', 'Sons of Horus': 'nemesis-claw-0-30.jpeg',
-  'Black Legion': 'nemesis-claw-0-30.jpeg',
+  "Emperor's Children": 'primarch-fulgrim.png', 'Sons of Horus': 'primarch-horus.png',
+  'Black Legion': 'primarch-horus.png',
 };
 
 function getFactionArt(faction: string): string | null {
