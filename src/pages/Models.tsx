@@ -12,8 +12,8 @@ import { Plus, Package, Search, Filter, ChevronDown, ChevronRight, Grid3X3, List
 import PageBanner from '../components/PageBanner';
 
 const FACTION_THUMBS: Record<string, string> = {
-  'Space Marines': 'angels-of-death-13-1.jpeg', 'Blood Angels': 'angels-of-death-13-1.jpeg',
-  'Dark Angels': 'murderwing-11-2.jpeg', 'Space Wolves': 'wolf-scouts-10-0.jpeg',
+  'Space Marines': 'primarch-guilliman.png', 'Blood Angels': 'primarch-sanguinius.png',
+  'Dark Angels': 'primarch-lion.png', 'Space Wolves': 'primarch-russ.png',
   'Astra Militarum': 'death-korps-0-31.jpeg', 'Necrons': 'canoptek-circle-0-22.jpeg',
   'Orks': 'farstalker-kinband-0-32.jpeg', 'Tyranids': 'brood-brothers-0-32.jpeg',
   'Chaos Space Marines': 'nemesis-claw-0-30.jpeg', 'Death Guard': 'plague-marines-10-2.jpeg',
@@ -27,10 +27,11 @@ const FACTION_THUMBS: Record<string, string> = {
   'Alpha Legion': 'nemesis-claw-0-30.jpeg', 'Night Lords': 'nemesis-claw-0-30.jpeg',
   'Word Bearers': 'nemesis-claw-0-30.jpeg', 'Iron Warriors': 'nemesis-claw-0-30.jpeg',
   "Emperor's Children": 'nemesis-claw-0-30.jpeg', 'Sons of Horus': 'nemesis-claw-0-30.jpeg',
-  'Black Legion': 'nemesis-claw-0-30.jpeg', 'Ultramarines': 'angels-of-death-13-1.jpeg',
+  'Black Legion': 'nemesis-claw-0-30.jpeg', 'Ultramarines': 'primarch-guilliman.png',
+  'Imperial Fists': 'primarch-dorn.png', 'Crimson Fists': 'primarch-dorn.png',
+  'Black Templars': 'primarch-dorn.png',
   'Salamanders': 'angels-of-death-13-1.jpeg', 'Iron Hands': 'angels-of-death-13-1.jpeg',
   'Raven Guard': 'scout-squad-0-32.jpeg', 'White Scars': 'scout-squad-0-32.jpeg',
-  'Imperial Fists': 'angels-of-death-13-1.jpeg', 'Crimson Fists': 'angels-of-death-13-1.jpeg',
 };
 function getFactionThumb(faction: string): string | null {
   if (FACTION_THUMBS[faction]) return `/faction-art/${FACTION_THUMBS[faction]}`;
