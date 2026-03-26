@@ -272,6 +272,8 @@ export default function ModelDetail() {
   const prevModel = modelIdx > 0 ? allModels[modelIdx - 1] : null;
   const nextModel = modelIdx < allModels.length - 1 ? allModels[modelIdx + 1] : null;
 
+  const [bitsPrompt, setBitsPrompt] = useState(false);
+
   if (!model) return <div className="empty">Loading...</div>;
 
   const setStatus = async (status: ModelStatus) => {
@@ -279,6 +281,7 @@ export default function ModelDetail() {
     if (status === 'wip' || status === 'painted' || status === 'based') update.lastPaintedAt = Date.now();
     await db.models.update(modelId, update);
     if (status === 'painted') { setConfetti(true); setTimeout(() => setConfetti(false), 1500); }
+    if (status === 'built' && !model.notes) setBitsPrompt(true);
   };
   const currentIdx = STATUS_FLOW.indexOf(model.status);
   const factionArt = getPrimarchArt(model.name) || getFactionArt(model.faction);
@@ -388,6 +391,19 @@ export default function ModelDetail() {
 
       {/* Confetti burst on painted */}
       {confetti && <div className="confetti-burst">{Array.from({ length: 20 }, (_, i) => <span key={i} style={{ left: (Math.random() - 0.5) * 200, background: ['#d4af37','#c0392b','#2ecc71','#3498db','#9b59b6'][i % 5], animationDelay: `${Math.random() * 0.4}s` }} />)}</div>}
+
+      {bitsPrompt && (
+        <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, marginBottom: 12 }}>
+          <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: 6 }}>🔧 Any leftover bits?</div>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: 8 }}>Jot down spare parts from this kit for future kitbashes.</p>
+          <textarea placeholder="e.g. Extra plasma gun, 3 spare heads, power sword arm..." rows={2} style={{ width: '100%', marginBottom: 8 }}
+            onBlur={async e => { if (e.target.value.trim()) await db.models.update(modelId, { notes: `Leftover bits: ${e.target.value.trim()}` }); }} />
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn btn-sm btn-primary" onClick={() => setBitsPrompt(false)}>Save</button>
+            <button className="btn btn-sm btn-ghost" onClick={() => setBitsPrompt(false)}>Skip</button>
+          </div>
+        </div>
+      )}
 
       {/* ─── TAB BAR ─── */}
       <div className="md-tabs">

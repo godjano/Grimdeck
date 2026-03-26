@@ -1,8 +1,10 @@
 import GoldIcon from '../components/GoldIcon';
 import PageBanner from '../components/PageBanner';
 import { useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../db';
 
-type Tab = 'techniques' | 'recipes' | 'tips';
+type Tab = 'techniques' | 'recipes' | 'tips' | 'kitbash';
 
 interface Technique {
   name: string;
@@ -172,9 +174,29 @@ export default function Inspiration() {
   const [tab, setTab] = useState<Tab>('techniques');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const models = useLiveQuery(() => db.models.toArray()) ?? [];
 
   const filteredTech = TECHNIQUES.filter(t => !search || t.name.toLowerCase().includes(search.toLowerCase()));
   const filteredRecipes = RECIPES.filter(r => !search || r.name.toLowerCase().includes(search.toLowerCase()) || r.faction.toLowerCase().includes(search.toLowerCase()));
+
+  // Kitbash ideas based on owned factions
+  const ownedFactions = [...new Set(models.filter(m => m.status !== 'unbuilt').map(m => m.faction))];
+  const KITBASH_COMBOS: { factions: string[]; idea: string; difficulty: string }[] = [
+    { factions: ['Space Marines', 'Adeptus Custodes'], idea: 'Custom Shield-Captain using Bladeguard Veterans body + Custodes weapons and head', difficulty: 'Medium' },
+    { factions: ['Space Marines', 'Dark Angels'], idea: 'Fallen Dark Angel — loyalist body with Dark Angels robes and heretical details', difficulty: 'Easy' },
+    { factions: ['Chaos Space Marines', 'Space Marines'], idea: 'Corrupted loyalist — SM body with CSM mutations, tentacles, and spikes', difficulty: 'Medium' },
+    { factions: ['Orks', 'Astra Militarum'], idea: 'Looted Leman Russ — Guard tank with Ork glyphs, extra armor plates, and a grot crew', difficulty: 'Hard' },
+    { factions: ['Necrons', 'Adeptus Mechanicus'], idea: 'Necron-infected Tech-Priest — AdMech body with Necron limbs and glowing green bits', difficulty: 'Hard' },
+    { factions: ['Tyranids', 'Genestealer Cults'], idea: 'Hybrid Patriarch — GSC body with Tyranid chitin armor and extra limbs', difficulty: 'Medium' },
+    { factions: ['Death Guard', 'Space Marines'], idea: 'Pre-Heresy Death Guard — clean SM body with DG shoulder pads and scythes', difficulty: 'Easy' },
+    { factions: ['Blood Angels', 'Chaos Daemons'], idea: 'Black Rage marine — Blood Angel with daemonic wings and blood effects', difficulty: 'Hard' },
+    { factions: ['Aeldari', 'Drukhari'], idea: 'Ynnari hybrid warrior — Craftworld body with Drukhari blades and trophies', difficulty: 'Medium' },
+    { factions: ['Space Wolves', 'Space Marines'], idea: 'Wolf Lord on Thunderwolf — Intercessor torso on a wolf mount with pelts and runes', difficulty: 'Medium' },
+    { factions: ['Imperial Fists', 'Astra Militarum'], idea: 'Siege specialist — IF marine with Guard heavy weapons and sandbag basing', difficulty: 'Easy' },
+    { factions: ['Thousand Sons', 'Necrons'], idea: 'Arcane construct — Rubric Marine with Necron staff and glowing runes', difficulty: 'Hard' },
+  ];
+  const myKitbashes = KITBASH_COMBOS.filter(k => k.factions.every(f => ownedFactions.some(o => o.toLowerCase().includes(f.toLowerCase().split(' ')[0]))));
+  const genericKitbashes = KITBASH_COMBOS.filter(k => !myKitbashes.includes(k));
 
   return (
     <div>
@@ -186,6 +208,7 @@ export default function Inspiration() {
         <button className={`game-tab ${tab === 'techniques' ? 'active' : ''}`} onClick={() => setTab('techniques')}><GoldIcon name="brushes" size={14} /> Techniques ({TECHNIQUES.length})</button>
         <button className={`game-tab ${tab === 'recipes' ? 'active' : ''}`} onClick={() => setTab('recipes')}><GoldIcon name="paints" size={14} /> Paint Recipes ({RECIPES.length})</button>
         <button className={`game-tab ${tab === 'tips' ? 'active' : ''}`} onClick={() => setTab('tips')}><GoldIcon name="lightning" size={14} /> Quick Tips ({TIPS.length})</button>
+        <button className={`game-tab ${tab === 'kitbash' ? 'active' : ''}`} onClick={() => setTab('kitbash')}><GoldIcon name="gear" size={14} /> Kitbash Ideas</button>
       </div>
 
       <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search techniques, recipes..." className="filter-search" style={{ marginBottom: 20, width: '100%' }} />
@@ -250,6 +273,34 @@ export default function Inspiration() {
               <div className="tip-icon"><GoldIcon name={t.icon} size={22} /></div>
               <div className="tip-title">{t.title}</div>
               <div className="tip-text">{t.text}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === 'kitbash' && (
+        <div>
+          {myKitbashes.length > 0 && (
+            <>
+              <h3 style={{ fontFamily: "'Cinzel', serif", color: 'var(--gold)', fontSize: '1rem', marginBottom: 12 }}>Based on your collection</h3>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: 12 }}>You have bits from these factions — here are kitbash ideas you can try now.</p>
+              {myKitbashes.map((k, i) => (
+                <div key={i} className="card" style={{ cursor: 'default' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>{k.idea}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: 4 }}>Uses: {k.factions.join(' + ')} · {k.difficulty}</div>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+          <h3 style={{ fontFamily: "'Cinzel', serif", color: 'var(--gold)', fontSize: '1rem', margin: '20px 0 12px' }}>All kitbash ideas</h3>
+          {genericKitbashes.map((k, i) => (
+            <div key={i} className="card" style={{ cursor: 'default', opacity: 0.7 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: '0.88rem' }}>{k.idea}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: 4 }}>Needs: {k.factions.join(' + ')} · {k.difficulty}</div>
+              </div>
             </div>
           ))}
         </div>
