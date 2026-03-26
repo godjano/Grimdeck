@@ -153,13 +153,13 @@ export default function Layout() {
         <NavLink to="/paints"><GoldIcon name="paints" size={22} /></NavLink>
         <NavLink to="/grey-pile"><GoldIcon name="skull" size={22} /></NavLink>
         <NavLink to="/progress"><GoldIcon name="progress" size={22} /></NavLink>
-        <NavLink to="/campaigns"><GoldIcon name="campaigns" size={22} /></NavLink>
+        <NavLink to="/account"><GoldIcon name="eagle-shield" size={22} /></NavLink>
         <button className="mobile-more-btn" onClick={() => setShowMore(!showMore)}><GoldIcon name="settings" size={22} /></button>
       </nav>
       {showMore && (
         <div className="mobile-more-overlay" onClick={() => setShowMore(false)}>
           <div className="mobile-more-menu" onClick={e => e.stopPropagation()}>
-            <NavLink to="/account" onClick={() => setShowMore(false)}><GoldIcon name="eagle-shield" size={18} /> Account</NavLink>
+            <NavLink to="/campaigns" onClick={() => setShowMore(false)}><GoldIcon name="campaigns" size={18} /> Campaigns</NavLink>
             <NavLink to="/army-list" onClick={() => setShowMore(false)}><GoldIcon name="guides" size={18} /> Army List</NavLink>
             <NavLink to="/suggestions" onClick={() => setShowMore(false)}><GoldIcon name="guides" size={18} /> Guides</NavLink>
             <NavLink to="/inspiration" onClick={() => setShowMore(false)}><GoldIcon name="inspiration" size={18} /> Reference</NavLink>
