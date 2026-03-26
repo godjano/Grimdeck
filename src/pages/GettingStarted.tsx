@@ -48,6 +48,33 @@ export default function GettingStarted() {
           <button className="btn btn-primary btn-lg" style={{ marginTop: 20 }} onClick={() => { if (selectedSet && selectedSet !== 'other') addSet(); setStep(1); }} disabled={!selectedSet}>
             Next →
           </button>
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border)', textAlign: 'center' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginBottom: 8 }}>Just want to explore first?</p>
+            <button className="btn btn-ghost" onClick={async () => {
+              const demo = [
+                { name: 'Intercessor Sergeant', faction: 'Ultramarines', status: 'painted', qty: 1, pts: 160 },
+                { name: 'Assault Intercessors', faction: 'Blood Angels', status: 'wip', qty: 5, pts: 160 },
+                { name: 'Terminators', faction: 'Dark Angels', status: 'primed', qty: 5, pts: 200 },
+                { name: 'Plague Marines', faction: 'Death Guard', status: 'built', qty: 5, pts: 180 },
+                { name: 'Necron Warriors', faction: 'Necrons', status: 'unbuilt', qty: 10, pts: 120 },
+                { name: 'Hive Tyrant', faction: 'Tyranids', status: 'wip', qty: 1, pts: 250 },
+                { name: 'Alpharius', faction: 'Alpha Legion', status: 'painted', qty: 1, pts: 0 },
+                { name: 'Leman Russ Battle Tank', faction: 'Astra Militarum', status: 'based', qty: 1, pts: 195 },
+              ];
+              for (const d of demo) {
+                await db.models.add({ name: d.name, faction: d.faction, unitType: 'Infantry', quantity: d.qty, status: d.status as any, notes: 'Demo', photoUrl: '', createdAt: Date.now() - Math.random() * 86400000 * 30, manufacturer: 'Games Workshop', gameSystem: 'Warhammer 40K', countsAs: '', pricePaid: 0, wishlist: false, points: d.pts, forceOrg: 'Other' });
+              }
+              const paints = [
+                { name: 'Macragge Blue', brand: 'Citadel', range: 'Base', type: 'base', hex: '#0D407F' },
+                { name: 'Retributor Armour', brand: 'Citadel', range: 'Base', type: 'base', hex: '#C39E3A' },
+                { name: 'Nuln Oil', brand: 'Citadel', range: 'Shade', type: 'shade', hex: '#14100E' },
+                { name: 'Mephiston Red', brand: 'Citadel', range: 'Base', type: 'base', hex: '#9A1115' },
+                { name: 'Death Guard Green', brand: 'Citadel', range: 'Base', type: 'base', hex: '#6D8537' },
+              ];
+              for (const p of paints) await db.paints.add({ ...p, owned: true, quantity: 1, notes: '' } as any);
+              nav('/');
+            }}>Load demo collection (8 models + 5 paints)</button>
+          </div>
         </div>
       )}
 

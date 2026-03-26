@@ -32,7 +32,7 @@ export default function Home() {
       <section className="hero">
         <p className="hero-eyebrow">Your Hobby Companion</p>
         <h1 className="hero-title">Track. Paint.<br /><span>Conquer.</span></h1>
-        <p className="hero-sub">Forge your legacy in miniature — manage your collection, master your craft, and wage war solo.</p>
+        <p className="hero-sub">Track your miniature collection, log painting progress, manage your paint rack, and play solo campaigns — all in one app.</p>
         <div className="hero-actions">
           <button className="btn btn-primary btn-lg" onClick={() => nav('/models')}>My Collection</button>
           <button className="btn btn-outline btn-lg" onClick={() => nav('/start')}>I'm New — Start Here</button>
@@ -40,6 +40,7 @@ export default function Home() {
       </section>
 
       <section className="stats-band">
+        {total > 0 ? (
         <div className="stats-band-inner">
           <div className="band-stat"><div className="band-num">{total}</div><div className="band-label">Models</div></div>
           <div className="band-divider" />
@@ -49,6 +50,12 @@ export default function Home() {
           <div className="band-divider" />
           <div className="band-stat"><div className="band-num">{pct}<span className="band-unit">%</span></div><div className="band-label">Complete</div></div>
         </div>
+        ) : (
+        <div className="stats-band-inner" style={{ flexDirection: 'column', gap: 4, padding: '8px 0' }}>
+          <div style={{ color: 'var(--gold)', fontFamily: "'Cinzel', serif", fontSize: '0.95rem' }}>Your hobby journey starts here</div>
+          <div style={{ color: 'var(--text-dim)', fontSize: '0.8rem' }}>Add your first models to see your stats</div>
+        </div>
+        )}
       </section>
 
       {divider}
@@ -139,7 +146,7 @@ export default function Home() {
           {(() => { const b = import.meta.env.BASE_URL; return [
             { to: '/models', img: 'icon-figurine.png', title: 'Collection', desc: 'Track every miniature by faction and status', color: '#3b82f6' },
             { to: '/paints', img: 'icon-palette2.png', title: 'Paint Rack', desc: 'Catalog paints across all major brands', color: '#a855f7' },
-            { to: '/grey-pile', img: 'icon-skull2.png', title: 'Pile of Grey', desc: 'Face your shame — promote through the pipeline', color: '#6b7280' },
+            { to: '/grey-pile', img: 'icon-skull2.png', title: 'Pile of Grey', desc: 'Your unpainted models — track them from box to battlefield', color: '#6b7280' },
             { to: '/progress', img: 'icon-trophy2.png', title: 'Progress', desc: 'Ranks, trophies, and painting streaks', color: '#f59e0b' },
             { to: '/campaigns', img: 'icon-swords2.png', title: 'Campaigns', desc: 'Solo Kill Team narrative missions', color: '#ef4444' },
             { to: '/suggestions', img: 'icon-book2.png', title: 'Paint Guides', desc: 'Step-by-step tutorials and recipes', color: '#10b981' },

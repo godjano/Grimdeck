@@ -12,24 +12,24 @@ import { Plus, Package, Search, Filter, ChevronDown, ChevronRight, Grid3X3, List
 import PageBanner from '../components/PageBanner';
 
 const FACTION_THUMBS: Record<string, string> = {
-  'Space Marines': 'primarch-guilliman.png', 'Blood Angels': 'primarch-sanguinius.png',
-  'Dark Angels': 'primarch-lion.png', 'Space Wolves': 'primarch-russ.png',
+  'Space Marines': 'primarch-guilliman.jpg', 'Blood Angels': 'primarch-sanguinius.jpg',
+  'Dark Angels': 'primarch-lion.jpg', 'Space Wolves': 'primarch-russ.jpg',
   'Astra Militarum': 'death-korps-0-31.jpeg', 'Necrons': 'canoptek-circle-0-22.jpeg',
   'Orks': 'farstalker-kinband-0-32.jpeg', 'Tyranids': 'brood-brothers-0-32.jpeg',
-  'Chaos Space Marines': 'primarch-horus.png', 'Death Guard': 'primarch-mortarion.png',
+  'Chaos Space Marines': 'primarch-horus.jpg', 'Death Guard': 'primarch-mortarion.jpg',
   'Adepta Sororitas': 'celestian-insidiants-10-2.jpeg', 'Adeptus Mechanicus': 'hunter-clade-14-8.jpeg',
   "T'au Empire": 'pathfinders-0-32.jpeg', 'Drukhari': 'mandrakes-0-31.jpeg',
   'Aeldari': 'mandrakes-0-31.jpeg', 'Adeptus Custodes': 'sanctifiers-0-30.jpeg',
-  'Grey Knights': 'sanctifiers-0-30.jpeg', 'Thousand Sons': 'primarch-magnus.png',
+  'Grey Knights': 'sanctifiers-0-30.jpeg', 'Thousand Sons': 'primarch-magnus.jpg',
   'World Eaters': 'nemesis-claw-0-30.jpeg', 'Genestealer Cults': 'brood-brothers-0-32.jpeg',
   'Leagues of Votann': 'hearthkyn-salvagers-14-18.jpeg',
   // Traitor Legions & Chapters
-  'Alpha Legion': 'primarch-alpharius.png', 'Night Lords': 'nemesis-claw-0-30.jpeg',
+  'Alpha Legion': 'primarch-alpharius.jpg', 'Night Lords': 'nemesis-claw-0-30.jpeg',
   'Word Bearers': 'nemesis-claw-0-30.jpeg', 'Iron Warriors': 'nemesis-claw-0-30.jpeg',
-  "Emperor's Children": 'primarch-fulgrim.png', 'Sons of Horus': 'primarch-horus.png',
-  'Black Legion': 'primarch-horus.png', 'Ultramarines': 'primarch-guilliman.png',
-  'Imperial Fists': 'primarch-dorn.png', 'Crimson Fists': 'primarch-dorn.png',
-  'Black Templars': 'primarch-dorn.png',
+  "Emperor's Children": 'primarch-fulgrim.jpg', 'Sons of Horus': 'primarch-horus.jpg',
+  'Black Legion': 'primarch-horus.jpg', 'Ultramarines': 'primarch-guilliman.jpg',
+  'Imperial Fists': 'primarch-dorn.jpg', 'Crimson Fists': 'primarch-dorn.jpg',
+  'Black Templars': 'primarch-dorn.jpg',
   'Salamanders': 'angels-of-death-13-1.jpeg', 'Iron Hands': 'angels-of-death-13-1.jpeg',
   'Raven Guard': 'scout-squad-0-32.jpeg', 'White Scars': 'scout-squad-0-32.jpeg',
 };

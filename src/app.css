@@ -3165,3 +3165,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 
 .md-primarch-name ~ .md-primarch-title ~ .md-faction,
 .md-primarch-title + .md-faction { color: rgba(255,255,255,0.85) !important; text-shadow: 0 1px 6px rgba(0,0,0,0.9); font-weight: 500; }
+
+/* ═══ TOOLTIPS ═══ */
+[data-tip] { position: relative; cursor: help; }
+[data-tip]:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); font-size: 0.72rem; padding: 6px 10px; border-radius: 6px; white-space: nowrap; z-index: 100; box-shadow: var(--shadow); pointer-events: none; max-width: 220px; white-space: normal; line-height: 1.4; }

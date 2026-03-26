@@ -87,22 +87,22 @@ export default function GreyPile() {
             <div className="grey-stat">
               <div className="grey-stat-icon"><GoldIcon name="models" size={20} /></div>
               <div className="grey-stat-num">{greyModels.filter(m => m.status === 'unbuilt').reduce((s, m) => s + m.quantity, 0)}</div>
-              <div className="grey-stat-label">Unbuilt</div>
+              <div className="grey-stat-label" data-tip="Still on the sprue — not yet assembled">Unbuilt</div>
             </div>
             <div className="grey-stat">
               <div className="grey-stat-icon"><GoldIcon name="campaigns" size={20} /></div>
               <div className="grey-stat-num">{greyModels.filter(m => m.status === 'built').reduce((s, m) => s + m.quantity, 0)}</div>
-              <div className="grey-stat-label">Built</div>
+              <div className="grey-stat-label" data-tip="Assembled and glued, ready for primer">Built</div>
             </div>
             <div className="grey-stat">
               <div className="grey-stat-icon"><GoldIcon name="skull" size={20} /></div>
               <div className="grey-stat-num">{greyModels.filter(m => m.status === 'primed').reduce((s, m) => s + m.quantity, 0)}</div>
-              <div className="grey-stat-label">Primed</div>
+              <div className="grey-stat-label" data-tip="Base coat of primer applied, ready to paint">Primed</div>
             </div>
             <div className="grey-stat grey-stat-wip">
               <div className="grey-stat-icon"><GoldIcon name="paints" size={20} /></div>
               <div className="grey-stat-num">{totalWip}</div>
-              <div className="grey-stat-label">WIP</div>
+              <div className="grey-stat-label" data-tip="Work In Progress — currently being painted">WIP</div>
             </div>
             <div className="grey-stat grey-stat-done">
               <div className="grey-stat-icon"><GoldIcon name="medal" size={20} /></div>
