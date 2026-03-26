@@ -151,13 +151,20 @@ export function checkTurnEnd(state: GameState): GameState {
       log: [...state.log, `\n--- Turning Point ${state.turningPoint} complete. Score: You ${pScore} - ${eScore} Enemy ---\n`] };
   }
 
-  // Switch active team — only after the current operative finishes (is marked activated)
-  // In Kill Team, you spend all AP on one operative, THEN it alternates
+  // Switch active team — only after the currently-acting operative is done
+  // An operative is "mid-activation" if they've used at least 1 AP this activation but aren't done yet
+  // We detect this by: apLeft < apl (used some AP) AND activated === false
   const currentTeamOps = alive.filter(o => o.team === state.activeTeam);
-  const anyStillActivating = currentTeamOps.some(o => !o.activated && o.apLeft > 0 && o.status === 'ready');
-  if (anyStillActivating) return state; // operative still has AP, don't switch
+  const midActivation = currentTeamOps.some(o => !o.activated && o.apLeft > 0 && o.apLeft < o.op.apl);
+  if (midActivation) return state; // someone is mid-turn, don't switch
 
+  // All current team's operatives are either fully activated or haven't started yet
+  // Check if current team just finished an activation (someone was marked activated this call)
+  const currentDone = currentTeamOps.every(o => o.activated);
+  if (currentDone) return state; // will be caught by allActivated check above on next call
+  
   const nextTeam = state.activeTeam === 'player' ? 'enemy' : 'player';
   const nextHasReady = alive.some(o => o.team === nextTeam && !o.activated);
-  return { ...state, activeTeam: nextHasReady ? nextTeam : state.activeTeam };
+  if (!nextHasReady) return state;
+  return { ...state, activeTeam: nextTeam };
 }
