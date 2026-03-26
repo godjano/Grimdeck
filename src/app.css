@@ -3191,3 +3191,11 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .showcase-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
 .showcase-faction { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
 @media (max-width: 480px) { .showcase-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } }
+
+/* ═══ GAME BOARD IMPROVEMENTS ═══ */
+.board-grid { --cell-size: 20px; }
+@media (max-width: 768px) { .board-grid { --cell-size: 28px; } .board-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; } }
+.cell-movable { background: rgba(46, 204, 113, 0.25) !important; cursor: pointer !important; }
+.cell-movable:hover { background: rgba(46, 204, 113, 0.45) !important; }
+.board-cell { width: var(--cell-size, 20px); height: var(--cell-size, 20px); }
+.board-op { width: calc(var(--cell-size, 20px) - 4px); height: calc(var(--cell-size, 20px) - 4px); }

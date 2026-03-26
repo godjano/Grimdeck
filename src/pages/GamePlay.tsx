@@ -22,11 +22,12 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   const [selectedOp, setSelectedOp] = useState<number | null>(null);
   const [selectedTarget, setSelectedTarget] = useState<number | null>(null);
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
-  const [diceInput, setDiceInput] = useState('');
   const [actionMode, setActionMode] = useState<'none' | 'move' | 'shoot' | 'fight'>('none');
   const [currentEvent, setCurrentEvent] = useState<RandomEvent | null>(null);
   const [tab, setTab] = useState<'board' | 'your' | 'enemy' | 'rules'>('board');
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
+  const [aiThinking, setAiThinking] = useState(false);
+  const [lastDiceRoll, setLastDiceRoll] = useState<number[] | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,6 +47,21 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   const enemyOps = game.operatives.filter(o => o.team === 'enemy');
   const activeOp = selectedOp !== null ? game.operatives[selectedOp] : null;
 
+  // Flow guide text
+  const getFlowGuide = () => {
+    if (game.phase === 'setup') return '📋 Review the board, then press Ready to begin';
+    if (game.phase === 'end') return '🏁 Game over — check the score';
+    if (game.phase === 'initiative') return '🎲 Roll initiative for the next turning point';
+    if (aiThinking) return '🤖 Enemy is thinking...';
+    if (game.activeTeam === 'enemy') return '🤖 Press Enemy Activation to let the AI act';
+    if (selectedOp === null) return '👆 Tap one of your ready operatives to activate them';
+    if (actionMode === 'none') return `⚔️ Choose an action for ${activeOp?.op.name}`;
+    if (actionMode === 'move') return '🏃 Tap a cell on the board to move there';
+    if (actionMode === 'shoot') return selectedWeapon ? (selectedTarget !== null ? '🎯 Press Fire to auto-roll and resolve' : '🎯 Tap an enemy on the board to target them') : '🔫 Pick a weapon below';
+    if (actionMode === 'fight') return selectedWeapon ? (selectedTarget !== null ? '⚔️ Press Fight to auto-roll and resolve' : '⚔️ Tap an adjacent enemy to fight') : '🗡️ Pick a melee weapon below';
+    return '';
+  };
+
   const startTurn = () => {
     const event = rollRandomEvent();
     setCurrentEvent(event);
@@ -57,46 +73,47 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   };
 
   const doAiTurn = () => {
-    let s = game;
-    // AI activates one operative
-    s = aiActivationV2(s, difficulty);
-    setGame(s);
+    setAiThinking(true);
+    setTimeout(() => {
+      let s = aiActivationV2(game, difficulty);
+      setGame(s);
+      setAiThinking(false);
+    }, 800);
   };
 
-  const parseDice = (): number[] => diceInput.split(/[,\s]+/).map(Number).filter(n => n >= 1 && n <= 6);
-
+  // Auto-roll shoot
   const doPlayerShoot = () => {
     if (selectedOp === null || selectedTarget === null || !selectedWeapon) return;
-    const rolls = parseDice();
-    if (rolls.length === 0) return;
+    const rolls = rollDice(selectedWeapon.attacks);
+    setLastDiceRoll(rolls);
     const attacker = game.operatives[selectedOp];
     const defender = game.operatives[selectedTarget];
     const result = resolveShoot(attacker, defender, selectedWeapon, rolls);
-    let s = { ...game, log: [...game.log, `\n🎯 YOUR SHOOT: ${result.log}`] };
+    let s = { ...game, log: [...game.log, `\n🎯 YOUR SHOOT: ${result.log}`, `   🎲 Rolled: [${rolls.join(', ')}]`] };
     s = applyDamage(s, selectedTarget, result.totalDmg);
-    // Mark activated, use AP
     const ops = [...s.operatives];
     const op = { ...ops[selectedOp], apLeft: ops[selectedOp].apLeft - 1 };
     if (op.apLeft <= 0) { op.activated = true; op.status = 'activated' as any; }
     ops[selectedOp] = op;
     s = checkTurnEnd({ ...s, operatives: ops });
     setGame(s);
-    setDiceInput('');
     setActionMode('none');
     setSelectedTarget(null);
     setSelectedWeapon(null);
+    setTimeout(() => setLastDiceRoll(null), 2000);
   };
 
+  // Auto-roll fight
   const doPlayerFight = () => {
     if (selectedOp === null || selectedTarget === null || !selectedWeapon) return;
-    const atkRolls = parseDice();
-    if (atkRolls.length === 0) return;
+    const atkRolls = rollDice(selectedWeapon.attacks);
+    setLastDiceRoll(atkRolls);
     const attacker = game.operatives[selectedOp];
     const defender = game.operatives[selectedTarget];
     const defWeapon = defender.op.weapons.find(w => w.type === 'melee') || defender.op.weapons[0];
     const defRolls = rollDice(defWeapon.attacks);
     const result = resolveFight(attacker, defender, selectedWeapon, defWeapon, atkRolls, defRolls);
-    let s = { ...game, log: [...game.log, `\n${result.log}`] };
+    let s = { ...game, log: [...game.log, `\n${result.log}`, `   🎲 You: [${atkRolls.join(', ')}] vs Enemy: [${defRolls.join(', ')}]`] };
     s = applyDamage(s, selectedTarget, result.atkDmg);
     s = applyDamage(s, selectedOp, result.defDmg);
     const ops = [...s.operatives];
@@ -104,24 +121,31 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     ops[selectedOp] = op;
     s = checkTurnEnd({ ...s, operatives: ops });
     setGame(s);
-    setDiceInput('');
     setActionMode('none');
     setSelectedTarget(null);
     setSelectedWeapon(null);
+    setTimeout(() => setLastDiceRoll(null), 2000);
   };
 
-  const doPlayerMove = () => {
-    if (selectedOp === null) return;
-    const coords = diceInput.split(/[,\s]+/).map(Number);
-    if (coords.length < 2) return;
-    const ops = [...game.operatives];
-    const op = { ...ops[selectedOp], x: coords[0], y: coords[1], apLeft: ops[selectedOp].apLeft - 1 };
-    if (op.apLeft <= 0) { op.activated = true; op.status = 'activated' as any; }
-    ops[selectedOp] = op;
-    const s = checkTurnEnd({ ...game, operatives: ops, log: [...game.log, `🏃 ${op.op.name} moves to (${coords[0]}, ${coords[1]})`] });
-    setGame(s);
-    setDiceInput('');
-    setActionMode('none');
+  // Tap-to-move on board
+  const handleCellClick = (x: number, y: number, cell: string) => {
+    if (actionMode === 'move' && selectedOp !== null && cell !== 'heavy') {
+      const ops = [...game.operatives];
+      const op = { ...ops[selectedOp], x, y, apLeft: ops[selectedOp].apLeft - 1 };
+      if (op.apLeft <= 0) { op.activated = true; op.status = 'activated' as any; }
+      ops[selectedOp] = op;
+      const s = checkTurnEnd({ ...game, operatives: ops, log: [...game.log, `🏃 ${op.op.name} moves to (${x}, ${y})`] });
+      setGame(s);
+      setActionMode('none');
+      return;
+    }
+    // Click enemy to target
+    const clickedOp = game.operatives.find(o => o.x === x && o.y === y && o.status !== 'incapacitated');
+    if (clickedOp) {
+      const idx = game.operatives.indexOf(clickedOp);
+      if (clickedOp.team === 'player') setSelectedOp(idx);
+      else setSelectedTarget(idx);
+    }
   };
 
   const endActivation = () => {
@@ -140,6 +164,13 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     onGameEnd(result, pDead, eDead);
   };
 
+  // Movement range highlight
+  const moveRange = (actionMode === 'move' && selectedOp !== null && activeOp) ? activeOp.op.movement : 0;
+  const inMoveRange = (x: number, y: number) => {
+    if (!activeOp || moveRange === 0) return false;
+    return Math.abs(x - activeOp.x) + Math.abs(y - activeOp.y) <= moveRange;
+  };
+
   return (
     <div>
       {/* Header */}
@@ -151,6 +182,20 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
           {game.phase === 'setup' ? 'SETUP' : game.phase === 'end' ? 'GAME OVER' : `${game.activeTeam === 'player' ? 'YOUR' : 'ENEMY'} TURN`}
         </div>
       </div>
+
+      {/* Flow Guide */}
+      <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 14px', marginBottom: 12, fontSize: '0.85rem', color: 'var(--gold)', textAlign: 'center' }}>
+        {getFlowGuide()}
+      </div>
+
+      {/* Dice Roll Display */}
+      {lastDiceRoll && (
+        <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 10 }}>
+          {lastDiceRoll.map((d, i) => (
+            <div key={i} style={{ width: 32, height: 32, background: d >= 4 ? 'var(--gold)' : 'var(--surface2)', color: d >= 4 ? '#0a0a0e' : 'var(--text-dim)', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.9rem', border: d === 6 ? '2px solid #2ecc71' : '1px solid var(--border)' }}>{d}</div>
+          ))}
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="game-tabs">
@@ -183,12 +228,13 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
           </div>
 
           <div className="board-container" style={{ position: 'relative', width: 'fit-content', margin: '0 auto' }}>
-          <div className="board-grid" style={{ gridTemplateColumns: `repeat(${game.map.cols}, 20px)` }}>
+          <div className="board-grid" style={{ gridTemplateColumns: `repeat(${game.map.cols}, var(--cell-size, 20px))` }}>
             {game.map.grid.map((row, y) => row.map((cell, x) => {
               const pOp = game.operatives.find(o => o.team === 'player' && o.x === x && o.y === y && o.status !== 'incapacitated');
               const eOp = game.operatives.find(o => o.team === 'enemy' && o.x === x && o.y === y && o.status !== 'incapacitated');
               const op = pOp || eOp;
               const cellClass = `cell-${cell}`;
+              const canMove = actionMode === 'move' && inMoveRange(x, y) && cell !== 'heavy';
 
               const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); };
               const handleDragLeave = (e: React.DragEvent) => { e.currentTarget.classList.remove('drag-over'); };
@@ -198,7 +244,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                 if (draggingIdx === null) return;
                 const dragOp = game.operatives[draggingIdx];
                 if (dragOp.team !== 'player') return;
-                if (cell === 'heavy') return; // can't drop on heavy terrain
+                if (cell === 'heavy') return;
                 const ops = [...game.operatives];
                 ops[draggingIdx] = { ...ops[draggingIdx], x, y };
                 const apCost = dragOp.activated ? 0 : 1;
@@ -215,8 +261,9 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
               return (
                 <div
                   key={`${x}-${y}`}
-                  className={`board-cell ${cellClass} ${op && selectedOp === game.operatives.indexOf(op) ? 'cell-selected' : ''}`}
+                  className={`board-cell ${cellClass} ${op && selectedOp === game.operatives.indexOf(op) ? 'cell-selected' : ''} ${canMove ? 'cell-movable' : ''}`}
                   title={`(${x},${y}) ${op ? `${op.op.name} [${op.op.role}] ${op.currentWounds}/${op.op.wounds}W` : CELL_LEGEND[cell].label}`}
+                  onClick={() => handleCellClick(x, y, cell)}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
@@ -252,7 +299,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
             const src = terrainImgs[t.type]?.[t.label];
             if (!src) return null;
             return <img key={i} src={`${b}decor/${src}`} alt={t.label} style={{
-              position: 'absolute', left: t.x * 20, top: t.y * 20, width: t.w * 20, height: t.h * 20,
+              position: 'absolute', left: `calc(${t.x} * var(--cell-size, 20px))`, top: `calc(${t.y} * var(--cell-size, 20px))`, width: `calc(${t.w} * var(--cell-size, 20px))`, height: `calc(${t.h} * var(--cell-size, 20px))`,
               objectFit: 'cover', borderRadius: 2, opacity: 0.7, pointerEvents: 'none', zIndex: 1,
             }} />;
           })}
@@ -346,7 +393,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
         )}
 
         {game.phase === 'firefight' && game.activeTeam === 'enemy' && (
-          <button className="btn btn-primary" onClick={doAiTurn}>🤖 Enemy Activation →</button>
+          <button className="btn btn-primary" onClick={doAiTurn} disabled={aiThinking}>{aiThinking ? '🤖 Thinking...' : '🤖 Enemy Activation →'}</button>
         )}
 
         {game.phase === 'firefight' && game.activeTeam === 'player' && (
@@ -365,9 +412,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
 
                 {actionMode === 'move' && (
                   <div className="action-input">
-                    <label>Enter new position (x, y):</label>
-                    <input value={diceInput} onChange={e => setDiceInput(e.target.value)} placeholder="e.g. 10, 8" />
-                    <button className="btn btn-sm btn-primary" onClick={doPlayerMove}>Confirm Move</button>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>Tap a highlighted cell on the board to move (range: {activeOp.op.movement}")</p>
                   </div>
                 )}
 
@@ -386,10 +431,9 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                         <div className="dice-helper">
                           🎲 Hit chance: {formatProbability(selectedWeapon.skill)} per die · Expected: {expectedHits(selectedWeapon.attacks, selectedWeapon.skill).toFixed(1)} hits · ~{expectedDamage(selectedWeapon.attacks, selectedWeapon.skill, selectedWeapon.normalDmg, selectedWeapon.critDmg).toFixed(1)} dmg
                         </div>
-                        <label>Select target (switch to Enemy tab), then enter your {selectedWeapon.attacks} dice rolls:</label>
-                        <input value={diceInput} onChange={e => setDiceInput(e.target.value)} placeholder={`e.g. 3, 5, 2, 6`} />
-                        <button className="btn btn-sm btn-primary" onClick={doPlayerShoot} disabled={selectedTarget === null}>
-                          Resolve Shot {selectedTarget !== null ? `→ ${game.operatives[selectedTarget].op.name}` : '(select target)'}
+                        <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>{selectedTarget !== null ? `Target: ${game.operatives[selectedTarget].op.name}` : 'Tap an enemy on the board to target'}</p>
+                        <button className="btn btn-primary" onClick={doPlayerShoot} disabled={selectedTarget === null}>
+                          🎲 Fire! (auto-roll {selectedWeapon.attacks} dice)
                         </button>
                       </>
                     )}
@@ -408,10 +452,9 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                     </div>
                     {selectedWeapon && (
                       <>
-                        <label>Select target (Enemy tab), then enter your {selectedWeapon.attacks} attack dice:</label>
-                        <input value={diceInput} onChange={e => setDiceInput(e.target.value)} placeholder={`e.g. 4, 6, 3, 1`} />
-                        <button className="btn btn-sm btn-primary" onClick={doPlayerFight} disabled={selectedTarget === null}>
-                          Resolve Fight {selectedTarget !== null ? `→ ${game.operatives[selectedTarget].op.name}` : '(select target)'}
+                        <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>{selectedTarget !== null ? `Target: ${game.operatives[selectedTarget].op.name}` : 'Tap an adjacent enemy to fight'}</p>
+                        <button className="btn btn-primary" onClick={doPlayerFight} disabled={selectedTarget === null}>
+                          ⚔️ Fight! (auto-roll {selectedWeapon.attacks} dice)
                         </button>
                       </>
                     )}
@@ -419,7 +462,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                 )}
               </>
             ) : (
-              <p style={{ color: 'var(--text-dim)' }}>Select one of your ready operatives from the "Your Team" tab to activate.</p>
+              <p style={{ color: 'var(--text-dim)' }}>Tap one of your ready operatives on the board or "Your Team" tab.</p>
             )}
           </div>
         )}
