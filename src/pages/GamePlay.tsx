@@ -14,11 +14,20 @@ interface Props {
   playerFaction: string;
   enemyFaction: string;
   difficulty?: AIDifficulty;
+  saveKey?: string;
   onGameEnd: (result: 'win' | 'loss' | 'draw', pCasualties: number, eCasualties: number) => void;
 }
 
-export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'normal', onGameEnd }: Props) {
-  const [game, setGame] = useState<GameState | null>(null);
+export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'normal', saveKey, onGameEnd }: Props) {
+  const [game, setGameRaw] = useState<GameState | null>(null);
+
+  // Persist game state
+  const storageKey = saveKey ? `grimdeck_game_${saveKey}` : null;
+  const setGame = (s: GameState | null) => {
+    setGameRaw(s);
+    if (s && storageKey) try { localStorage.setItem(storageKey, JSON.stringify(s)); } catch {}
+  };
+
   const [selectedOp, setSelectedOp] = useState<number | null>(null);
   const [selectedTarget, setSelectedTarget] = useState<number | null>(null);
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
@@ -31,10 +40,17 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Try to restore saved game
+    if (storageKey) {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) { setGameRaw(JSON.parse(saved)); return; }
+      } catch {}
+    }
     const pOps = getRoster(playerFaction);
     const eOps = getRoster(enemyFaction);
     const map = generateMap();
-    setGame(createGameState(pOps, eOps, map));
+    setGameRaw(createGameState(pOps, eOps, map));
   }, [playerFaction, enemyFaction]);
 
   useEffect(() => {
@@ -158,6 +174,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   };
 
   const endGame = () => {
+    if (storageKey) localStorage.removeItem(storageKey);
     const pDead = playerOps.filter(o => o.status === 'incapacitated').length;
     const eDead = enemyOps.filter(o => o.status === 'incapacitated').length;
     const result = game.playerScore > game.enemyScore ? 'win' : game.playerScore < game.enemyScore ? 'loss' : 'draw';
