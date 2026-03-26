@@ -228,6 +228,20 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
           </div>
 
           <div className="board-container" style={{ position: 'relative', width: 'fit-content', margin: '0 auto' }}>
+          {/* Column numbers */}
+          <div style={{ display: 'flex', marginLeft: 'calc(var(--cell-size, 20px) + 2px)', marginBottom: 2 }}>
+            {Array.from({ length: game.map.cols }, (_, i) => (
+              <div key={i} style={{ width: 'var(--cell-size, 20px)', textAlign: 'center', fontSize: '0.5rem', color: 'var(--text-dim)', lineHeight: 1 }}>{i % 5 === 0 ? i : ''}</div>
+            ))}
+          </div>
+          <div style={{ display: 'flex' }}>
+          {/* Row numbers */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {Array.from({ length: game.map.rows }, (_, i) => (
+              <div key={i} style={{ height: 'var(--cell-size, 20px)', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 3, fontSize: '0.5rem', color: 'var(--text-dim)', width: 'var(--cell-size, 20px)' }}>{i % 5 === 0 ? i : ''}</div>
+            ))}
+          </div>
+          <div style={{ position: 'relative' }}>
           <div className="board-grid" style={{ gridTemplateColumns: `repeat(${game.map.cols}, var(--cell-size, 20px))` }}>
             {game.map.grid.map((row, y) => row.map((cell, x) => {
               const pOp = game.operatives.find(o => o.team === 'player' && o.x === x && o.y === y && o.status !== 'incapacitated');
@@ -304,6 +318,8 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
             }} />;
           })}
           </div>
+          </div>{/* close position:relative */}
+          </div>{/* close flex row */}
 
           <div className="board-legend">
             <span className="legend-item"><GoldIcon name="flag-player" size={18} /> Your deploy zone</span>
