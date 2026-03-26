@@ -269,7 +269,9 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                 }
                 const s = checkTurnEnd({ ...game, operatives: ops, log: [...game.log, `🏃 ${dragOp.op.name} moves to (${x}, ${y})`] });
                 setGame(s);
+                setSelectedOp(draggingIdx);
                 setDraggingIdx(null);
+                setActionMode('none');
               };
 
               return (

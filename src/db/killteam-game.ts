@@ -151,8 +151,13 @@ export function checkTurnEnd(state: GameState): GameState {
       log: [...state.log, `\n--- Turning Point ${state.turningPoint} complete. Score: You ${pScore} - ${eScore} Enemy ---\n`] };
   }
 
-  // Switch active team
+  // Switch active team — only after the current operative finishes (is marked activated)
+  // In Kill Team, you spend all AP on one operative, THEN it alternates
+  const currentTeamOps = alive.filter(o => o.team === state.activeTeam);
+  const anyStillActivating = currentTeamOps.some(o => !o.activated && o.apLeft > 0 && o.status === 'ready');
+  if (anyStillActivating) return state; // operative still has AP, don't switch
+
   const nextTeam = state.activeTeam === 'player' ? 'enemy' : 'player';
-  const hasReady = alive.some(o => o.team === nextTeam && !o.activated);
-  return { ...state, activeTeam: hasReady ? nextTeam : state.activeTeam };
+  const nextHasReady = alive.some(o => o.team === nextTeam && !o.activated);
+  return { ...state, activeTeam: nextHasReady ? nextTeam : state.activeTeam };
 }
