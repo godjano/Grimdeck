@@ -18,6 +18,7 @@ export interface MiniatureModel {
   wishlist: boolean;
   points: number;
   forceOrg: string;
+  lastPaintedAt?: number;
 }
 
 export const FORCE_ORG = ['HQ', 'Troops', 'Elites', 'Fast Attack', 'Heavy Support', 'Flyer', 'Dedicated Transport', 'Fortification', 'Lord of War', 'Kill Team Operative', 'Other'];

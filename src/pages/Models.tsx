@@ -56,6 +56,14 @@ export default function Models() {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set(['__ALL_COLLAPSED__']));
   const [showFilters, setShowFilters] = useState(false);
   const [openMenu, setOpenMenu] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [selectMode, setSelectMode] = useState(false);
+
+  const toggleSelect = (id: number) => setSelected(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const batchStatus = async (status: string) => {
+    for (const id of selected) await db.models.update(id, { status: status as any });
+    setSelected(new Set()); setSelectMode(false);
+  };
 
   const nav = useNavigate();
   const modelsRaw = useLiveQuery(() => db.models.orderBy('createdAt').reverse().toArray());
@@ -115,6 +123,9 @@ export default function Models() {
       {/* ─── Header ─── */}
       <div className="page-header">
         <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-ghost btn-sm" onClick={() => setSelectMode(!selectMode)}>
+            {selectMode ? <><X size={16} /> Cancel</> : '☑ Select'}
+          </button>
           <button className="btn btn-ghost btn-sm" onClick={() => { setShowBulk(!showBulk); setShowForm(false); }}>
             <Package size={16} />
           </button>
@@ -123,6 +134,16 @@ export default function Models() {
           </button>
         </div>
       </div>
+
+      {selectMode && selected.size > 0 && (
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12, padding: '10px', background: 'var(--surface2)', borderRadius: 8, alignItems: 'center' }}>
+          <span style={{ fontSize: '0.82rem', color: 'var(--gold)', marginRight: 8 }}>{selected.size} selected</span>
+          {(['built', 'primed', 'wip', 'painted', 'based'] as const).map(s => (
+            <button key={s} className="btn btn-sm btn-ghost" onClick={() => batchStatus(s)}>→ {s}</button>
+          ))}
+          <button className="btn btn-sm btn-ghost" style={{ color: '#c0392b' }} onClick={async () => { for (const id of selected) await db.models.delete(id); setSelected(new Set()); setSelectMode(false); }}>Delete</button>
+        </div>
+      )}
 
       {showBulk && <BulkAddModels onDone={() => setShowBulk(false)} />}
       {showForm && <AddModelForm onDone={() => setShowForm(false)} />}
@@ -199,7 +220,7 @@ export default function Models() {
         /* ─── Grid view — photo tiles ─── */
         <div className="ml-grid">
           {filtered.map(m => (
-            <div key={m.id} className="ml-tile" onClick={() => nav(`/model/${m.id}`)}>
+            <div key={m.id} className={`ml-tile ${selected.has(m.id!) ? 'ml-selected' : ''}`} onClick={() => selectMode ? toggleSelect(m.id!) : nav(`/model/${m.id}`)}>
               <div className="ml-tile-img">
                 {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : getFactionThumb(m.faction) ? <img src={getFactionThumb(m.faction)!} alt={m.faction} style={{ objectFit: 'cover', width: '100%', height: '100%', opacity: 0.5 }} /> : <div className="ml-tile-placeholder"><Camera size={24} strokeWidth={1} /></div>}
                 <span className={`ml-tile-status status-${m.status}`}>{m.status}</span>
@@ -226,7 +247,7 @@ export default function Models() {
                 <div className="ml-group-items">
                   {items.map(m => (
                     <ModelCard key={m.id} m={m} nav={nav} openMenu={openMenu} setOpenMenu={setOpenMenu}
-                      updateStatus={updateStatus} deleteModel={deleteModel} />
+                      updateStatus={updateStatus} deleteModel={deleteModel} selected={selected} selectMode={selectMode} toggleSelect={toggleSelect} />
                   ))}
                 </div>
               )}
@@ -238,7 +259,7 @@ export default function Models() {
         <div className="ml-list">
           {filtered.map(m => (
             <ModelCard key={m.id} m={m} nav={nav} openMenu={openMenu} setOpenMenu={setOpenMenu}
-              updateStatus={updateStatus} deleteModel={deleteModel} />
+              updateStatus={updateStatus} deleteModel={deleteModel} selected={selected} selectMode={selectMode} toggleSelect={toggleSelect} />
           ))}
         </div>
       )}
@@ -247,12 +268,13 @@ export default function Models() {
 }
 
 /* ─── Clean model card with overflow menu ─── */
-function ModelCard({ m, nav, openMenu, setOpenMenu, updateStatus, deleteModel }: {
+function ModelCard({ m, nav, openMenu, setOpenMenu, updateStatus, deleteModel, selected, selectMode, toggleSelect }: {
   m: any; nav: any; openMenu: number | null; setOpenMenu: (id: number | null) => void;
   updateStatus: (id: number, s: ModelStatus) => void; deleteModel: (id: number) => void;
+  selected: Set<number>; selectMode: boolean; toggleSelect: (id: number) => void;
 }) {
   return (
-    <div className="ml-card" onClick={() => nav(`/model/${m.id}`)}>
+    <div className={`ml-card ${selected.has(m.id!) ? 'ml-selected' : ''}`} onClick={() => selectMode ? toggleSelect(m.id!) : nav(`/model/${m.id}`)}>
       {m.photoUrl ? (
         <img src={m.photoUrl} alt={m.name} className="ml-card-photo" />
       ) : (

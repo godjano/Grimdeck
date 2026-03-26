@@ -6,10 +6,12 @@ import { db } from '../db';
 export default function ArmyList() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
   const [faction, setFaction] = useState('');
+  const [targetPts, setTargetPts] = useState(2000);
   const factions = [...new Set(models.filter(m => !m.wishlist).map(m => m.faction))].sort();
 
   const armyModels = models.filter(m => !m.wishlist && (!faction || m.faction === faction));
   const totalPts = armyModels.reduce((s, m) => s + (m.points || 0), 0);
+  const diff = totalPts - targetPts;
 
   const byForceOrg: Record<string, typeof armyModels> = {};
   for (const m of armyModels) { (byForceOrg[m.forceOrg || 'Other'] ??= []).push(m); }
@@ -43,6 +45,15 @@ export default function ArmyList() {
 
       <div className="army-summary">
         <div className="army-points">{totalPts}<span className="army-pts-label">pts</span></div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', marginBottom: 8 }}>
+          <span style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>Target:</span>
+          {[500, 1000, 1500, 2000].map(p => (
+            <button key={p} className={`btn btn-sm ${targetPts === p ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setTargetPts(p)} style={{ padding: '3px 10px', fontSize: '0.75rem' }}>{p}</button>
+          ))}
+        </div>
+        {totalPts > 0 && <div style={{ fontSize: '0.85rem', fontWeight: 600, color: diff > 0 ? '#c0392b' : diff === 0 ? '#2ecc71' : 'var(--gold)', marginBottom: 8 }}>
+          {diff > 0 ? `${diff}pts over limit` : diff === 0 ? 'Exactly on target!' : `${Math.abs(diff)}pts remaining`}
+        </div>}
         <div className="army-checks">
           <span className={isLegal ? 'army-check-pass' : 'army-check-fail'}>{hqCount >= 1 ? '✓' : '✕'} HQ ({hqCount})</span>
           <span className={troopsCount >= 1 ? 'army-check-pass' : 'army-check-fail'}>{troopsCount >= 1 ? '✓' : '✕'} Troops ({troopsCount})</span>

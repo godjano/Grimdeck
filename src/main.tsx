@@ -20,6 +20,8 @@ import ArmyList from './pages/ArmyList';
 import GettingStarted from './pages/GettingStarted';
 import Tools from './pages/Tools';
 import DataManager from './pages/DataManager';
+import BattleLogPage from './pages/BattleLog';
+import Showcase from './pages/Showcase';
 
 const router = createHashRouter([
   {
@@ -43,6 +45,8 @@ const router = createHashRouter([
       { path: 'start', element: <GettingStarted /> },
       { path: 'tools', element: <Tools /> },
       { path: 'data-manager', element: <DataManager /> },
+      { path: 'battle-log', element: <BattleLogPage /> },
+      { path: 'showcase', element: <Showcase /> },
     ],
   },
 ]);

@@ -275,7 +275,9 @@ export default function ModelDetail() {
   if (!model) return <div className="empty">Loading...</div>;
 
   const setStatus = async (status: ModelStatus) => {
-    await db.models.update(modelId, { status });
+    const update: any = { status };
+    if (status === 'wip' || status === 'painted' || status === 'based') update.lastPaintedAt = Date.now();
+    await db.models.update(modelId, update);
     if (status === 'painted') { setConfetti(true); setTimeout(() => setConfetti(false), 1500); }
   };
   const currentIdx = STATUS_FLOW.indexOf(model.status);
@@ -299,7 +301,7 @@ export default function ModelDetail() {
       const img = new window.Image();
       img.onload = async () => {
         const canvas = document.createElement('canvas');
-        const scale = Math.min(600 / img.width, 600 / img.height, 1);
+        const scale = Math.min(1200 / img.width, 1200 / img.height, 1);
         canvas.width = img.width * scale; canvas.height = img.height * scale;
         canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
         await db.models.update(modelId, { photoUrl: canvas.toDataURL('image/jpeg', 0.75) });

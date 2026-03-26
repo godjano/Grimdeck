@@ -152,6 +152,8 @@ export default function Home() {
             { to: '/suggestions', img: 'icon-book2.png', title: 'Paint Guides', desc: 'Step-by-step tutorials and recipes', color: '#10b981' },
             { to: '/inspiration', img: 'icon-eagle-shield.png', title: 'Inspiration', desc: 'Techniques, tips, and pro recipes', color: '#ec4899' },
             { to: '/community', img: 'icon-compass.png', title: 'Community', desc: 'Share models and browse the gallery', color: '#06b6d4' },
+            { to: '/battle-log', img: 'icon-swords2.png', title: 'Battle Log', desc: 'Track your games — wins, losses, and rivals', color: '#e74c3c' },
+            { to: '/showcase', img: 'icon-trophy2.png', title: 'Showcase', desc: 'Your shelf of pride — finished masterpieces', color: '#f1c40f' },
           ].map(f => (
             <div key={f.to} className="feature-card" onClick={() => nav(f.to)} style={{ '--feat-color': f.color } as React.CSSProperties}>
               <div className="feature-icon"><img src={`${b}decor/${f.img}`} alt="" width={44} height={44} /></div>

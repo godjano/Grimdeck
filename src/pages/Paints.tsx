@@ -176,13 +176,18 @@ export default function Paints() {
               <div key={ri} className="pr-shelf">
                 <div className="pr-shelf-pots">
                   {row.map(p => (
-                    <div key={p.id} className="pr-pot" title={`${p.name}\n${p.brand} · ${p.range} · ${p.type}`}>
+                    <div key={p.id} className="pr-pot" title={`${p.name}\n${p.brand} · ${p.range} · ${p.type}\nQty: ${p.quantity}`}>
                       <div className="pr-pot-cap" style={{ background: p.hexColor || '#555' }}>
                         <div className="pr-pot-shine" />
                       </div>
                       <div className="pr-pot-body">
                         <div className="pr-pot-name">{p.name}</div>
                         <div className="pr-pot-brand">{p.brand}</div>
+                        <div className="pr-pot-qty">
+                          <button onClick={e => { e.stopPropagation(); if (p.quantity > 0) db.paints.update(p.id!, { quantity: p.quantity - 1 }); }}>−</button>
+                          <span>{p.quantity}</span>
+                          <button onClick={e => { e.stopPropagation(); db.paints.update(p.id!, { quantity: p.quantity + 1 }); }}>+</button>
+                        </div>
                       </div>
                       <button className="pr-pot-del" onClick={(e) => { e.stopPropagation(); deletePaint(p.id!); }}><Trash2 size={10} /></button>
                     </div>

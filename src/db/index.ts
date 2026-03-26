@@ -2,6 +2,8 @@ import Dexie, { type Table } from 'dexie';
 import type { MiniatureModel, Paint, ModelPaintLink, PaintingLog } from '../types';
 import type { Campaign, Operative, MissionResult } from '../types/campaign';
 
+export interface BattleLog { id?: number; date: number; opponent: string; myFaction: string; oppFaction: string; points: number; result: 'win' | 'loss' | 'draw'; gameSystem: string; notes: string; }
+
 class AppDB extends Dexie {
   models!: Table<MiniatureModel, number>;
   paints!: Table<Paint, number>;
@@ -10,6 +12,7 @@ class AppDB extends Dexie {
   operatives!: Table<Operative, number>;
   missionResults!: Table<MissionResult, number>;
   paintingLogs!: Table<PaintingLog, number>;
+  battleLogs!: Table<BattleLog, number>;
 
   constructor() {
     super('WarhammerCompanion');
@@ -48,7 +51,18 @@ class AppDB extends Dexie {
       missionResults: '++id, campaignId, nodeId',
       paintingLogs: '++id, modelId, timestamp',
     });
+    this.version(5).stores({
+      models: '++id, name, faction, status, createdAt, manufacturer, gameSystem, wishlist, forceOrg',
+      paints: '++id, name, brand, type, owned',
+      modelPaintLinks: '++id, modelId, paintId',
+      campaigns: '++id, status, createdAt',
+      operatives: '++id, campaignId, status',
+      missionResults: '++id, campaignId, nodeId',
+      paintingLogs: '++id, modelId, timestamp',
+      battleLogs: '++id, date',
+    });
   }
 }
+
 
 export const db = new AppDB();

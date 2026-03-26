@@ -3169,3 +3169,25 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 /* ═══ TOOLTIPS ═══ */
 [data-tip] { position: relative; cursor: help; }
 [data-tip]:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary); font-size: 0.72rem; padding: 6px 10px; border-radius: 6px; white-space: nowrap; z-index: 100; box-shadow: var(--shadow); pointer-events: none; max-width: 220px; white-space: normal; line-height: 1.4; }
+
+/* ═══ PAINT QTY CONTROLS ═══ */
+.pr-pot-qty { display: flex; align-items: center; justify-content: center; gap: 2px; margin-top: 2px; }
+.pr-pot-qty button { background: rgba(255,255,255,0.08); border: none; color: var(--gold); width: 16px; height: 16px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+.pr-pot-qty button:hover { background: rgba(255,255,255,0.15); }
+.pr-pot-qty span { font-size: 0.6rem; color: var(--text-dim); min-width: 14px; text-align: center; }
+
+/* ═══ BATCH SELECT ═══ */
+.ml-selected { outline: 2px solid var(--gold) !important; outline-offset: -2px; }
+.ml-selected::after { content: '✓'; position: absolute; top: 6px; right: 6px; background: var(--gold); color: #0a0a0e; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; z-index: 5; }
+.ml-tile { position: relative; }
+.ml-card { position: relative; }
+
+/* ═══ SHOWCASE ═══ */
+.showcase-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.showcase-card { border-radius: var(--radius-lg); overflow: hidden; background: var(--surface); border: 1px solid var(--border); cursor: pointer; transition: var(--transition); }
+.showcase-card:hover { transform: translateY(-4px); border-color: var(--gold-dim); box-shadow: 0 8px 30px rgba(0,0,0,0.4); }
+.showcase-img { width: 100%; aspect-ratio: 1; object-fit: cover; object-position: center top; display: block; }
+.showcase-info { padding: 10px 12px; }
+.showcase-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.showcase-faction { font-size: 0.72rem; color: var(--text-dim); margin-top: 2px; }
+@media (max-width: 480px) { .showcase-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; } }
