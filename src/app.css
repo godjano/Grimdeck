@@ -3240,3 +3240,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .game-mission-bar { background: linear-gradient(135deg, rgba(184,134,11,0.1), rgba(184,134,11,0.05)); border: 1px solid rgba(184,134,11,0.2); border-radius: 8px; padding: 8px 14px; margin-bottom: 12px; }
 .game-mission-title { font-family: 'Cinzel', serif; font-size: 0.85rem; color: var(--gold); font-weight: 600; }
 .game-mission-obj { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+
+/* ═══ COMBAT FLASH ═══ */
+@keyframes flashIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.combat-flash { background: rgba(184,134,11,0.15); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 10px 16px; margin-bottom: 10px; font-size: 0.88rem; color: var(--gold); text-align: center; font-weight: 600; animation: flashIn 0.3s ease-out; }

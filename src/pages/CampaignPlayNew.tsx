@@ -10,7 +10,7 @@ import { AI_CONFIGS, type AIDifficulty } from '../db/killteam-ai-v2';
 import OperativeSelection from '../components/OperativeSelection';
 import type { KTOperative } from '../db/killteam-data';
 
-type Mode = 'campaign' | 'difficulty' | 'selecting' | 'playing';
+type Mode = 'campaign' | 'difficulty' | 'selecting' | 'playing' | 'results';
 
 export default function CampaignPlay() {
   const { id } = useParams();
@@ -19,6 +19,7 @@ export default function CampaignPlay() {
   const [mode, setMode] = useState<Mode>('campaign');
   const [difficulty, setDifficulty] = useState<AIDifficulty>('normal');
   const [selectedOps, setSelectedOps] = useState<KTOperative[]>([]); void selectedOps;
+  const [lastResult, setLastResult] = useState<{ outcome: string; narrative: string; pCas: number; eCas: number } | null>(null);
 
   const campaign = useLiveQuery(() => db.campaigns.get(campaignId), [campaignId]);
   const operatives = useLiveQuery(() => db.operatives.where('campaignId').equals(campaignId).toArray(), [campaignId]);
@@ -63,6 +64,11 @@ export default function CampaignPlay() {
             await db.operatives.update(op.id!, { xp: op.xp + (outcome === 'win' ? 2 : 1), status: 'ready' });
           }
 
+          // Heal injured operatives between missions (recovery)
+          for (const op of operatives.filter(o => o.status === 'injured')) {
+            await db.operatives.update(op.id!, { status: 'ready' });
+          }
+
           const nextId = outcome === 'win' ? mission?.winNext : mission?.lossNext;
           const newWins = campaign.wins + (outcome === 'win' ? 1 : 0);
           const newLosses = campaign.losses + (outcome !== 'win' ? 1 : 0);
@@ -73,9 +79,50 @@ export default function CampaignPlay() {
             await db.campaigns.update(campaignId, { currentNodeId: nextId, turn: campaign.turn + 1, wins: newWins, losses: newLosses });
           }
 
-          setMode('campaign');
+          setLastResult({ outcome, narrative, pCas: pCasualties, eCas: eCasualties });
+          setMode('results');
         }}
       />
+    );
+  }
+
+  // Post-battle results
+  if (mode === 'results' && lastResult) {
+    const isWin = lastResult.outcome === 'win';
+    return (
+      <div>
+        <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <GoldIcon name={isWin ? 'victory' : 'defeat'} size={48} />
+          <h2 style={{ fontFamily: "'Cinzel', serif", color: isWin ? '#2ecc71' : '#c0392b', margin: '16px 0 8px', fontSize: '1.8rem' }}>
+            {isWin ? 'Victory!' : 'Defeat'}
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: 500, margin: '0 auto 24px', lineHeight: 1.7 }}>
+            {lastResult.narrative}
+          </p>
+          <div style={{ display: 'flex', gap: 24, justifyContent: 'center', marginBottom: 24 }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--gold)' }}>{lastResult.pCas}</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Your casualties</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#c0392b' }}>{lastResult.eCas}</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>Enemy killed</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--gold)' }}>{isWin ? '+2' : '+1'}</div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>XP earned</div>
+            </div>
+          </div>
+          {lastResult.pCas > 0 && (
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginBottom: 16 }}>
+              Injured operatives have recovered for the next mission. Fallen operatives are lost permanently.
+            </p>
+          )}
+          <button className="btn btn-primary btn-lg" onClick={() => { setLastResult(null); setMode('campaign'); }}>
+            {campaign.status === 'active' ? 'Continue Campaign →' : 'View Campaign Summary'}
+          </button>
+        </div>
+      </div>
     );
   }
 
@@ -152,6 +199,7 @@ export default function CampaignPlay() {
           );
         })}
         <button className="btn btn-ghost" style={{ marginTop: 16 }} onClick={() => nav('/campaigns')}>← Back</button>
+        <button className="btn btn-primary" style={{ marginTop: 8 }} onClick={() => nav('/campaigns')}>+ Start New Campaign</button>
       </div>
     );
   }

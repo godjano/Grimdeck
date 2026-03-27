@@ -39,6 +39,8 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
   const [aiThinking, setAiThinking] = useState(false);
   const [lastDiceRoll, setLastDiceRoll] = useState<number[] | null>(null);
+  const [combatFlash, setCombatFlash] = useState<string | null>(null);
+  const flash = (msg: string) => { setCombatFlash(msg); setTimeout(() => setCombatFlash(null), 3000); };
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -109,6 +111,8 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     const result = resolveShoot(attacker, defender, selectedWeapon, rolls);
     let s = { ...game, log: [...game.log, `\n🎯 YOUR SHOOT: ${result.log}`, `   🎲 Rolled: [${rolls.join(', ')}]`] };
     s = applyDamage(s, selectedTarget, result.totalDmg);
+    const targetAfter = s.operatives[selectedTarget];
+    flash(result.totalDmg > 0 ? `💥 ${defender.op.name} takes ${result.totalDmg} damage!${targetAfter.status === 'incapacitated' ? ' ☠️ INCAPACITATED!' : ` (${targetAfter.currentWounds}W left)`}` : `🛡️ ${defender.op.name} saves all damage!`);
     const ops = [...s.operatives];
     const op = { ...ops[selectedOp], apLeft: ops[selectedOp].apLeft - 1 };
     if (op.apLeft <= 0) { op.activated = true; op.status = 'activated' as any; }
@@ -134,6 +138,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     let s = { ...game, log: [...game.log, `\n${result.log}`, `   🎲 You: [${atkRolls.join(', ')}] vs Enemy: [${defRolls.join(', ')}]`] };
     s = applyDamage(s, selectedTarget, result.atkDmg);
     s = applyDamage(s, selectedOp, result.defDmg);
+    flash(`⚔️ You deal ${result.atkDmg} dmg, take ${result.defDmg} back!`);
     const ops = [...s.operatives];
     const op = { ...ops[selectedOp], apLeft: ops[selectedOp].apLeft - 2, activated: true, status: 'activated' as any };
     ops[selectedOp] = op;
@@ -208,6 +213,9 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
 
       {/* Flow Guide */}
       <div className="game-flow-guide">{getFlowGuide()}</div>
+
+      {/* Combat Flash */}
+      {combatFlash && <div className="combat-flash">{combatFlash}</div>}
 
       {/* Mission Objective Bar */}
       {missionTitle && (
