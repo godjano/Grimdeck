@@ -16,8 +16,20 @@ export default function CampaignPlay() {
   const { id } = useParams();
   const nav = useNavigate();
   const campaignId = Number(id);
-  const [mode, setMode] = useState<Mode>('campaign');
-  const [difficulty, setDifficulty] = useState<AIDifficulty>('normal');
+  const [difficulty, setDifficulty] = useState<AIDifficulty>(() => {
+    try { return (localStorage.getItem(`grimdeck_diff_${campaignId}`) as AIDifficulty) || 'normal'; } catch { return 'normal'; }
+  });
+  const [mode, setMode] = useState<Mode>(() => {
+    // Resume game if saved state exists
+    try {
+      const key = `grimdeck_game_campaign_${campaignId}_`;
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k?.startsWith(key)) return 'playing';
+      }
+    } catch {}
+    return 'campaign';
+  });
   const [selectedOps, setSelectedOps] = useState<KTOperative[]>([]); void selectedOps;
   const [lastResult, setLastResult] = useState<{ outcome: string; narrative: string; pCas: number; eCas: number } | null>(null);
 
@@ -163,7 +175,7 @@ export default function CampaignPlay() {
         </div>
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20 }}>
           <button className="btn btn-ghost" onClick={() => setMode('campaign')}>← Back</button>
-          <button className="btn btn-primary btn-lg" onClick={() => setMode('selecting')}><GoldIcon name="campaigns" size={16} /> Select Operatives ({AI_CONFIGS[difficulty].name})</button>
+          <button className="btn btn-primary btn-lg" onClick={() => { localStorage.setItem(`grimdeck_diff_${campaignId}`, difficulty); setMode('selecting'); }}><GoldIcon name="campaigns" size={16} /> Select Operatives ({AI_CONFIGS[difficulty].name})</button>
         </div>
       </div>
     );
