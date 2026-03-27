@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { getRoster } from '../db/killteam-data';
 import type { Weapon } from '../db/killteam-data';
 import { generateMap, CELL_LEGEND } from '../db/map-generator';
-import { createGameState, rollInitiative, resolveShoot, resolveFight, applyDamage, checkTurnEnd, rollDice, type GameState, type OpState } from '../db/killteam-game';
+import { createGameState, rollInitiative, resolveShoot, resolveFight, applyDamage, checkTurnEnd, rollDice, useStratagem, STRATAGEMS, type GameState, type OpState } from '../db/killteam-game';
 import GoldIcon from '../components/GoldIcon';
 import { aiActivationV2, AI_CONFIGS, type AIDifficulty } from '../db/killteam-ai-v2';
 import { formatProbability, expectedHits, expectedDamage } from '../db/dice-math';
@@ -49,7 +49,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   };
   const [selectedTarget, setSelectedTarget] = useState<number | null>(null);
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
-  const [actionMode, setActionMode] = useState<'none' | 'move' | 'shoot' | 'fight'>('none');
+  const [actionMode, setActionMode] = useState<'none' | 'move' | 'shoot' | 'fight' | 'dash' | 'charge'>('none');
   const [currentEvent, setCurrentEvent] = useState<RandomEvent | null>(null);
   const [tab, setTab] = useState<'board' | 'your' | 'enemy' | 'rules'>('board');
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
@@ -93,6 +93,8 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     if (selectedOp === null) return '👆 Tap one of your ready operatives to activate them';
     if (actionMode === 'none') return `⚔️ Choose an action for ${activeOp?.op.name}`;
     if (actionMode === 'move') return '🏃 Tap a cell on the board to move there';
+    if (actionMode === 'dash') return '💨 Tap a cell to dash (second move)';
+    if (actionMode === 'charge') return '⚡ Tap a cell near an enemy to charge into melee';
     if (actionMode === 'shoot') return selectedWeapon ? (selectedTarget !== null ? '🎯 Press Fire to auto-roll and resolve' : '🎯 Tap an enemy on the board to target them') : '🔫 Pick a weapon below';
     if (actionMode === 'fight') return selectedWeapon ? (selectedTarget !== null ? '⚔️ Press Fight to auto-roll and resolve' : '⚔️ Tap an adjacent enemy to fight') : '🗡️ Pick a melee weapon below';
     return '';
@@ -168,17 +170,18 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
 
   // Tap-to-move on board
   const handleCellClick = (x: number, y: number, cell: string) => {
-    if (actionMode === 'move' && selectedOp !== null && cell !== 'heavy') {
+    if ((actionMode === 'move' || actionMode === 'dash' || actionMode === 'charge') && selectedOp !== null && cell !== 'heavy') {
       const ops = [...game.operatives];
-      const op = { ...ops[selectedOp], x, y, apLeft: ops[selectedOp].apLeft - 1 };
+      const apCost = actionMode === 'charge' ? 1 : 1;
+      const op = { ...ops[selectedOp], x, y, apLeft: ops[selectedOp].apLeft - apCost, movedThisActivation: true };
       if (op.apLeft <= 0) { op.activated = true; op.status = 'activated' as any; }
       ops[selectedOp] = op;
-      const s = checkTurnEnd({ ...game, operatives: ops, log: [...game.log, `🏃 ${op.op.name} moves to (${x}, ${y})`] });
+      const label = actionMode === 'dash' ? '💨 DASH' : actionMode === 'charge' ? '⚡ CHARGE' : '🏃 MOVE';
+      const s = checkTurnEnd({ ...game, operatives: ops, log: [...game.log, `${label}: ${op.op.name} to (${x}, ${y})`] });
       setGame(s);
       setActionMode('none');
       return;
     }
-    // Click enemy to target
     const clickedOp = game.operatives.find(o => o.x === x && o.y === y && o.status !== 'incapacitated');
     if (clickedOp) {
       const idx = game.operatives.indexOf(clickedOp);
@@ -205,7 +208,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   };
 
   // Movement range highlight
-  const moveRange = (actionMode === 'move' && selectedOp !== null && activeOp) ? activeOp.op.movement : 0;
+  const moveRange = ((actionMode === 'move' || actionMode === 'dash' || actionMode === 'charge') && selectedOp !== null && activeOp) ? activeOp.op.movement : 0;
   const inMoveRange = (x: number, y: number) => {
     if (!activeOp || moveRange === 0) return false;
     return Math.abs(x - activeOp.x) + Math.abs(y - activeOp.y) <= moveRange;
@@ -422,6 +425,8 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                   <span className="roster-mini-name">{o.op.name}</span>
                   <span className="roster-mini-hp">{o.currentWounds}W</span>
                   <span className="roster-mini-ap">{o.activated ? '✓' : `${o.apLeft}AP`}</span>
+                  <span style={{ fontSize: '0.6rem', color: o.order === 'conceal' ? '#3498db' : '#2ecc71' }}>{o.order === 'conceal' ? '🔵' : '🟢'}</span>
+                  {o.onGuard && <span style={{ fontSize: '0.6rem' }}>🛡️</span>}
                 </div>
               );
             })}
@@ -492,21 +497,49 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
 
         {game.phase === 'firefight' && game.activeTeam === 'player' && (
           <div className="player-actions">
+            {/* Stratagems */}
+            {game.playerCP > 0 && (
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 4 }}>
+                <span style={{ fontSize: '0.7rem', color: 'var(--gold)', fontWeight: 600 }}>{game.playerCP}CP:</span>
+                {STRATAGEMS.filter(s => s.phase === 'firefight').map(s => (
+                  <button key={s.id} className="btn btn-sm btn-ghost" style={{ fontSize: '0.68rem', padding: '2px 6px' }}
+                    onClick={() => setGame(useStratagem(game, 'player', s.id))} title={s.desc}>
+                    {s.icon} {s.name}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {selectedOp !== null && activeOp && activeOp.status === 'ready' ? (
               <>
                 <div className="action-info">
-                  <strong>{activeOp.op.name}</strong> — {activeOp.apLeft} AP left
+                  <strong>{activeOp.op.name}</strong> — {activeOp.apLeft} AP · <span style={{ color: activeOp.order === 'conceal' ? '#3498db' : '#2ecc71', fontSize: '0.78rem' }}>{activeOp.order === 'conceal' ? '🔵 Conceal' : '🟢 Engage'}</span>
+                  <button className="btn btn-sm btn-ghost" style={{ marginLeft: 6, fontSize: '0.68rem', padding: '2px 6px' }}
+                    onClick={() => { const ops = [...game.operatives]; ops[selectedOp] = { ...ops[selectedOp], order: activeOp.order === 'conceal' ? 'engage' : 'conceal' }; setGame({ ...game, operatives: ops, log: [...game.log, `🔄 ${activeOp.op.name} switches to ${activeOp.order === 'conceal' ? 'Engage' : 'Conceal'} order`] }); }}>
+                    Toggle Order
+                  </button>
                 </div>
                 <div className="action-buttons">
                   <button className={`btn btn-sm ${actionMode === 'move' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('move')}>🏃 Move (1AP)</button>
-                  <button className={`btn btn-sm ${actionMode === 'shoot' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('shoot')}><GoldIcon name="crosshair" size={14} /> Shoot (1AP)</button>
+                  <button className={`btn btn-sm ${actionMode === 'dash' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('dash')}>💨 Dash (1AP)</button>
+                  <button className={`btn btn-sm ${actionMode === 'charge' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('charge')}>⚡ Charge (1AP)</button>
+                  <button className={`btn btn-sm ${actionMode === 'shoot' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('shoot')} disabled={activeOp.order === 'conceal'}><GoldIcon name="crosshair" size={14} /> Shoot (1AP)</button>
                   <button className={`btn btn-sm ${actionMode === 'fight' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('fight')}><GoldIcon name="fist2" size={14} /> Fight (2AP)</button>
+                  <button className="btn btn-sm btn-ghost" onClick={() => {
+                    const ops = [...game.operatives]; ops[selectedOp] = { ...ops[selectedOp], onGuard: true, apLeft: ops[selectedOp].apLeft - 1, activated: ops[selectedOp].apLeft <= 1, status: ops[selectedOp].apLeft <= 1 ? 'activated' as any : 'ready' };
+                    setGame(checkTurnEnd({ ...game, operatives: ops, log: [...game.log, `🛡️ ${activeOp.op.name} goes on Guard (1AP)`] }));
+                  }} disabled={activeOp.onGuard}>🛡️ Guard (1AP)</button>
+                  <button className="btn btn-sm btn-ghost" onClick={() => {
+                    setActionMode('move'); // Fall back = move away, costs 2AP
+                    const ops = [...game.operatives]; ops[selectedOp] = { ...ops[selectedOp], apLeft: ops[selectedOp].apLeft - 1 }; // extra AP cost
+                    setGame({ ...game, operatives: ops, log: [...game.log, `🏳️ ${activeOp.op.name} falls back (2AP total)`] });
+                  }}>🏳️ Fall Back (2AP)</button>
                   <button className="btn btn-sm btn-ghost" onClick={endActivation}>✓ End</button>
                 </div>
 
-                {actionMode === 'move' && (
+                {(actionMode === 'move' || actionMode === 'dash' || actionMode === 'charge') && (
                   <div className="action-input">
-                    <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>Tap a highlighted cell on the board to move (range: {activeOp.op.movement}")</p>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>Tap a highlighted cell on the board (range: {activeOp.op.movement}")</p>
                   </div>
                 )}
 

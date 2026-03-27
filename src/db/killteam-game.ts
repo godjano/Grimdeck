@@ -1,6 +1,8 @@
 import type { KTOperative, Weapon } from './killteam-data';
 import type { GameMap } from './map-generator';
 
+export type Order = 'engage' | 'conceal';
+
 export interface OpState {
   op: KTOperative;
   team: 'player' | 'enemy';
@@ -8,6 +10,10 @@ export interface OpState {
   activated: boolean;
   apLeft: number;
   status: 'ready' | 'activated' | 'incapacitated';
+  order: Order;
+  onGuard: boolean;
+  hasCounteracted: boolean;
+  movedThisActivation: boolean;
   x: number;
   y: number;
 }
@@ -24,6 +30,8 @@ export interface GameState {
   objectiveControl: Record<number, 'player' | 'enemy' | 'none'>;
   playerScore: number;
   enemyScore: number;
+  playerCP: number;
+  enemyCP: number;
 }
 
 export function rollD6(): number { return Math.floor(Math.random() * 6) + 1; }
@@ -31,27 +39,22 @@ export function rollDice(count: number): number[] { return Array.from({ length: 
 
 export function createGameState(playerOps: KTOperative[], enemyOps: KTOperative[], map: GameMap): GameState {
   const operatives: OpState[] = [];
-
-  // Place player operatives in deployment zone
   let py = 2;
   for (const op of playerOps) {
-    operatives.push({ op, team: 'player', currentWounds: op.wounds, activated: false, apLeft: op.apl, status: 'ready', x: 2, y: Math.min(py, map.rows - 2) });
+    operatives.push({ op, team: 'player', currentWounds: op.wounds, activated: false, apLeft: op.apl, status: 'ready', order: 'engage', onGuard: false, hasCounteracted: false, movedThisActivation: false, x: 2, y: Math.min(py, map.rows - 2) });
     py += 3;
   }
-
-  // Place enemy operatives in enemy deployment zone
   let ey = 2;
   for (const op of enemyOps) {
-    operatives.push({ op, team: 'enemy', currentWounds: op.wounds, activated: false, apLeft: op.apl, status: 'ready', x: map.cols - 3, y: Math.min(ey, map.rows - 2) });
+    operatives.push({ op, team: 'enemy', currentWounds: op.wounds, activated: false, apLeft: op.apl, status: 'ready', order: 'engage', onGuard: false, hasCounteracted: false, movedThisActivation: false, x: map.cols - 3, y: Math.min(ey, map.rows - 2) });
     ey += 3;
   }
-
   return {
     turningPoint: 1, maxTurningPoints: 4,
     phase: 'setup', initiative: 'player', activeTeam: 'player',
     operatives, log: ['⚔️ Kill Team mission begins. Set up your board using the map above.'],
     map, objectiveControl: { 1: 'none', 2: 'none', 3: 'none', 4: 'none' },
-    playerScore: 0, enemyScore: 0,
+    playerScore: 0, enemyScore: 0, playerCP: 2, enemyCP: 2,
   };
 }
 
@@ -61,10 +64,13 @@ export function rollInitiative(state: GameState): GameState {
   const winner = pRoll >= eRoll ? 'player' : 'enemy';
   const log = [...state.log, `🎲 Initiative: You rolled ${pRoll}, Enemy rolled ${eRoll}. ${winner === 'player' ? 'You have' : 'Enemy has'} initiative.`];
 
-  // Reset activations
-  const operatives = state.operatives.map(o => o.status !== 'incapacitated' ? { ...o, activated: false, apLeft: o.op.apl, status: 'ready' as const } : o);
+  const operatives = state.operatives.map(o => o.status !== 'incapacitated' ? {
+    ...o, activated: false, apLeft: o.op.apl, status: 'ready' as const,
+    onGuard: false, hasCounteracted: false, movedThisActivation: false,
+  } : o);
 
-  return { ...state, initiative: winner, activeTeam: winner, phase: 'firefight', log, operatives };
+  return { ...state, initiative: winner, activeTeam: winner, phase: 'firefight', log, operatives,
+    playerCP: Math.min(state.playerCP + 1, 4), enemyCP: Math.min(state.enemyCP + 1, 4) };
 }
 
 export function resolveShoot(attacker: OpState, defender: OpState, weapon: Weapon, attackRolls: number[]): { hits: number; crits: number; normalDmg: number; critDmg: number; totalDmg: number; defSaves: number[]; log: string } {
@@ -214,4 +220,75 @@ export function checkTurnEnd(state: GameState): GameState {
   const nextHasReady = alive.some(o => o.team === nextTeam && !o.activated);
   if (!nextHasReady) return state;
   return { ...state, activeTeam: nextTeam };
+}
+
+// ─── CONCEALMENT ───
+export function canTarget(attacker: OpState, defender: OpState): { valid: boolean; reason?: string } {
+  if (defender.status === 'incapacitated') return { valid: false, reason: 'Incapacitated' };
+  if (defender.order === 'conceal') {
+    // Concealed operatives can only be targeted within 6" or from Vantage
+    const dist = Math.abs(attacker.x - defender.x) + Math.abs(attacker.y - defender.y);
+    if (dist > 6) return { valid: false, reason: 'Concealed (too far)' };
+  }
+  // Can't shoot while within 1" of enemy
+  return { valid: true };
+}
+
+// ─── STRATAGEMS ───
+export interface Stratagem {
+  id: string;
+  name: string;
+  cost: number;
+  phase: 'strategy' | 'firefight';
+  desc: string;
+  icon: string;
+}
+
+export const STRATAGEMS: Stratagem[] = [
+  { id: 'command_reroll', name: 'Command Re-roll', cost: 1, phase: 'firefight', desc: 'Re-roll one of your attack or defense dice.', icon: '🎲' },
+  { id: 'tactical_reposition', name: 'Tactical Reposition', cost: 1, phase: 'strategy', desc: 'One friendly operative with Conceal order can make a free Dash move.', icon: '🏃' },
+  { id: 'overwatch', name: 'Overwatch', cost: 1, phase: 'firefight', desc: 'After an enemy moves, one of your operatives on Guard can shoot at -1 to hit.', icon: '🎯' },
+  { id: 'inspiring_leader', name: 'Inspiring Leader', cost: 1, phase: 'strategy', desc: 'Your leader gives +1 APL to one nearby operative this turning point.', icon: '👑' },
+  { id: 'smoke_grenades', name: 'Smoke Grenades', cost: 1, phase: 'firefight', desc: 'Place smoke within 6" of an operative. Enemies shooting through it are -1 to hit.', icon: '💨' },
+];
+
+export function useStratagem(state: GameState, team: 'player' | 'enemy', stratagemId: string): GameState {
+  const strat = STRATAGEMS.find(s => s.id === stratagemId);
+  if (!strat) return state;
+  const cpKey = team === 'player' ? 'playerCP' : 'enemyCP';
+  if (state[cpKey] < strat.cost) return state;
+
+  let s = { ...state, [cpKey]: state[cpKey] - strat.cost };
+  const log = [...s.log];
+
+  switch (stratagemId) {
+    case 'command_reroll':
+      log.push(`🎲 ${team === 'player' ? 'You use' : 'Enemy uses'} Command Re-roll (1CP)`);
+      break;
+    case 'tactical_reposition': {
+      const concealed = s.operatives.filter(o => o.team === team && o.order === 'conceal' && o.status !== 'incapacitated');
+      if (concealed.length > 0) {
+        log.push(`🏃 ${team === 'player' ? 'You use' : 'Enemy uses'} Tactical Reposition — ${concealed[0].op.name} can Dash for free`);
+      }
+      break;
+    }
+    case 'inspiring_leader': {
+      const leader = s.operatives.find(o => o.team === team && o.op.role === 'leader' && o.status !== 'incapacitated');
+      if (leader) {
+        const nearby = s.operatives.filter(o => o.team === team && o !== leader && o.status !== 'incapacitated' && Math.abs(o.x - leader.x) + Math.abs(o.y - leader.y) <= 6);
+        if (nearby.length > 0) {
+          const ops = [...s.operatives];
+          const idx = ops.indexOf(nearby[0]);
+          ops[idx] = { ...ops[idx], apLeft: ops[idx].apLeft + 1 };
+          s = { ...s, operatives: ops };
+          log.push(`👑 ${team === 'player' ? 'You use' : 'Enemy uses'} Inspiring Leader — ${nearby[0].op.name} gains +1 APL`);
+        }
+      }
+      break;
+    }
+    default:
+      log.push(`${strat.icon} ${team === 'player' ? 'You use' : 'Enemy uses'} ${strat.name} (${strat.cost}CP)`);
+  }
+
+  return { ...s, log };
 }
