@@ -363,29 +363,19 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
           </div>{/* close position:relative */}
           </div>{/* close flex row */}
 
-          <div className="board-legend">
-            <span className="legend-item"><GoldIcon name="flag-player" size={18} /> Your deploy zone</span>
-            <span className="legend-item"><GoldIcon name="flag-enemy" size={18} /> Enemy deploy zone</span>
-            <span className="legend-item"><GoldIcon name="heavy-cover" size={18} /> Heavy cover (blocks LOS)</span>
-            <span className="legend-item"><GoldIcon name="light-cover" size={18} /> Light cover</span>
-            <span className="legend-item"><GoldIcon name="vantage" size={18} /> Vantage point</span>
-            <span className="legend-item"><GoldIcon name="objective" size={18} /> Objective</span>
-          </div>
-          <div className="board-legend">
-            <strong style={{ marginRight: 8 }}>Roles:</strong>
-            <span className="legend-item"><GoldIcon name="role-leader" size={18} /> Leader</span>
-            <span className="legend-item"><GoldIcon name="role-fighter" size={18} /> Fighter</span>
-            <span className="legend-item"><GoldIcon name="role-gunner" size={18} /> Gunner</span>
-            <span className="legend-item"><GoldIcon name="role-heavy" size={18} /> Heavy</span>
-            <span className="legend-item"><GoldIcon name="role-scout" size={18} /> Scout</span>
-            <span className="legend-item"><GoldIcon name="role-medic" size={18} /> Medic</span>
-          </div>
-          <div className="terrain-list">
-            <strong><GoldIcon name="models" size={14} /> Terrain to place on your board:</strong>
-            {game.map.terrain.map((t, i) => (
-              <span key={i} className="terrain-tag">{t.label} ({t.w}×{t.h}") at col {t.x}, row {t.y}</span>
-            ))}
-          </div>
+          <details className="board-legend-details">
+            <summary style={{ cursor: 'pointer', fontSize: '0.7rem', color: 'var(--text-dim)', padding: '6px 0' }}>Board Legend & Terrain</summary>
+            <div className="board-legend">
+              <span className="legend-item"><span style={{ display: 'inline-block', width: 10, height: 10, background: 'rgba(34,197,94,0.15)', borderRadius: 2 }} /> Deploy</span>
+              <span className="legend-item"><span style={{ display: 'inline-block', width: 10, height: 10, background: '#3a2e24', borderRadius: 2 }} /> Heavy</span>
+              <span className="legend-item"><span style={{ display: 'inline-block', width: 10, height: 10, background: '#242e34', borderRadius: 2 }} /> Light</span>
+              <span className="legend-item"><span style={{ display: 'inline-block', width: 10, height: 10, background: '#2a2240', borderRadius: 2 }} /> Vantage</span>
+              <span className="legend-item"><GoldIcon name="objective" size={12} /> Obj</span>
+            </div>
+            <div style={{ fontSize: '0.6rem', color: 'var(--text-dim)', marginTop: 4 }}>
+              {game.map.terrain.map((t, i) => <span key={i} style={{ marginRight: 8 }}>{t.label} ({t.x},{t.y})</span>)}
+            </div>
+          </details>
         </div>
       )}
 
