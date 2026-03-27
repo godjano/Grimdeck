@@ -60,11 +60,20 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Try to restore saved game
     if (storageKey) {
       try {
         const saved = localStorage.getItem(storageKey);
-        if (saved) { setGameRaw(JSON.parse(saved)); return; }
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          // Migrate old saves: add missing fields
+          parsed.playerCP ??= 2; parsed.enemyCP ??= 2;
+          parsed.operatives = parsed.operatives.map((o: any) => ({
+            ...o, order: o.order ?? 'engage', onGuard: o.onGuard ?? false,
+            hasCounteracted: o.hasCounteracted ?? false, movedThisActivation: o.movedThisActivation ?? false,
+          }));
+          setGameRaw(parsed);
+          return;
+        }
       } catch {}
     }
     const pOps = getRoster(playerFaction);
@@ -72,6 +81,15 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     const map = generateMap();
     setGameRaw(createGameState(pOps, eOps, map));
   }, [playerFaction, enemyFaction]);
+
+  const resetGame = () => {
+    if (storageKey) localStorage.removeItem(storageKey);
+    const pOps = getRoster(playerFaction);
+    const eOps = getRoster(enemyFaction);
+    const map = generateMap();
+    setGameRaw(createGameState(pOps, eOps, map));
+    setSelectedOpRaw(null); setActionMode('none');
+  };
 
   useEffect(() => {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -228,6 +246,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
         <div className={`status status-${game.activeTeam === 'player' ? 'painted' : 'unbuilt'}`}>
           {game.phase === 'setup' ? 'SETUP' : game.phase === 'end' ? 'GAME OVER' : `${game.activeTeam === 'player' ? 'YOUR' : 'ENEMY'} TURN`}
         </div>
+        <button className="btn btn-sm btn-ghost" onClick={resetGame} style={{ fontSize: '0.65rem', padding: '2px 8px' }} title="Restart this mission">↺</button>
       </div>
 
       {/* Flow Guide */}
