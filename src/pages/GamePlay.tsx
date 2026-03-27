@@ -344,21 +344,6 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
               );
             }))}
           </div>
-          {/* Terrain image overlays */}
-          {game.map.terrain.map((t, i) => {
-            const b = import.meta.env.BASE_URL;
-            const terrainImgs: Record<string, Record<string, string>> = {
-              heavy: { Ruins: 'terrain-ruins.jpg', Wall: 'terrain-wall.jpg', Building: 'terrain-building.jpg' },
-              light: { Barricade: 'terrain-barricade.jpg', Crates: 'terrain-crates.jpg', Pipes: 'terrain-pipes.jpg' },
-              vantage: { Tower: 'terrain-tower.jpg', Platform: 'terrain-platform.jpg' },
-            };
-            const src = terrainImgs[t.type]?.[t.label];
-            if (!src) return null;
-            return <img key={i} src={`${b}decor/${src}`} alt={t.label} style={{
-              position: 'absolute', left: `calc(${t.x} * var(--cell-size, 20px))`, top: `calc(${t.y} * var(--cell-size, 20px))`, width: `calc(${t.w} * var(--cell-size, 20px))`, height: `calc(${t.h} * var(--cell-size, 20px))`,
-              objectFit: 'cover', borderRadius: 2, opacity: 0.7, pointerEvents: 'none', zIndex: 1,
-            }} />;
-          })}
           </div>
           </div>{/* close position:relative */}
           </div>{/* close flex row */}
