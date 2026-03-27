@@ -3200,3 +3200,38 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .cell-movable:hover { background: rgba(46, 204, 113, 0.5) !important; animation: none !important; }
 .board-cell { width: var(--cell-size, 20px); height: var(--cell-size, 20px); }
 .board-op { width: calc(var(--cell-size, 20px) - 4px); height: calc(var(--cell-size, 20px) - 4px); }
+
+/* ═══ GAME SPLIT LAYOUT ═══ */
+.game-split { display: flex; flex-direction: column; gap: 16px; }
+@media (min-width: 900px) {
+  .game-split { flex-direction: row; align-items: flex-start; }
+  .game-left { flex: 1; min-width: 0; overflow-x: auto; }
+  .game-right { width: 300px; flex-shrink: 0; position: sticky; top: 70px; max-height: calc(100vh - 90px); overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+}
+.game-flow-guide { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; margin-bottom: 12px; font-size: 0.85rem; color: var(--gold); text-align: center; }
+.dice-display { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
+.dice-face { width: 32px; height: 32px; background: var(--surface2); color: var(--text-dim); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; border: 1px solid var(--border); }
+.dice-hit { background: var(--gold); color: #0a0a0e; }
+.dice-crit { border: 2px solid #2ecc71; }
+
+/* Mini roster sidebar */
+.game-roster-mini { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; }
+.roster-mini-item { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 6px; cursor: pointer; font-size: 0.78rem; transition: background 0.15s; }
+.roster-mini-item:hover { background: var(--surface2); }
+.roster-mini-item.active { background: rgba(196,149,42,0.15); outline: 1px solid var(--gold-dim); }
+.roster-mini-item.done { opacity: 0.4; }
+.roster-mini-item.enemy.active { background: rgba(192,57,43,0.15); outline: 1px solid #c0392b; }
+.roster-mini-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.roster-mini-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.roster-mini-hp { font-size: 0.65rem; color: var(--text-dim); }
+.roster-mini-ap { font-size: 0.65rem; color: var(--gold); font-weight: 600; }
+
+/* Active operative detail */
+.game-active-op { background: var(--surface); border: 1px solid var(--gold-dim); border-radius: var(--radius); padding: 10px; }
+
+/* Compact controls in sidebar */
+@media (min-width: 900px) {
+  .game-controls { padding: 14px; }
+  .action-buttons { flex-wrap: wrap; }
+  .action-buttons .btn { font-size: 0.78rem; padding: 5px 10px; }
+}

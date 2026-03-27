@@ -188,40 +188,45 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     return Math.abs(x - activeOp.x) + Math.abs(y - activeOp.y) <= moveRange;
   };
 
+  // Compact operative list for sidebar
+  const readyPlayerOps = playerOps.filter(o => o.status !== 'incapacitated');
+  const readyEnemyOps = enemyOps.filter(o => o.status !== 'incapacitated');
+
   return (
     <div>
       {/* Header */}
       <div className="game-header">
         <div>TP {game.turningPoint}/{game.maxTurningPoints}</div>
         <div><GoldIcon name={difficulty === 'easy' ? 'shield-check' : difficulty === 'normal' ? 'crosshair' : 'flame-skull'} size={14} /> {AI_CONFIGS[difficulty].name}</div>
-        <div>Score: You {game.playerScore} - {game.enemyScore} Enemy</div>
+        <div>You {game.playerScore} - {game.enemyScore} Enemy</div>
         <div className={`status status-${game.activeTeam === 'player' ? 'painted' : 'unbuilt'}`}>
           {game.phase === 'setup' ? 'SETUP' : game.phase === 'end' ? 'GAME OVER' : `${game.activeTeam === 'player' ? 'YOUR' : 'ENEMY'} TURN`}
         </div>
       </div>
 
       {/* Flow Guide */}
-      <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 14px', marginBottom: 12, fontSize: '0.85rem', color: 'var(--gold)', textAlign: 'center' }}>
-        {getFlowGuide()}
-      </div>
+      <div className="game-flow-guide">{getFlowGuide()}</div>
 
       {/* Dice Roll Display */}
       {lastDiceRoll && (
-        <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 10 }}>
+        <div className="dice-display">
           {lastDiceRoll.map((d, i) => (
-            <div key={i} style={{ width: 32, height: 32, background: d >= 4 ? 'var(--gold)' : 'var(--surface2)', color: d >= 4 ? '#0a0a0e' : 'var(--text-dim)', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.9rem', border: d === 6 ? '2px solid #2ecc71' : '1px solid var(--border)' }}>{d}</div>
+            <div key={i} className={`dice-face ${d >= 4 ? 'dice-hit' : ''} ${d === 6 ? 'dice-crit' : ''}`}>{d}</div>
           ))}
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="game-tabs">
-        {(['board', 'your', 'enemy', 'rules'] as const).map(t => (
-          <button key={t} className={`game-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
-            {t === 'board' ? <><GoldIcon name="scroll" size={14} /> Board</> : t === 'your' ? <><GoldIcon name="shield-check" size={14} /> Your Team</> : t === 'enemy' ? <><GoldIcon name="skull-bones" size={14} /> Enemy</> : <><GoldIcon name="guides" size={14} /> Rules</>}
-          </button>
-        ))}
-      </div>
+      {/* ═══ SPLIT LAYOUT: Board left, Controls right ═══ */}
+      <div className="game-split">
+        {/* LEFT: Board + Log */}
+        <div className="game-left">
+          <div className="game-tabs">
+            {(['board', 'your', 'enemy', 'rules'] as const).map(t => (
+              <button key={t} className={`game-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
+                {t === 'board' ? 'Board' : t === 'your' ? 'Your Team' : t === 'enemy' ? 'Enemy' : 'Rules'}
+              </button>
+            ))}
+          </div>
 
       {/* Board Tab */}
       {tab === 'board' && (
@@ -389,10 +394,55 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
       {/* Rules Tab */}
       {tab === 'rules' && <RulesReference />}
 
-      {/* Action Log */}
-      <div className="action-log" ref={logRef}>
-        {game.log.map((l, i) => <div key={i} className="log-line">{l}</div>)}
-      </div>
+          {/* Action Log (compact) */}
+          <div className="action-log" ref={logRef} style={{ maxHeight: 150 }}>
+            {game.log.slice(-20).map((l, i) => <div key={i} className="log-line">{l}</div>)}
+          </div>
+        </div>{/* end game-left */}
+
+        {/* RIGHT: Controls + Operative sidebar */}
+        <div className="game-right">
+          {/* Quick roster */}
+          <div className="game-roster-mini">
+            <div style={{ fontSize: '0.72rem', color: 'var(--gold)', fontWeight: 600, marginBottom: 6 }}>YOUR TEAM</div>
+            {readyPlayerOps.map(o => {
+              const idx = game.operatives.indexOf(o);
+              return (
+                <div key={idx} className={`roster-mini-item ${selectedOp === idx ? 'active' : ''} ${o.activated ? 'done' : ''}`} onClick={() => setSelectedOp(idx)}>
+                  <span className="roster-mini-dot" style={{ background: getOpColor('player', o.op.role) }} />
+                  <span className="roster-mini-name">{o.op.name}</span>
+                  <span className="roster-mini-hp">{o.currentWounds}W</span>
+                  <span className="roster-mini-ap">{o.activated ? '✓' : `${o.apLeft}AP`}</span>
+                </div>
+              );
+            })}
+            <div style={{ fontSize: '0.72rem', color: '#c0392b', fontWeight: 600, margin: '8px 0 6px' }}>ENEMY</div>
+            {readyEnemyOps.map(o => {
+              const idx = game.operatives.indexOf(o);
+              return (
+                <div key={idx} className={`roster-mini-item enemy ${selectedTarget === idx ? 'active' : ''}`} onClick={() => setSelectedTarget(idx)}>
+                  <span className="roster-mini-dot" style={{ background: getOpColor('enemy', o.op.role) }} />
+                  <span className="roster-mini-name">{o.op.name}</span>
+                  <span className="roster-mini-hp">{o.currentWounds}W</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Selected operative detail */}
+          {activeOp && activeOp.team === 'player' && !activeOp.activated && (
+            <div className="game-active-op">
+              <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--gold)' }}>{activeOp.op.name}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{activeOp.op.role} · {activeOp.currentWounds}/{activeOp.op.wounds}W · {activeOp.apLeft}AP left</div>
+              <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
+                {activeOp.op.weapons.map(w => (
+                  <span key={w.name} style={{ fontSize: '0.65rem', background: 'var(--surface2)', padding: '2px 6px', borderRadius: 4, color: 'var(--text-secondary)' }}>
+                    {w.type === 'ranged' ? '🔫' : '⚔️'} {w.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
       {/* Controls */}
       <div className="game-controls">
@@ -504,10 +554,12 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
 
         {game.phase === 'end' && (
           <button className="btn btn-primary" onClick={endGame}>
-            {game.playerScore > game.enemyScore ? '<GoldIcon name="victory" size={16} /> Claim Victory' : game.playerScore < game.enemyScore ? '<GoldIcon name="defeat" size={16} /> Accept Defeat' : '<GoldIcon name="handshake" size={16} /> Accept Draw'} →
+            {game.playerScore > game.enemyScore ? 'Claim Victory →' : game.playerScore < game.enemyScore ? 'Accept Defeat →' : 'Accept Draw →'}
           </button>
         )}
       </div>
+        </div>{/* end game-right */}
+      </div>{/* end game-split */}
     </div>
   );
 }
