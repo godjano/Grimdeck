@@ -15,10 +15,12 @@ interface Props {
   enemyFaction: string;
   difficulty?: AIDifficulty;
   saveKey?: string;
+  missionTitle?: string;
+  missionObjective?: string;
   onGameEnd: (result: 'win' | 'loss' | 'draw', pCasualties: number, eCasualties: number) => void;
 }
 
-export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'normal', saveKey, onGameEnd }: Props) {
+export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'normal', saveKey, missionTitle, missionObjective, onGameEnd }: Props) {
   const [game, setGameRaw] = useState<GameState | null>(null);
 
   // Persist game state
@@ -206,6 +208,14 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
 
       {/* Flow Guide */}
       <div className="game-flow-guide">{getFlowGuide()}</div>
+
+      {/* Mission Objective Bar */}
+      {missionTitle && (
+        <div className="game-mission-bar">
+          <div className="game-mission-title"><GoldIcon name="scroll" size={14} /> {missionTitle}</div>
+          {missionObjective && <div className="game-mission-obj">🎯 {missionObjective}</div>}
+        </div>
+      )}
 
       {/* Dice Roll Display */}
       {lastDiceRoll && (

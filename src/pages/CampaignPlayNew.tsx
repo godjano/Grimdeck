@@ -34,6 +34,8 @@ export default function CampaignPlay() {
         enemyFaction={campaign.enemyFaction}
         difficulty={difficulty}
         saveKey={`campaign_${campaignId}_${campaign.currentNodeId}`}
+        missionTitle={mission?.title}
+        missionObjective={mission?.objectiveText}
         onGameEnd={async (result, pCasualties, eCasualties) => {
           const outcome = result === 'draw' ? 'loss' : result;
           const narrative = fillNarrative(
