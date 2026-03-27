@@ -547,23 +547,37 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                   <div className="action-input">
                     <label>Select weapon:</label>
                     <div className="action-buttons">
-                      {activeOp.op.weapons.filter(w => w.type === 'ranged').map(w => (
-                        <button key={w.name} className={`btn btn-sm ${selectedWeapon === w ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSelectedWeapon(w)}>
-                          {w.name} ({w.attacks}A, {w.skill}+, {w.normalDmg}/{w.critDmg}dmg)
-                        </button>
-                      ))}
+                      {activeOp.op.weapons.filter(w => w.type === 'ranged').map(w => {
+                        const isHeavy = w.special?.includes('Heavy');
+                        const cantUse = isHeavy && activeOp.movedThisActivation;
+                        return (
+                          <button key={w.name} className={`btn btn-sm ${selectedWeapon === w ? 'btn-primary' : 'btn-ghost'}`} onClick={() => !cantUse && setSelectedWeapon(w)} disabled={cantUse}
+                            title={cantUse ? 'Heavy: cannot shoot after moving' : ''}>
+                            {w.name} ({w.attacks}A, {w.skill}+, {w.normalDmg}/{w.critDmg}dmg{w.range ? `, ${w.range}"` : ''}{isHeavy ? ', Heavy' : ''})
+                          </button>
+                        );
+                      })}
                     </div>
-                    {selectedWeapon && (
-                      <>
-                        <div className="dice-helper">
-                          🎲 Hit chance: {formatProbability(selectedWeapon.skill)} per die · Expected: {expectedHits(selectedWeapon.attacks, selectedWeapon.skill).toFixed(1)} hits · ~{expectedDamage(selectedWeapon.attacks, selectedWeapon.skill, selectedWeapon.normalDmg, selectedWeapon.critDmg).toFixed(1)} dmg
-                        </div>
-                        <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>{selectedTarget !== null ? `Target: ${game.operatives[selectedTarget].op.name}` : 'Tap an enemy on the board to target'}</p>
-                        <button className="btn btn-primary" onClick={doPlayerShoot} disabled={selectedTarget === null}>
-                          🎲 Fire! (auto-roll {selectedWeapon.attacks} dice)
-                        </button>
-                      </>
-                    )}
+                    {selectedWeapon && (() => {
+                      const targetOp = selectedTarget !== null ? game.operatives[selectedTarget] : null;
+                      const dist = targetOp ? Math.abs(activeOp.x - targetOp.x) + Math.abs(activeOp.y - targetOp.y) : null;
+                      const inRange = !selectedWeapon.range || (dist !== null && dist <= selectedWeapon.range);
+                      const targetConcealed = targetOp && targetOp.order === 'conceal' && dist !== null && dist > 6;
+                      return (
+                        <>
+                          <div className="dice-helper">
+                            🎲 Hit: {formatProbability(selectedWeapon.skill)}/die · Expected: {expectedHits(selectedWeapon.attacks, selectedWeapon.skill).toFixed(1)} hits · ~{expectedDamage(selectedWeapon.attacks, selectedWeapon.skill, selectedWeapon.normalDmg, selectedWeapon.critDmg).toFixed(1)} dmg
+                            {selectedWeapon.range && <span> · Range: {selectedWeapon.range}"</span>}
+                          </div>
+                          <p style={{ fontSize: '0.82rem', color: 'var(--text-dim)' }}>
+                            {targetOp ? <>Target: {targetOp.op.name} ({dist}" away){!inRange && <span style={{ color: '#c0392b' }}> — OUT OF RANGE</span>}{targetConcealed && <span style={{ color: '#3498db' }}> — CONCEALED</span>}</> : 'Tap an enemy on the board to target'}
+                          </p>
+                          <button className="btn btn-primary" onClick={doPlayerShoot} disabled={selectedTarget === null || !inRange || !!targetConcealed}>
+                            🎲 Fire! (auto-roll {selectedWeapon.attacks} dice)
+                          </button>
+                        </>
+                      );
+                    })()}
                   </div>
                 )}
 

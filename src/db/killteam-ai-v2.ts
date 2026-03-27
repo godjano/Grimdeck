@@ -121,13 +121,21 @@ export function aiActivationV2(state: GameState, difficulty: AIDifficulty): Game
       s = applyDamage(s, opIdx, result.defDmg);
       apUsed += 2;
     } else if (rangedWeapon && target) {
-      // Shoot if can't reach melee
-      let rolls = rollDice(rangedWeapon.attacks);
-      rolls = applyRerolls(rolls, rangedWeapon.skill, config.rerolls);
-      const result = resolveShoot(op, target, rangedWeapon, rolls);
-      log.push(`→ SHOOT: ${result.log}`);
-      const eIdx = s.operatives.indexOf(target);
-      if (eIdx >= 0) s = applyDamage(s, eIdx, result.totalDmg);
+      // Shoot if can't reach melee — check range
+      const shootDist = distance(op, target);
+      if (!rangedWeapon.range || shootDist <= rangedWeapon.range) {
+        let rolls = rollDice(rangedWeapon.attacks);
+        rolls = applyRerolls(rolls, rangedWeapon.skill, config.rerolls);
+        const result = resolveShoot(op, target, rangedWeapon, rolls);
+        log.push(`→ SHOOT: ${result.log}`);
+        const eIdx = s.operatives.indexOf(target);
+        if (eIdx >= 0) s = applyDamage(s, eIdx, result.totalDmg);
+      } else {
+        // Move closer if out of range
+        const move = moveToward(op, target.x, target.y, op.op.movement);
+        log.push(`→ MOVE: Advances toward ${target.op.name} (out of range)`);
+        op.x = move.x; op.y = move.y;
+      }
       apUsed++;
     }
   } else if (shouldObjective) {
@@ -140,7 +148,7 @@ export function aiActivationV2(state: GameState, difficulty: AIDifficulty): Game
       apUsed++;
     }
     // Shoot if possible
-    if (target && rangedWeapon) {
+    if (target && rangedWeapon && (!rangedWeapon.range || distance(op, target) <= rangedWeapon.range)) {
       let rolls = rollDice(rangedWeapon.attacks);
       rolls = applyRerolls(rolls, rangedWeapon.skill, config.rerolls);
       const result = resolveShoot(op, target, rangedWeapon, rolls);
@@ -150,7 +158,7 @@ export function aiActivationV2(state: GameState, difficulty: AIDifficulty): Game
       apUsed++;
     }
     // Second shot on hard
-    if (apUsed < op.op.apl && target && rangedWeapon && difficulty === 'hard') {
+    if (apUsed < op.op.apl && target && rangedWeapon && (!rangedWeapon.range || distance(op, target) <= rangedWeapon.range) && difficulty === 'hard') {
       let rolls = rollDice(rangedWeapon.attacks);
       rolls = applyRerolls(rolls, rangedWeapon.skill, config.rerolls);
       const result = resolveShoot(op, target, rangedWeapon, rolls);
@@ -160,7 +168,7 @@ export function aiActivationV2(state: GameState, difficulty: AIDifficulty): Game
     }
   } else {
     // Defensive / default
-    if (target && rangedWeapon) {
+    if (target && rangedWeapon && (!rangedWeapon.range || distance(op, target) <= rangedWeapon.range)) {
       let rolls = rollDice(rangedWeapon.attacks);
       rolls = applyRerolls(rolls, rangedWeapon.skill, config.rerolls);
       const result = resolveShoot(op, target, rangedWeapon, rolls);
