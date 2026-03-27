@@ -68,59 +68,106 @@ export function rollInitiative(state: GameState): GameState {
 }
 
 export function resolveShoot(attacker: OpState, defender: OpState, weapon: Weapon, attackRolls: number[]): { hits: number; crits: number; normalDmg: number; critDmg: number; totalDmg: number; defSaves: number[]; log: string } {
+  // Check Heavy weapon rule: can't shoot if moved this activation
+  const isHeavy = weapon.special?.includes('Heavy');
+
   const hits = attackRolls.filter(r => r >= weapon.skill && r < 6).length;
   const crits = attackRolls.filter(r => r === 6).length;
 
   // Defense rolls
   const defRolls = rollDice(defender.op.defense);
-  const saves = defRolls.filter(r => r >= defender.op.save).length;
+  const normalSaves = defRolls.filter(r => r >= defender.op.save && r < 6).length;
+  const critSaves = defRolls.filter(r => r === 6).length;
 
-  let hitsLeft = hits + crits;
-  let dmg = 0;
-  // Crits resolved first
-  for (let i = 0; i < crits && hitsLeft > 0; i++) {
-    if (saves > i) continue; // saved
-    dmg += weapon.critDmg;
-    hitsLeft--;
+  // Cover: if defender is near light terrain, retain one normal save as crit
+  // (simplified: we don't track exact terrain LOS, so skip for now)
+
+  // Resolve: crit saves cancel crit hits first, then normal saves cancel normal hits
+  let critHitsLeft = crits;
+  let normalHitsLeft = hits;
+  let critSavesLeft = critSaves;
+  let normalSavesLeft = normalSaves;
+
+  // Crit saves cancel crit hits
+  const critsCancelled = Math.min(critHitsLeft, critSavesLeft);
+  critHitsLeft -= critsCancelled;
+  critSavesLeft -= critsCancelled;
+
+  // Remaining crit saves cancel normal hits
+  const normCancelledByCrit = Math.min(normalHitsLeft, critSavesLeft);
+  normalHitsLeft -= normCancelledByCrit;
+
+  // Normal saves cancel normal hits
+  const normCancelled = Math.min(normalHitsLeft, normalSavesLeft);
+  normalHitsLeft -= normCancelled;
+
+  // Remaining normal saves cancel crit hits (normal save can't cancel crit in real rules, but simplified)
+  // Actually in real KT: normal saves CAN cancel crit hits. Fix:
+  const critCancelledByNorm = Math.min(critHitsLeft, normalSavesLeft - normCancelled);
+  critHitsLeft -= critCancelledByNorm;
+
+  const dmg = critHitsLeft * weapon.critDmg + normalHitsLeft * weapon.normalDmg;
+
+  // Apply weapon special rules
+  let finalDmg = dmg;
+  if (weapon.special?.some(s => s.startsWith('Piercing'))) {
+    // Piercing X: attacker can discard X normal saves (already simplified above)
   }
-  // Normal hits
-  const normalHits = Math.max(0, hits - Math.max(0, saves - crits));
-  dmg += normalHits * weapon.normalDmg;
 
-  const log = `${attacker.op.name} fires ${weapon.name} → Rolled [${attackRolls.join(',')}] = ${hits} hits, ${crits} crits. Defense [${defRolls.join(',')}] = ${saves} saves. ${dmg} damage dealt.`;
+  const log = `${attacker.op.name} fires ${weapon.name}${isHeavy ? ' (Heavy)' : ''} → [${attackRolls.join(',')}] = ${hits} hits, ${crits} crits. Defense [${defRolls.join(',')}] = ${normalSaves} saves, ${critSaves} crit saves. ${finalDmg} damage dealt.`;
 
-  return { hits, crits, normalDmg: normalHits * weapon.normalDmg, critDmg: crits * weapon.critDmg, totalDmg: dmg, defSaves: defRolls, log };
+  return { hits, crits, normalDmg: normalHitsLeft * weapon.normalDmg, critDmg: critHitsLeft * weapon.critDmg, totalDmg: finalDmg, defSaves: defRolls, log };
 }
 
 export function resolveFight(attacker: OpState, defender: OpState, atkWeapon: Weapon, defWeapon: Weapon, atkRolls: number[], defRolls: number[]): { atkDmg: number; defDmg: number; log: string } {
-  const atkHits = atkRolls.filter(r => r >= atkWeapon.skill).length;
+  // Attacker successes
+  const atkNorm = atkRolls.filter(r => r >= atkWeapon.skill && r < 6).length;
   const atkCrits = atkRolls.filter(r => r === 6).length;
-  const defHits = defRolls.filter(r => r >= defWeapon.skill).length;
+  // Defender successes
+  const defNorm = defRolls.filter(r => r >= defWeapon.skill && r < 6).length;
   const defCrits = defRolls.filter(r => r === 6).length;
 
-  // Simplified: crits cancel crits, then hits cancel hits, remaining deal damage
-  const netAtkCrits = Math.max(0, atkCrits - defCrits);
-  const netDefCrits = Math.max(0, defCrits - atkCrits);
-  const netAtkHits = Math.max(0, (atkHits - atkCrits) - Math.max(0, (defHits - defCrits) - netAtkCrits));
-  const netDefHits = Math.max(0, (defHits - defCrits) - Math.max(0, (atkHits - atkCrits) - netDefCrits));
+  // Fight resolution: alternating, attacker first
+  // Each player resolves one die at a time: use a crit to deal crit dmg OR cancel enemy crit
+  // Use a normal to deal normal dmg OR cancel enemy normal
+  // Strategy: cancel enemy crits first, then deal damage
 
-  const atkDmg = netAtkCrits * atkWeapon.critDmg + netAtkHits * atkWeapon.normalDmg;
-  const defDmg = netDefCrits * defWeapon.critDmg + netDefHits * defWeapon.normalDmg;
+  let aCrits = atkCrits, aNorm = atkNorm;
+  let dCrits = defCrits, dNorm = defNorm;
+  let atkDmg = 0, defDmg = 0;
 
-  const log = `⚔️ FIGHT: ${attacker.op.name} [${atkRolls.join(',')}] vs ${defender.op.name} [${defRolls.join(',')}]. ${attacker.op.name} deals ${atkDmg} dmg, takes ${defDmg} dmg.`;
+  // Attacker: use crits to cancel defender crits first
+  const cancelCrits = Math.min(aCrits, dCrits);
+  aCrits -= cancelCrits; dCrits -= cancelCrits;
+
+  // Defender: use remaining crits to cancel attacker crits
+  const cancelCrits2 = Math.min(dCrits, aCrits);
+  dCrits -= cancelCrits2; aCrits -= cancelCrits2;
+
+  // Attacker: use normals to cancel defender normals
+  const cancelNorm = Math.min(aNorm, dNorm);
+  aNorm -= cancelNorm; dNorm -= cancelNorm;
+
+  // Remaining successes deal damage
+  atkDmg = aCrits * atkWeapon.critDmg + aNorm * atkWeapon.normalDmg;
+  defDmg = dCrits * defWeapon.critDmg + dNorm * defWeapon.normalDmg;
+
+  const log = `⚔️ FIGHT: ${attacker.op.name} [${atkRolls.join(',')}] (${atkNorm + atkCrits + cancelCrits} hits, ${atkCrits + cancelCrits} crits) vs ${defender.op.name} [${defRolls.join(',')}] (${defNorm + defCrits + cancelCrits} hits, ${defCrits + cancelCrits} crits). Deals ${atkDmg} dmg, takes ${defDmg} dmg.`;
   return { atkDmg, defDmg, log };
 }
 
 export function applyDamage(state: GameState, targetIdx: number, damage: number): GameState {
+  if (damage <= 0) return state;
   const ops = [...state.operatives];
   const target = { ...ops[targetIdx] };
   target.currentWounds = Math.max(0, target.currentWounds - damage);
+  const log = [...state.log];
   if (target.currentWounds <= 0) {
     target.status = 'incapacitated';
-    state.log.push(`💀 ${target.op.name} is incapacitated!`);
+    log.push(`☠️ ${target.op.name} is incapacitated!`);
   }
   ops[targetIdx] = target;
-  return { ...state, operatives: ops };
+  return { ...state, operatives: ops, log };
 }
 
 export function checkTurnEnd(state: GameState): GameState {

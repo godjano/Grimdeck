@@ -611,18 +611,19 @@ function OpCard({ op, selected, onSelect }: { op: OpState; idx: number; selected
 function RulesReference() {
   return (
     <div className="rules-ref">
-      <h3><GoldIcon name="guides" size={18} /> Kill Team Quick Reference</h3>
+      <h3><GoldIcon name="guides" size={18} /> Kill Team Quick Reference (Feb '26 Errata)</h3>
 
       <h4>Turn Sequence</h4>
       <ol>
-        <li><strong>Initiative Phase</strong> — Both players roll off. Winner chooses who activates first.</li>
-        <li><strong>Firefight Phase</strong> — Players alternate activating one operative each. Each operative has APL (Action Point Limit) to spend on actions.</li>
+        <li><strong>Initiative Phase</strong> — Both players roll off. Winner chooses who activates first. The player who had initiative resolves any simultaneous rules first.</li>
+        <li><strong>Strategy Phase</strong> — Use strategic ploys (not implemented in solo mode).</li>
+        <li><strong>Firefight Phase</strong> — Players alternate activating one operative each. Each operative has APL to spend on actions.</li>
       </ol>
 
       <h4>Actions (cost in AP)</h4>
       <ul>
-        <li><strong>Move (1AP)</strong> — Move up to M inches. Can't move through enemies or heavy terrain.</li>
-        <li><strong>Shoot (1AP)</strong> — Pick a ranged weapon and a visible target. Roll attack dice.</li>
+        <li><strong>Move (1AP)</strong> — Move up to M inches. Can't move through enemies or Heavy terrain. Accessible terrain costs extra movement.</li>
+        <li><strong>Shoot (1AP)</strong> — Pick a ranged weapon and a visible target. Roll attack dice. Cannot shoot if within control range of enemy (1") unless rules allow it.</li>
         <li><strong>Fight (2AP)</strong> — Must be within 1" of enemy. Both players roll simultaneously.</li>
         <li><strong>Dash (1AP)</strong> — Move up to M inches (second move).</li>
         <li><strong>Charge (1AP)</strong> — Move up to M, must end within 1" of enemy. Enables Fight.</li>
@@ -631,46 +632,52 @@ function RulesReference() {
 
       <h4>Shooting Sequence</h4>
       <ol>
-        <li><strong>Roll attack dice</strong> — number of dice = weapon's A (Attacks) stat.</li>
-        <li><strong>Check hits</strong> — each die ≥ weapon's BS/WS skill = normal hit. Die = 6 = critical hit.</li>
-        <li><strong>Defender rolls saves</strong> — rolls DF (Defence) dice. Each ≥ Save stat = one save.</li>
-        <li><strong>Resolve damage</strong> — saves cancel hits (crits cancel crits first, then normal). Remaining hits deal damage.</li>
-        <li>Normal hits deal normal damage. Critical hits deal crit damage.</li>
+        <li><strong>Select valid target</strong> — must be visible and not obscured by Heavy terrain. Cannot shoot while within 1" of enemy.</li>
+        <li><strong>Roll attack dice</strong> — number of dice = weapon's A stat.</li>
+        <li><strong>Check hits</strong> — each die ≥ weapon's Hit stat = normal hit. Die = 6 = critical hit.</li>
+        <li><strong>Defender rolls saves</strong> — rolls Defence dice. Each ≥ Save stat = normal save. Die = 6 = critical save.</li>
+        <li><strong>Resolve saves</strong> — Critical saves cancel critical hits first, then normal hits. Normal saves cancel normal hits, then critical hits.</li>
+        <li><strong>Deal damage</strong> — remaining crits deal crit damage, remaining normals deal normal damage. Successes resolve simultaneously.</li>
       </ol>
+      <div className="rules-example"><strong>Heavy weapon rule:</strong> Cannot shoot if the operative moved this activation, and cannot move after shooting with a Heavy weapon.</div>
+      <div className="rules-example"><strong>Severe weapon rule:</strong> Devastating and Piercing Crits still take effect, but Punishing and Rending don't.</div>
 
-      <h4><GoldIcon name="fist2" size={16} /> Fighting Sequence (Melee Combat)</h4>
+      <h4><GoldIcon name="fist2" size={16} /> Fighting Sequence (Melee)</h4>
       <ol>
-        <li><strong>Both players roll simultaneously</strong> — attacker rolls their melee weapon's A dice, defender rolls their melee weapon's A dice.</li>
-        <li><strong>Check successes</strong> — each die ≥ weapon's WS = success. Die = 6 = critical success.</li>
-        <li><strong>Resolve strikes</strong> — starting with the attacker:
+        <li><strong>Both roll simultaneously</strong> — attacker and defender each roll their melee weapon's A dice.</li>
+        <li><strong>Check successes</strong> — die ≥ weapon's WS = normal success. Die = 6 = critical success.</li>
+        <li><strong>Resolve alternating</strong> — attacker resolves one die first, then defender, alternating:
           <ul>
-            <li>A <strong>critical</strong> can: deal crit damage to the enemy, OR cancel one of the enemy's crits.</li>
-            <li>A <strong>normal hit</strong> can: deal normal damage to the enemy, OR cancel one of the enemy's normal hits.</li>
+            <li>A <strong>critical</strong> can: deal crit damage OR cancel one enemy critical.</li>
+            <li>A <strong>normal</strong> can: deal normal damage OR cancel one enemy normal.</li>
           </ul>
         </li>
-        <li><strong>Alternate</strong> — attacker resolves one die, then defender resolves one die, back and forth until all dice are resolved.</li>
-        <li><strong>Strategy</strong> — you choose whether to deal damage or cancel enemy hits. Cancel their crits first to survive!</li>
+        <li><strong>Strategy tip</strong> — cancel enemy crits first to survive, then deal damage with remaining dice.</li>
       </ol>
-      <div className="rules-example">
-        <strong>Example:</strong> Your operative (4A, 3+, 3/5dmg) fights an Ork (4A, 3+, 4/5dmg).<br/>
-        You roll: 3, 5, 6, 2 → 2 normal hits + 1 crit.<br/>
-        Ork rolls: 4, 3, 6, 1 → 2 normal hits + 1 crit.<br/>
-        You go first: Use your crit to cancel the Ork's crit (smart!). Then deal 3 dmg with a normal hit. Then deal 3 dmg with your other normal hit.<br/>
-        Ork responds: Deals 4 dmg with a normal hit. Deals 4 dmg with the other normal hit.<br/>
-        Result: You dealt 6 damage, Ork dealt 8 damage. Both take wounds.
-      </div>
 
-      <h4>Cover</h4>
+      <h4>Counteract (Feb '26 Errata)</h4>
       <ul>
-        <li><strong>Light Cover</strong> — Defender retains one normal save as a crit.</li>
-        <li><strong>Heavy Cover</strong> — Blocks line of sight. Can't shoot through it.</li>
-        <li><strong>Vantage Point</strong> — Ignores light cover when shooting down.</li>
+        <li>After an enemy activates, you can select an expended friendly operative with Engage order to perform a 1AP action (excluding Guard) for free.</li>
+        <li>Each operative can only counteract <strong>once per turning point</strong>.</li>
+        <li>Cannot move more than 2" while counteracting. Accessible terrain affects this distance.</li>
       </ul>
 
-      <h4>Injury</h4>
+      <h4>Cover & Terrain</h4>
       <ul>
-        <li>When wounds reach 0, operative is <strong>incapacitated</strong> (removed).</li>
-        <li>Excess damage is lost — no overkill carry-over.</li>
+        <li><strong>Light Cover</strong> — Defender retains one normal save as a critical save.</li>
+        <li><strong>Heavy Cover</strong> — Blocks line of sight. Cannot shoot through it.</li>
+        <li><strong>Vantage Point</strong> — Ignores light cover when shooting down. Heavy terrain connected to Vantage terrain is not ignored for obscured.</li>
+        <li><strong>Accessible</strong> — Costs extra movement to traverse. Operatives cannot normally move through Accessible terrain during a counteraction.</li>
+        <li><strong>Ceiling</strong> — Operatives with 50mm or smaller base can move underneath regardless of height.</li>
+        <li><strong>Jumping</strong> — From Vantage terrain higher than 2", can jump up to 4" horizontally, then must drop or climb.</li>
+        <li>An operative <strong>cannot be in cover and obscured</strong> from the same terrain feature — defender must choose one.</li>
+      </ul>
+
+      <h4>Incapacitation</h4>
+      <ul>
+        <li>When wounds reach 0, operative is <strong>incapacitated</strong> and removed.</li>
+        <li>Some rules allow a free action before removal (max one free action, excluding Place Marker).</li>
+        <li>Excess damage is lost.</li>
       </ul>
 
       <h4>Scoring</h4>
@@ -678,6 +685,15 @@ function RulesReference() {
         <li>At end of each Turning Point, check objective control.</li>
         <li>Operative controls objective if within 2" and has more APL than enemies nearby.</li>
         <li>1 VP per controlled objective per turning point.</li>
+        <li>If carrying a mission/objective marker, that marker is the same distance as the operative.</li>
+      </ul>
+
+      <h4>Key Errata Notes</h4>
+      <ul>
+        <li>A dice can only be retained/re-rolled <strong>once</strong>.</li>
+        <li>Auto-retained dice (e.g. cover, Accurate) cannot be re-rolled and have no numerical result.</li>
+        <li>If an operative's stats change during an action, apply after the action completes. Weapon rule changes apply immediately.</li>
+        <li>Guard: operative is no longer on guard after counteracting.</li>
       </ul>
     </div>
   );
