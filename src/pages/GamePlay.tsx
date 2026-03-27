@@ -30,7 +30,23 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     if (s && storageKey) try { localStorage.setItem(storageKey, JSON.stringify(s)); } catch {}
   };
 
-  const [selectedOp, setSelectedOp] = useState<number | null>(null);
+  const [selectedOp, setSelectedOpRaw] = useState<number | null>(null);
+
+  // When switching operatives, auto-end the previous one
+  const setSelectedOp = (idx: number | null) => {
+    if (game && selectedOp !== null && selectedOp !== idx) {
+      const prev = game.operatives[selectedOp];
+      if (prev && !prev.activated && prev.apLeft < prev.op.apl && prev.status !== 'incapacitated') {
+        // Previous operative was mid-activation — end them
+        const ops = [...game.operatives];
+        ops[selectedOp] = { ...ops[selectedOp], activated: true, apLeft: 0, status: 'activated' as any };
+        const s = checkTurnEnd({ ...game, operatives: ops, log: [...game.log, `✓ ${prev.op.name} ends activation (auto).`] });
+        setGame(s);
+      }
+    }
+    setSelectedOpRaw(idx);
+    setActionMode('none');
+  };
   const [selectedTarget, setSelectedTarget] = useState<number | null>(null);
   const [selectedWeapon, setSelectedWeapon] = useState<Weapon | null>(null);
   const [actionMode, setActionMode] = useState<'none' | 'move' | 'shoot' | 'fight'>('none');
