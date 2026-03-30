@@ -238,7 +238,7 @@ function getFactionArt(faction: string): string | null {
   return null;
 }
 
-type Tab = 'stats' | 'recipe' | 'journal' | 'inspiration';
+type Tab = 'stats' | 'recipe' | 'journal' | 'inspiration' | 'compare';
 
 export default function ModelDetail() {
   const { id } = useParams();
@@ -342,6 +342,7 @@ export default function ModelDetail() {
     { key: 'recipe', label: 'Recipe', icon: <GoldIcon name="paints" size={18} /> , count: linkedPaints.length },
     { key: 'journal', label: 'Journal', icon: <GoldIcon name="guides" size={18} />, count: logs.length },
     { key: 'inspiration', label: 'Inspo', icon: <GoldIcon name="inspiration" size={18} /> },
+    { key: 'compare', label: 'Compare', icon: <GoldIcon name="lens" size={18} /> },
   ];
 
   return (
@@ -596,6 +597,47 @@ export default function ModelDetail() {
             <h3 className="md-section-title"><Image size={16} /> Inspiration Board</h3>
             <p className="md-inspo-hint">Save reference images — right-click → Copy Image, then paste here.</p>
             <InspirationBoard modelId={modelId} />
+          </div>
+        )}
+
+        {tab === 'compare' && (
+          <div className="md-compare-tab">
+            <h3 className="md-section-title"><GoldIcon name="lens" size={16} /> Compare with Studio</h3>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-dim)', marginBottom: 12 }}>See your model next to the official GW studio paint job.</p>
+            <div className="compare-container">
+              <div className="compare-side">
+                <div className="compare-label">Yours</div>
+                {model.photoUrl ? (
+                  <img src={model.photoUrl} alt={model.name} className="compare-img" />
+                ) : (
+                  <div className="compare-empty"><GoldIcon name="lens" size={24} /><span>Add a photo to your model</span></div>
+                )}
+              </div>
+              <div className="compare-side">
+                <div className="compare-label">GW Studio</div>
+                <div className="compare-gw">
+                  <iframe src={getGWSearchUrl(model.name)} title="GW Store" className="compare-iframe" sandbox="allow-scripts allow-same-origin" />
+                  <a href={getGWSearchUrl(model.name)} target="_blank" rel="noreferrer" className="compare-link">Open in GW Store →</a>
+                </div>
+              </div>
+            </div>
+            {/* Time spent on this model */}
+            {(() => {
+              const modelSessions = logs.filter(l => l.text.includes('⏱'));
+              const totalSecs = modelSessions.reduce((s, l) => {
+                const m = l.text.match(/(\d+):(\d+):(\d+)/);
+                return s + (m ? parseInt(m[1]) * 3600 + parseInt(m[2]) * 60 + parseInt(m[3]) : 0);
+              }, 0);
+              return totalSecs > 0 ? (
+                <div className="goal-ring" style={{ marginTop: 16 }}>
+                  <GoldIcon name="winged-hour" size={24} />
+                  <div className="goal-ring-info">
+                    <div className="goal-ring-title">Time Invested</div>
+                    <div className="goal-ring-sub">{Math.floor(totalSecs / 3600)}h {Math.floor((totalSecs % 3600) / 60)}m across {modelSessions.length} sessions</div>
+                  </div>
+                </div>
+              ) : null;
+            })()}
           </div>
         )}
       </div>
