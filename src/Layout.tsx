@@ -15,9 +15,12 @@ function QuickAdd({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('');
   const [faction, setFaction] = useState('');
   const [system, setSystem] = useState('Warhammer 40K');
+  const [qty, setQty] = useState(1);
+  const [pts, setPts] = useState(0);
+  const [unitType, setUnitType] = useState('Infantry');
   const submit = async () => {
     if (!name.trim()) return;
-    const id = await db.models.add({ name: name.trim(), faction: faction.trim() || 'Unknown', gameSystem: system, unitType: 'Infantry', quantity: 1, status: 'unbuilt', points: 0, createdAt: new Date() } as any);
+    const id = await db.models.add({ name: name.trim(), faction: faction.trim() || 'Unknown', gameSystem: system, unitType, quantity: qty, status: 'unbuilt', points: pts, createdAt: Date.now(), notes: '', photoUrl: '', manufacturer: 'Games Workshop', countsAs: '', pricePaid: 0, wishlist: false, forceOrg: 'Other' } as any);
     onClose();
     nav(`/model/${id}`);
   };
@@ -25,12 +28,20 @@ function QuickAdd({ onClose }: { onClose: () => void }) {
     <div className="quick-add-overlay" onClick={onClose}>
       <div className="quick-add-sheet" onClick={e => e.stopPropagation()}>
         <h3>Quick Add Model</h3>
-        <input autoFocus placeholder="Model name" value={name} onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()} />
+        <input autoFocus placeholder="Model name *" value={name} onChange={e => setName(e.target.value)} onKeyDown={e => e.key === 'Enter' && submit()} />
         <input placeholder="Faction" value={faction} onChange={e => setFaction(e.target.value)} />
-        <select value={system} onChange={e => setSystem(e.target.value)}>
-          <option>Warhammer 40K</option><option>Kill Team</option><option>Age of Sigmar</option><option>Horus Heresy</option><option>Other</option>
-        </select>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+          <select value={system} onChange={e => setSystem(e.target.value)}>
+            <option>Warhammer 40K</option><option>Kill Team</option><option>Age of Sigmar</option><option>Horus Heresy</option><option>Other</option>
+          </select>
+          <select value={unitType} onChange={e => setUnitType(e.target.value)}>
+            {['Infantry', 'Character', 'Vehicle', 'Walker', 'Monster', 'Battleline', 'Transport', 'Other'].map(t => <option key={t}>{t}</option>)}
+          </select>
+          <input type="number" placeholder="Quantity" value={qty} onChange={e => setQty(Number(e.target.value))} min={1} />
+          <input type="number" placeholder="Points" value={pts} onChange={e => setPts(Number(e.target.value))} min={0} />
+        </div>
         <button className="btn btn-primary" onClick={submit}>Add to Collection</button>
+        <p style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textAlign: 'center', marginTop: 4 }}>You can edit all details on the model page after adding</p>
       </div>
     </div>
   );

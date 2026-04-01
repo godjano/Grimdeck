@@ -277,6 +277,7 @@ export default function ModelDetail() {
   const nextModel = modelIdx < allModels.length - 1 ? allModels[modelIdx + 1] : null;
 
   const [bitsPrompt, setBitsPrompt] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   if (!model) return <div className="empty">Loading...</div>;
 
@@ -358,6 +359,9 @@ export default function ModelDetail() {
         <button className="btn btn-ghost btn-sm md-back" onClick={() => nav('/models')}>
           <ChevronLeft size={16} /> Back
         </button>
+        <button className="btn btn-ghost btn-sm" style={{ position: 'absolute', top: 16, right: 80, zIndex: 5, fontSize: '0.72rem' }} onClick={() => setEditing(!editing)}>
+          ✏️ Edit
+        </button>
         <div className="md-hero-content">
           <div className="md-portrait" onClick={() => photoRef.current?.click()}>
             {model.photoUrl ? <img src={model.photoUrl} alt={model.name} /> : <Camera size={28} strokeWidth={1.5} />}
@@ -388,6 +392,56 @@ export default function ModelDetail() {
           <ExternalLink size={14} /> GW Store
         </a>
       </div>
+
+      {/* Edit Model Form */}
+      {editing && (
+        <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 12, padding: 16, marginBottom: 12 }}>
+          <h4 style={{ color: 'var(--gold)', fontFamily: "'Cinzel', serif", marginBottom: 10 }}>Edit Model</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Name</label>
+              <input defaultValue={model.name} onBlur={e => db.models.update(modelId, { name: e.target.value })} />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Faction</label>
+              <input defaultValue={model.faction} onBlur={e => db.models.update(modelId, { faction: e.target.value })} />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Points</label>
+              <input type="number" defaultValue={model.points} onBlur={e => db.models.update(modelId, { points: Number(e.target.value) })} />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Quantity</label>
+              <input type="number" defaultValue={model.quantity} onBlur={e => db.models.update(modelId, { quantity: Number(e.target.value) })} />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Unit Type</label>
+              <input defaultValue={model.unitType} onBlur={e => db.models.update(modelId, { unitType: e.target.value })} />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Game System</label>
+              <select defaultValue={model.gameSystem} onChange={e => db.models.update(modelId, { gameSystem: e.target.value })}>
+                <option>Warhammer 40K</option><option>Kill Team</option><option>Age of Sigmar</option><option>Horus Heresy</option><option>Other</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Force Org</label>
+              <select defaultValue={model.forceOrg} onChange={e => db.models.update(modelId, { forceOrg: e.target.value })}>
+                {['HQ', 'Troops', 'Elites', 'Fast Attack', 'Heavy Support', 'Flyer', 'Dedicated Transport', 'Lord of War', 'Other'].map(o => <option key={o}>{o}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Manufacturer</label>
+              <input defaultValue={model.manufacturer} onBlur={e => db.models.update(modelId, { manufacturer: e.target.value })} />
+            </div>
+          </div>
+          <div style={{ marginTop: 8 }}>
+            <label style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Notes</label>
+            <textarea defaultValue={model.notes} rows={2} style={{ width: '100%' }} onBlur={e => db.models.update(modelId, { notes: e.target.value })} />
+          </div>
+          <button className="btn btn-sm btn-primary" style={{ marginTop: 8 }} onClick={() => setEditing(false)}>Done</button>
+        </div>
+      )}
 
       {/* Prev / Next navigation */}
       <div className="md-nav">
