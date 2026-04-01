@@ -14,6 +14,7 @@ export interface OpState {
   onGuard: boolean;
   hasCounteracted: boolean;
   movedThisActivation: boolean;
+  actionsUsed: string[];  // track which actions were performed
   x: number;
   y: number;
 }
@@ -41,12 +42,12 @@ export function createGameState(playerOps: KTOperative[], enemyOps: KTOperative[
   const operatives: OpState[] = [];
   let py = 2;
   for (const op of playerOps) {
-    operatives.push({ op, team: 'player', currentWounds: op.wounds, activated: false, apLeft: op.apl, status: 'ready', order: 'engage', onGuard: false, hasCounteracted: false, movedThisActivation: false, x: 2, y: Math.min(py, map.rows - 2) });
+    operatives.push({ op, team: 'player', currentWounds: op.wounds, activated: false, apLeft: op.apl, status: 'ready', order: 'engage', onGuard: false, hasCounteracted: false, movedThisActivation: false, actionsUsed: [], x: 2, y: Math.min(py, map.rows - 2) });
     py += 3;
   }
   let ey = 2;
   for (const op of enemyOps) {
-    operatives.push({ op, team: 'enemy', currentWounds: op.wounds, activated: false, apLeft: op.apl, status: 'ready', order: 'engage', onGuard: false, hasCounteracted: false, movedThisActivation: false, x: map.cols - 3, y: Math.min(ey, map.rows - 2) });
+    operatives.push({ op, team: 'enemy', currentWounds: op.wounds, activated: false, apLeft: op.apl, status: 'ready', order: 'engage', onGuard: false, hasCounteracted: false, movedThisActivation: false, actionsUsed: [], x: map.cols - 3, y: Math.min(ey, map.rows - 2) });
     ey += 3;
   }
   return {
@@ -66,7 +67,7 @@ export function rollInitiative(state: GameState): GameState {
 
   const operatives = state.operatives.map(o => o.status !== 'incapacitated' ? {
     ...o, activated: false, apLeft: o.op.apl, status: 'ready' as const,
-    onGuard: false, hasCounteracted: false, movedThisActivation: false,
+    onGuard: false, hasCounteracted: false, movedThisActivation: false, actionsUsed: [],
   } : o);
 
   return { ...state, initiative: winner, activeTeam: winner, phase: 'firefight', log, operatives,

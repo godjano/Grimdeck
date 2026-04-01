@@ -69,7 +69,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
           parsed.playerCP ??= 2; parsed.enemyCP ??= 2;
           parsed.operatives = parsed.operatives.map((o: any) => ({
             ...o, order: o.order ?? 'engage', onGuard: o.onGuard ?? false,
-            hasCounteracted: o.hasCounteracted ?? false, movedThisActivation: o.movedThisActivation ?? false,
+            hasCounteracted: o.hasCounteracted ?? false, movedThisActivation: o.movedThisActivation ?? false, actionsUsed: o.actionsUsed ?? [],
           }));
           setGameRaw(parsed);
           return;
@@ -150,7 +150,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     const targetAfter = s.operatives[selectedTarget];
     flash(result.totalDmg > 0 ? `💥 ${defender.op.name} takes ${result.totalDmg} damage!${targetAfter.status === 'incapacitated' ? ' ☠️ INCAPACITATED!' : ` (${targetAfter.currentWounds}W left)`}` : `🛡️ ${defender.op.name} saves all damage!`);
     const ops = [...s.operatives];
-    const op = { ...ops[selectedOp], apLeft: ops[selectedOp].apLeft - 1 };
+    const op = { ...ops[selectedOp], apLeft: ops[selectedOp].apLeft - 1, actionsUsed: [...(ops[selectedOp].actionsUsed || []), 'shoot'] };
     if (op.apLeft <= 0) { op.activated = true; op.status = 'activated' as any; }
     ops[selectedOp] = op;
     s = checkTurnEnd({ ...s, operatives: ops });
@@ -176,7 +176,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     s = applyDamage(s, selectedOp, result.defDmg);
     flash(`⚔️ You deal ${result.atkDmg} dmg, take ${result.defDmg} back!`);
     const ops = [...s.operatives];
-    const op = { ...ops[selectedOp], apLeft: ops[selectedOp].apLeft - 2, activated: true, status: 'activated' as any };
+    const op = { ...ops[selectedOp], apLeft: ops[selectedOp].apLeft - 2, activated: true, status: 'activated' as any, actionsUsed: [...(ops[selectedOp].actionsUsed || []), 'fight'] };
     ops[selectedOp] = op;
     s = checkTurnEnd({ ...s, operatives: ops });
     setGame(s);
@@ -191,7 +191,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
     if ((actionMode === 'move' || actionMode === 'dash' || actionMode === 'charge') && selectedOp !== null && cell !== 'heavy') {
       const ops = [...game.operatives];
       const apCost = actionMode === 'charge' ? 1 : 1;
-      const op = { ...ops[selectedOp], x, y, apLeft: ops[selectedOp].apLeft - apCost, movedThisActivation: true };
+      const op = { ...ops[selectedOp], x, y, apLeft: ops[selectedOp].apLeft - apCost, movedThisActivation: true, actionsUsed: [...(ops[selectedOp].actionsUsed || []), actionMode] };
       if (op.apLeft <= 0) { op.activated = true; op.status = 'activated' as any; }
       ops[selectedOp] = op;
       const label = actionMode === 'dash' ? '💨 DASH' : actionMode === 'charge' ? '⚡ CHARGE' : '🏃 MOVE';
@@ -538,12 +538,20 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                     Toggle Order
                   </button>
                 </div>
+                {(() => {
+                  const used = activeOp.actionsUsed || [];
+                  const didMove = used.includes('move');
+                  const didDash = used.includes('dash');
+                  const didShoot = used.includes('shoot');
+                  const didFight = used.includes('fight');
+                  const didCharge = used.includes('charge');
+                  return (
                 <div className="action-buttons">
-                  <button className={`btn btn-sm ${actionMode === 'move' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('move')}>🏃 Move (1AP)</button>
-                  <button className={`btn btn-sm ${actionMode === 'dash' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('dash')}>💨 Dash (1AP)</button>
-                  <button className={`btn btn-sm ${actionMode === 'charge' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('charge')}>⚡ Charge (1AP)</button>
-                  <button className={`btn btn-sm ${actionMode === 'shoot' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('shoot')} disabled={activeOp.order === 'conceal'}><GoldIcon name="crosshair" size={14} /> Shoot (1AP)</button>
-                  <button className={`btn btn-sm ${actionMode === 'fight' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('fight')}><GoldIcon name="fist2" size={14} /> Fight (2AP)</button>
+                  <button className={`btn btn-sm ${actionMode === 'move' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('move')} disabled={didMove}>🏃 Move{didMove ? ' ✓' : ' (1AP)'}</button>
+                  <button className={`btn btn-sm ${actionMode === 'dash' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('dash')} disabled={didDash}>💨 Dash{didDash ? ' ✓' : ' (1AP)'}</button>
+                  <button className={`btn btn-sm ${actionMode === 'charge' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('charge')} disabled={didCharge || didMove}>⚡ Charge{didCharge ? ' ✓' : ' (1AP)'}</button>
+                  <button className={`btn btn-sm ${actionMode === 'shoot' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('shoot')} disabled={activeOp.order === 'conceal' || didShoot}><GoldIcon name="crosshair" size={14} /> Shoot{didShoot ? ' ✓' : ' (1AP)'}</button>
+                  <button className={`btn btn-sm ${actionMode === 'fight' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('fight')} disabled={didFight || activeOp.apLeft < 2}><GoldIcon name="fist2" size={14} /> Fight{didFight ? ' ✓' : ' (2AP)'}</button>
                   <button className="btn btn-sm btn-ghost" onClick={() => {
                     const ops = [...game.operatives]; ops[selectedOp] = { ...ops[selectedOp], onGuard: true, apLeft: ops[selectedOp].apLeft - 1, activated: ops[selectedOp].apLeft <= 1, status: ops[selectedOp].apLeft <= 1 ? 'activated' as any : 'ready' };
                     setGame(checkTurnEnd({ ...game, operatives: ops, log: [...game.log, `🛡️ ${activeOp.op.name} goes on Guard (1AP)`] }));
@@ -555,6 +563,8 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                   }}>🏳️ Fall Back (2AP)</button>
                   <button className="btn btn-sm btn-ghost" onClick={endActivation}>✓ End</button>
                 </div>
+                  );
+                })()}
 
                 {(actionMode === 'move' || actionMode === 'dash' || actionMode === 'charge') && (
                   <div className="action-input">
