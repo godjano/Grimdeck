@@ -3356,3 +3356,23 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .compare-iframe { width: 100%; height: 300px; border: none; opacity: 0.9; }
 .compare-link { display: block; text-align: center; padding: 8px; font-size: 0.75rem; color: var(--gold); text-decoration: none; border-top: 1px solid var(--border); }
 .compare-link:hover { color: var(--gold-bright); }
+
+/* ═══ PRO RECIPE SYSTEM ═══ */
+.recipe-add-form { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+.recipe-select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; color: var(--text); font-size: 0.78rem; font-family: inherit; width: 100%; }
+.recipe-area { margin-bottom: 16px; }
+.recipe-area-title { font-family: 'Cinzel', serif; font-size: 0.82rem; color: var(--gold); padding: 6px 0; border-bottom: 1px solid var(--border); margin-bottom: 6px; text-transform: capitalize; display: flex; align-items: center; gap: 6px; }
+.recipe-step { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.recipe-step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--surface2); color: var(--gold); font-size: 0.65rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.recipe-step-info { flex: 1; min-width: 0; }
+.recipe-step-name { font-size: 0.85rem; font-weight: 600; }
+.recipe-step-brand { font-size: 0.7rem; color: var(--text-dim); font-weight: 400; }
+.recipe-step-meta { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+.recipe-tag { font-size: 0.62rem; background: rgba(184,134,11,0.1); color: var(--gold-dim); padding: 1px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.recipe-step-note { font-size: 0.72rem; color: var(--text-secondary); margin-top: 2px; font-style: italic; }
+
+/* ═══ TECHNIQUE TAGS ═══ */
+.technique-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+.technique-tag { font-size: 0.68rem; padding: 3px 8px; border-radius: 12px; cursor: pointer; transition: var(--transition); border: 1px solid var(--border); color: var(--text-dim); }
+.technique-tag.active { background: rgba(184,134,11,0.15); border-color: var(--gold-dim); color: var(--gold); }
+.technique-tag:hover { border-color: var(--gold-dim); }

@@ -19,6 +19,7 @@ export interface MiniatureModel {
   points: number;
   forceOrg: string;
   lastPaintedAt?: number;
+  techniques?: string[];  // e.g. ['NMM', 'OSL', 'wet blending', 'freehand']
 }
 
 export const FORCE_ORG = ['HQ', 'Troops', 'Elites', 'Fast Attack', 'Heavy Support', 'Flyer', 'Dedicated Transport', 'Fortification', 'Lord of War', 'Kill Team Operative', 'Other'];
@@ -40,6 +41,11 @@ export interface ModelPaintLink {
   modelId: number;
   paintId: number;
   usageNote: string;
+  area?: string;       // e.g. 'armour', 'skin', 'cloak', 'base'
+  stepOrder?: number;   // 1, 2, 3... within the area
+  technique?: string;   // e.g. 'basecoat', 'shade', 'layer', 'highlight', 'glaze', 'drybrush'
+  tool?: string;        // e.g. 'airbrush', 'fine brush', 'large brush', 'sponge'
+  mixRatio?: string;    // e.g. '1:1 with Sky Blue'
 }
 
 export interface PaintingLog {

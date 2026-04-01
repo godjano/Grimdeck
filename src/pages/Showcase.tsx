@@ -4,10 +4,16 @@ import { db } from '../db';
 import PageBanner from '../components/PageBanner';
 import GoldIcon from '../components/GoldIcon';
 
+import { useState } from 'react';
+
 export default function Showcase() {
   const nav = useNavigate();
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
   const painted = models.filter(m => (m.status === 'painted' || m.status === 'based') && m.photoUrl);
+  const [techFilter, setTechFilter] = useState('');
+
+  const allTechs = [...new Set(painted.flatMap(m => m.techniques || []))].sort();
+  const filtered = techFilter ? painted.filter(m => (m.techniques || []).includes(techFilter)) : painted;
 
   return (
     <div>
@@ -20,14 +26,27 @@ export default function Showcase() {
         </div>
       ) : (
         <>
-          <p style={{ color: 'var(--text-dim)', fontSize: '0.82rem', marginBottom: 16 }}>{painted.length} masterpiece{painted.length !== 1 ? 's' : ''}</p>
+          <p style={{ color: 'var(--text-dim)', fontSize: '0.82rem', marginBottom: 8 }}>{filtered.length} masterpiece{filtered.length !== 1 ? 's' : ''}</p>
+          {allTechs.length > 0 && (
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 12 }}>
+              <button className={`btn btn-sm ${!techFilter ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setTechFilter('')} style={{ fontSize: '0.7rem', padding: '3px 8px' }}>All</button>
+              {allTechs.map(t => (
+                <button key={t} className={`btn btn-sm ${techFilter === t ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setTechFilter(t)} style={{ fontSize: '0.7rem', padding: '3px 8px' }}>{t}</button>
+              ))}
+            </div>
+          )}
           <div className="showcase-grid">
-            {painted.map(m => (
+            {filtered.map(m => (
               <div key={m.id} className="showcase-card" onClick={() => nav(`/model/${m.id}`)}>
                 <img src={m.photoUrl} alt={m.name} className="showcase-img" />
                 <div className="showcase-info">
                   <div className="showcase-name">{m.name}</div>
                   <div className="showcase-faction">{m.faction}</div>
+                {(m.techniques || []).length > 0 && (
+                  <div style={{ display: 'flex', gap: 2, flexWrap: 'wrap', marginTop: 4 }}>
+                    {(m.techniques || []).map(t => <span key={t} className="recipe-tag">{t}</span>)}
+                  </div>
+                )}
                 </div>
               </div>
             ))}

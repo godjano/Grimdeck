@@ -262,6 +262,10 @@ export default function ModelDetail() {
 
   const [paintSearch, setPaintSearch] = useState('');
   const [usageNote, setUsageNote] = useState('');
+  const [addArea, setAddArea] = useState('armour');
+  const [addTechnique, setAddTechnique] = useState('basecoat');
+  const [addTool, setAddTool] = useState('');
+  const [addMix, setAddMix] = useState('');
   const [logText, setLogText] = useState('');
   const [showAddPaint, setShowAddPaint] = useState(false);
   const photoRef = useRef<HTMLInputElement>(null);
@@ -292,8 +296,9 @@ export default function ModelDetail() {
   const w40k = !datacard ? get40KProfile(model.name, model.faction) : null;
 
   const addPaintToRecipe = async (paintId: number) => {
-    await db.modelPaintLinks.add({ modelId, paintId, usageNote: usageNote.trim() });
-    setPaintSearch(''); setUsageNote(''); setShowAddPaint(false);
+    const areaLinks = linkedPaints.filter(({ link }) => link.area === addArea);
+    await db.modelPaintLinks.add({ modelId, paintId, usageNote: usageNote.trim(), area: addArea, stepOrder: areaLinks.length + 1, technique: addTechnique, tool: addTool || undefined, mixRatio: addMix || undefined });
+    setPaintSearch(''); setUsageNote(''); setAddMix(''); setShowAddPaint(false);
   };
   const removePaint = async (linkId: number) => { await db.modelPaintLinks.delete(linkId); };
 
@@ -468,6 +473,20 @@ export default function ModelDetail() {
                 <div className="md-stat-card"><div className="md-stat-label">Status</div><div className="md-stat-value md-stat-text">{model.status}</div></div>
               </div>
             )}
+            {/* Technique Tags */}
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginBottom: 6 }}>Techniques used:</div>
+              <div className="technique-tags">
+                {['NMM', 'OSL', 'Wet Blending', 'Glazing', 'Drybrushing', 'Edge Highlighting', 'Zenithal', 'Weathering', 'Freehand', 'Stippling', 'Contrast', 'Airbrush', 'Oil Wash', 'Chipping', 'Basing'].map(t => (
+                  <span key={t} className={`technique-tag ${(model.techniques || []).includes(t) ? 'active' : ''}`}
+                    onClick={async () => {
+                      const techs = model.techniques || [];
+                      const next = techs.includes(t) ? techs.filter(x => x !== t) : [...techs, t];
+                      await db.models.update(modelId, { techniques: next });
+                    }}>{t}</span>
+                ))}
+              </div>
+            </div>
             {/* Decorative skull divider */}
             <div className="md-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" loading="lazy" /></div>
           </div>
@@ -478,11 +497,24 @@ export default function ModelDetail() {
             <div className="md-section-header">
               <h3 className="md-section-title"><GoldIcon name="paints" size={16} /> Paint Recipe</h3>
               <button className="btn btn-sm btn-ghost" onClick={() => setShowAddPaint(!showAddPaint)}>
-                {showAddPaint ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Add Paint</>}
+                {showAddPaint ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Add Step</>}
               </button>
             </div>
             {showAddPaint && (
-              <div className="md-add-paint">
+              <div className="recipe-add-form">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                  <select value={addArea} onChange={e => setAddArea(e.target.value)} className="recipe-select">
+                    {['armour', 'skin', 'cloth', 'metallics', 'leather', 'gems', 'weapons', 'base', 'details', 'other'].map(a => <option key={a}>{a}</option>)}
+                  </select>
+                  <select value={addTechnique} onChange={e => setAddTechnique(e.target.value)} className="recipe-select">
+                    {['basecoat', 'shade', 'layer', 'highlight', 'edge highlight', 'glaze', 'drybrush', 'wash', 'contrast', 'wetblend', 'stipple', 'zenithal', 'other'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                  <select value={addTool} onChange={e => setAddTool(e.target.value)} className="recipe-select">
+                    <option value="">Tool (optional)</option>
+                    {['fine brush', 'large brush', 'airbrush', 'sponge', 'drybrush', 'palette knife'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                  <input value={addMix} onChange={e => setAddMix(e.target.value)} placeholder="Mix ratio (optional)" className="recipe-select" />
+                </div>
                 <PaintAutocomplete value={paintSearch} onChange={setPaintSearch} onSelect={async (preset: PaintPreset) => {
                   let paint = await db.paints.where('name').equals(preset.name).first();
                   if (!paint) {
@@ -492,60 +524,58 @@ export default function ModelDetail() {
                   if (paint?.id) await addPaintToRecipe(paint.id);
                   setPaintSearch('');
                 }} />
-                <input value={usageNote} onChange={e => setUsageNote(e.target.value)} placeholder="Usage (e.g. base coat armour)" className="md-usage-input" />
+                <input value={usageNote} onChange={e => setUsageNote(e.target.value)} placeholder="Notes (e.g. thin to milk consistency, recess only)" className="md-usage-input" />
               </div>
             )}
             {linkedPaints.length === 0 ? (
-              <div className="md-empty-tab">
-                <img src="/decor/gear.png" alt="" className="md-empty-icon" />
-                <p>No paints assigned yet</p>
-              </div>
+              <div className="md-empty-tab"><GoldIcon name="gear" size={24} /><p>No paints assigned yet. Add steps to build your recipe.</p></div>
             ) : (
               <>
-                <div className="md-recipe-list">
-                  {linkedPaints.map(({ link, paint }) => (
-                    <div key={link.id} className="md-recipe-item">
-                      <div className="md-swatch" style={{ background: paint.hexColor || '#555' }} />
-                      <div className="md-recipe-info">
-                        <div className="md-recipe-name">{paint.name}</div>
-                        <div className="md-recipe-note">{link.usageNote || `${paint.brand} · ${paint.type}`}</div>
-                      </div>
-                      <button className="btn-icon-sm" onClick={() => removePaint(link.id!)}><Trash2 size={14} /></button>
+                {/* Group by area */}
+                {(() => {
+                  const areas: Record<string, typeof linkedPaints> = {};
+                  for (const lp of linkedPaints) (areas[lp.link.area || 'general'] ??= []).push(lp);
+                  // Sort each area by stepOrder
+                  for (const a of Object.keys(areas)) areas[a].sort((a2, b) => (a2.link.stepOrder || 0) - (b.link.stepOrder || 0));
+                  return Object.entries(areas).map(([area, steps]) => (
+                    <div key={area} className="recipe-area">
+                      <div className="recipe-area-title"><GoldIcon name="paints" size={14} /> {area}</div>
+                      {steps.map(({ link, paint }, i) => (
+                        <div key={link.id} className="recipe-step">
+                          <div className="recipe-step-num">{i + 1}</div>
+                          <div className="md-swatch" style={{ background: paint.hexColor || '#555' }} />
+                          <div className="recipe-step-info">
+                            <div className="recipe-step-name">{paint.name} <span className="recipe-step-brand">{paint.brand}</span></div>
+                            <div className="recipe-step-meta">
+                              {link.technique && <span className="recipe-tag">{link.technique}</span>}
+                              {link.tool && <span className="recipe-tag">{link.tool}</span>}
+                              {link.mixRatio && <span className="recipe-tag">mix: {link.mixRatio}</span>}
+                            </div>
+                            {link.usageNote && <div className="recipe-step-note">{link.usageNote}</div>}
+                          </div>
+                          <button className="btn-icon-sm" onClick={() => removePaint(link.id!)}><Trash2 size={14} /></button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  ));
+                })()}
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 12 }}>
+                  <button className="btn btn-sm btn-ghost" onClick={() => {
+                    const text = `Paint recipe for ${model.name} (${model.faction}):\n` + linkedPaints.map(({ link, paint }) => `${link.stepOrder || '-'}. [${link.area || ''}] ${link.technique || ''}: ${paint.name} (${paint.brand})${link.tool ? ` — ${link.tool}` : ''}${link.usageNote ? ` — ${link.usageNote}` : ''}`).join('\n');
+                    navigator.clipboard.writeText(text);
+                  }}><Copy size={14} /> Copy</button>
+                  <button className="btn btn-sm btn-ghost" onClick={async () => {
+                    const name = prompt('Apply recipe to which model?');
+                    if (!name) return;
+                    const target = (await db.models.toArray()).find(m => m.name.toLowerCase().includes(name.toLowerCase()));
+                    if (!target?.id) { alert('Model not found'); return; }
+                    for (const { link, paint } of linkedPaints) {
+                      if (!paint.id) continue;
+                      await db.modelPaintLinks.add({ modelId: target.id, paintId: paint.id, usageNote: link.usageNote, area: link.area, stepOrder: link.stepOrder, technique: link.technique, tool: link.tool, mixRatio: link.mixRatio });
+                    }
+                    alert(`Recipe applied to ${target.name}`);
+                  }}><Copy size={14} /> Apply to model</button>
                 </div>
-                <button className="btn btn-sm btn-ghost" style={{ marginTop: 12 }} onClick={() => {
-                  const text = `Paint recipe for ${model.name} (${model.faction}):\n` + linkedPaints.map(({ link, paint }) => `• ${paint.name} (${paint.brand}) — ${link.usageNote || paint.type}`).join('\n');
-                  navigator.clipboard.writeText(text);
-                }}><Copy size={14} /> Copy recipe</button>
-                <button className="btn btn-sm btn-ghost" style={{ marginTop: 4 }} onClick={() => {
-                  const c = document.createElement('canvas'); c.width = 600; c.height = 400;
-                  const ctx = c.getContext('2d')!;
-                  ctx.fillStyle = '#0a0a0e'; ctx.fillRect(0, 0, 600, 400);
-                  ctx.fillStyle = '#d4af37'; ctx.font = 'bold 22px serif'; ctx.fillText(model.name, 24, 40);
-                  ctx.fillStyle = '#888'; ctx.font = '14px sans-serif'; ctx.fillText(model.faction, 24, 62);
-                  ctx.fillStyle = '#d4af37'; ctx.fillRect(24, 76, 552, 1);
-                  linkedPaints.forEach(({ paint, link }, i) => {
-                    const y = 100 + i * 32;
-                    ctx.fillStyle = paint.hexColor || '#555'; ctx.beginPath(); ctx.arc(40, y + 6, 8, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#eee'; ctx.font = '14px sans-serif'; ctx.fillText(paint.name, 58, y + 11);
-                    ctx.fillStyle = '#888'; ctx.font = '12px sans-serif'; ctx.fillText(link.usageNote || paint.type, 58, y + 26);
-                  });
-                  ctx.fillStyle = '#555'; ctx.font = '11px sans-serif'; ctx.fillText('Made with Grimdeck', 24, 385);
-                  c.toBlob(blob => { if (!blob) return; const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `${model.name}-recipe.png`; a.click(); URL.revokeObjectURL(url); });
-                }}><Image size={14} /> Save as image</button>
-                <button className="btn btn-sm btn-ghost" style={{ marginTop: 4 }} onClick={async () => {
-                  const name = prompt('Apply this recipe to which model? (enter name)');
-                  if (!name) return;
-                  const target = (await db.models.toArray()).find(m => m.name.toLowerCase().includes(name.toLowerCase()));
-                  if (!target?.id) { alert('Model not found'); return; }
-                  for (const { link, paint } of linkedPaints) {
-                    if (!paint.id) continue;
-                    const exists = await db.modelPaintLinks.where({ modelId: target.id, paintId: paint.id }).first();
-                    if (!exists) await db.modelPaintLinks.add({ modelId: target.id, paintId: paint.id, usageNote: link.usageNote });
-                  }
-                  alert(`Recipe applied to ${target.name}`);
-                }}><Copy size={14} /> Apply to another model</button>
               </>
             )}
           </div>
