@@ -303,8 +303,7 @@ export default function ModelDetail() {
   };
   const removePaint = async (linkId: number) => { await db.modelPaintLinks.delete(linkId); };
 
-  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return;
+  const processImage = (file: Blob) => {
     const reader = new FileReader();
     reader.onload = async () => {
       const img = new window.Image();
@@ -318,6 +317,22 @@ export default function ModelDetail() {
       img.src = reader.result as string;
     };
     reader.readAsDataURL(file);
+  };
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    processImage(file);
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const item = Array.from(e.clipboardData.items).find(i => i.type.startsWith('image/'));
+    if (item) { e.preventDefault(); const blob = item.getAsFile(); if (blob) processImage(blob); }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file?.type.startsWith('image/')) processImage(file);
   };
 
   const addLog = async (photoUrl = '') => {
@@ -354,7 +369,8 @@ export default function ModelDetail() {
   return (
     <div className="model-detail-v2" style={factionColor ? { '--faction-accent': factionColor } as React.CSSProperties : {}}>
       {/* ─── HERO BANNER with faction art ─── */}
-      <div className={`md-hero ${factionArt ? '' : 'md-hero-frame'}`} style={factionArt ? { backgroundImage: `url(${factionArt})` } : {}}>
+      <div className={`md-hero ${factionArt ? '' : 'md-hero-frame'}`} style={factionArt ? { backgroundImage: `url(${factionArt})` } : {}}
+        onPaste={handlePaste} onDrop={handleDrop} onDragOver={e => e.preventDefault()} tabIndex={0}>
         <div className="md-hero-overlay" />
         <button className="btn btn-ghost btn-sm md-back" onClick={() => nav('/models')}>
           <ChevronLeft size={16} /> Back
@@ -364,7 +380,7 @@ export default function ModelDetail() {
         </button>
         <div className="md-hero-content">
           <div className="md-portrait" onClick={() => photoRef.current?.click()}>
-            {model.photoUrl ? <img src={model.photoUrl} alt={model.name} /> : <Camera size={28} strokeWidth={1.5} />}
+            {model.photoUrl ? <img src={model.photoUrl} alt={model.name} /> : <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}><Camera size={24} strokeWidth={1.5} /><span style={{ fontSize: '0.5rem', color: 'var(--text-dim)' }}>Tap, paste or drop</span></div>}
             <input ref={photoRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} style={{ display: 'none' }} />
           </div>
           <div className="md-hero-info">
