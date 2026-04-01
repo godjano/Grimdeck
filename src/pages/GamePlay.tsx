@@ -545,11 +545,12 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                   const didShoot = used.includes('shoot');
                   const didFight = used.includes('fight');
                   const didCharge = used.includes('charge');
+                  const didAnyMove = didMove || didDash || didCharge; // Move/Dash/Charge are mutually exclusive
                   return (
                 <div className="action-buttons">
-                  <button className={`btn btn-sm ${actionMode === 'move' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('move')} disabled={didMove}>🏃 Move{didMove ? ' ✓' : ' (1AP)'}</button>
-                  <button className={`btn btn-sm ${actionMode === 'dash' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('dash')} disabled={didDash}>💨 Dash{didDash ? ' ✓' : ' (1AP)'}</button>
-                  <button className={`btn btn-sm ${actionMode === 'charge' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('charge')} disabled={didCharge || didMove}>⚡ Charge{didCharge ? ' ✓' : ' (1AP)'}</button>
+                  <button className={`btn btn-sm ${actionMode === 'move' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('move')} disabled={didAnyMove}>🏃 Move{didMove ? ' ✓' : ' (1AP)'}</button>
+                  <button className={`btn btn-sm ${actionMode === 'dash' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('dash')} disabled={didAnyMove}>💨 Dash{didDash ? ' ✓' : ' (1AP)'}</button>
+                  <button className={`btn btn-sm ${actionMode === 'charge' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('charge')} disabled={didAnyMove}>⚡ Charge{didCharge ? ' ✓' : ' (1AP)'}</button>
                   <button className={`btn btn-sm ${actionMode === 'shoot' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('shoot')} disabled={activeOp.order === 'conceal' || didShoot}><GoldIcon name="crosshair" size={14} /> Shoot{didShoot ? ' ✓' : ' (1AP)'}</button>
                   <button className={`btn btn-sm ${actionMode === 'fight' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setActionMode('fight')} disabled={didFight || activeOp.apLeft < 2}><GoldIcon name="fist2" size={14} /> Fight{didFight ? ' ✓' : ' (2AP)'}</button>
                   <button className="btn btn-sm btn-ghost" onClick={() => {
