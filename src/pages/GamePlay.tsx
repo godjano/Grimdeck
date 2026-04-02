@@ -344,14 +344,13 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                 const dragOp = game.operatives[draggingIdx];
                 if (dragOp.team !== 'player') return;
                 if (cell === 'heavy') return;
+                // Block if already used a move-type action
+                const used = dragOp.actionsUsed || [];
+                if (used.includes('move') || used.includes('dash') || used.includes('charge')) return;
                 const ops = [...game.operatives];
-                ops[draggingIdx] = { ...ops[draggingIdx], x, y };
-                const apCost = dragOp.activated ? 0 : 1;
-                if (apCost > 0) {
-                  const updated = { ...ops[draggingIdx], apLeft: ops[draggingIdx].apLeft - 1 };
-                  if (updated.apLeft <= 0) { updated.activated = true; updated.status = 'activated' as any; }
-                  ops[draggingIdx] = updated;
-                }
+                const updated = { ...ops[draggingIdx], x, y, apLeft: ops[draggingIdx].apLeft - 1, movedThisActivation: true, actionsUsed: [...used, 'move'] };
+                if (updated.apLeft <= 0) { updated.activated = true; updated.status = 'activated' as any; }
+                ops[draggingIdx] = updated;
                 const s = checkTurnEnd({ ...game, operatives: ops, log: [...game.log, `🏃 ${dragOp.op.name} moves to (${x}, ${y})`] });
                 setGame(s);
                 setSelectedOp(draggingIdx);
@@ -373,7 +372,7 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
                     <div
                       className={`board-op ${op.team}`}
                       style={{ background: getOpColor(op.team, op.op.role) }}
-                      draggable={op.team === 'player' && !op.activated && op.status === 'ready'}
+                      draggable={op.team === 'player' && !op.activated && op.status === 'ready' && !(op.actionsUsed || []).some(a => ['move','dash','charge'].includes(a))}
                       onDragStart={() => setDraggingIdx(game.operatives.indexOf(op))}
                       onClick={() => {
                         const idx = game.operatives.indexOf(op);
