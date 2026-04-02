@@ -83,12 +83,19 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
   }, [playerFaction, enemyFaction]);
 
   const resetGame = () => {
-    if (storageKey) localStorage.removeItem(storageKey);
+    // Clear all saved game states
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k?.startsWith('grimdeck_game_')) keysToRemove.push(k);
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
     const pOps = getRoster(playerFaction);
     const eOps = getRoster(enemyFaction);
     const map = generateMap();
     setGameRaw(createGameState(pOps, eOps, map));
     setSelectedOpRaw(null); setActionMode('none');
+    setCombatFlash('Game restarted — fresh board');
   };
 
   useEffect(() => {
@@ -642,6 +649,18 @@ export default function GamePlay({ playerFaction, enemyFaction, difficulty = 'no
           <button className="btn btn-primary" onClick={endGame}>
             {game.playerScore > game.enemyScore ? 'Claim Victory →' : game.playerScore < game.enemyScore ? 'Accept Defeat →' : 'Accept Draw →'}
           </button>
+        )}
+
+        {/* Stuck escape */}
+        {game.phase === 'firefight' && (
+          <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
+            <button className="btn btn-sm btn-ghost" style={{ fontSize: '0.65rem' }} onClick={() => {
+              // Force end current turning point
+              const ops = game.operatives.map(o => o.status !== 'incapacitated' ? { ...o, activated: true, apLeft: 0, status: 'activated' as any } : o);
+              setGame(checkTurnEnd({ ...game, operatives: ops, log: [...game.log, '⏭️ Force-ended turning point'] }));
+            }}>⏭️ Force end turn</button>
+            <button className="btn btn-sm btn-ghost" style={{ fontSize: '0.65rem' }} onClick={resetGame}>↺ Restart mission</button>
+          </div>
         )}
       </div>
         </div>{/* end game-right */}
