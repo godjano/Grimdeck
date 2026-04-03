@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://grimdeck.vercel.app/sitemap.xml
