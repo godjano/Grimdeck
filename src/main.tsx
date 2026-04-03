@@ -23,6 +23,7 @@ import DataManager from './pages/DataManager';
 import BattleLogPage from './pages/BattleLog';
 import Showcase from './pages/Showcase';
 import HobbyStats from './pages/HobbyStats';
+import Challenges from './pages/Challenges';
 
 const router = createHashRouter([
   {
@@ -49,6 +50,7 @@ const router = createHashRouter([
       { path: 'battle-log', element: <BattleLogPage /> },
       { path: 'showcase', element: <Showcase /> },
       { path: 'hobby-stats', element: <HobbyStats /> },
+      { path: 'challenges', element: <Challenges /> },
     ],
   },
 ]);

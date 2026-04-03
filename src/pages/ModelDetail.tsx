@@ -738,6 +738,17 @@ export default function ModelDetail() {
                 </div>
               ) : null;
             })()}
+            {/* QR Code for base */}
+            <div style={{ marginTop: 16, textAlign: 'center' }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginBottom: 6 }}>QR Code — stick under the base</div>
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.href)}&bgcolor=0a0a0e&color=d4af37`} alt="QR Code" style={{ borderRadius: 8, border: '1px solid var(--border)' }} width={120} height={120} />
+              <div style={{ marginTop: 6 }}>
+                <button className="btn btn-sm btn-ghost" onClick={() => {
+                  const url = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(window.location.href)}&bgcolor=0a0a0e&color=d4af37`;
+                  const a = document.createElement('a'); a.href = url; a.download = `${model.name}-qr.png`; a.click();
+                }}>Download QR</button>
+              </div>
+            </div>
           </div>
         )}
       </div>

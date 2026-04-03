@@ -135,6 +135,7 @@ export default function Layout() {
                 <NavLink to="/battle-log"><GoldIcon name="campaigns" size={14} /> Battle Log</NavLink>
                 <NavLink to="/showcase"><GoldIcon name="trophy" size={14} /> Showcase</NavLink>
                 <NavLink to="/hobby-stats"><GoldIcon name="winged-hour" size={14} /> Hobby Stats</NavLink>
+                <NavLink to="/challenges"><GoldIcon name="lightning" size={14} /> Challenges</NavLink>
                 <NavLink to="/suggestions"><GoldIcon name="guides" size={14} /> Guides</NavLink>
                 <NavLink to="/inspiration"><GoldIcon name="brushes" size={14} /> Reference</NavLink>
                 <NavLink to="/tools">🧰 Tools</NavLink>
@@ -178,6 +179,7 @@ export default function Layout() {
             <NavLink to="/battle-log" onClick={() => setShowMore(false)}><GoldIcon name="campaigns" size={18} /> Battle Log</NavLink>
             <NavLink to="/showcase" onClick={() => setShowMore(false)}><GoldIcon name="trophy" size={18} /> Showcase</NavLink>
             <NavLink to="/hobby-stats" onClick={() => setShowMore(false)}><GoldIcon name="winged-hour" size={18} /> Hobby Stats</NavLink>
+            <NavLink to="/challenges" onClick={() => setShowMore(false)}><GoldIcon name="lightning" size={18} /> Challenges</NavLink>
             <NavLink to="/suggestions" onClick={() => setShowMore(false)}><GoldIcon name="guides" size={18} /> Guides</NavLink>
             <NavLink to="/inspiration" onClick={() => setShowMore(false)}><GoldIcon name="inspiration" size={18} /> Reference</NavLink>
             <NavLink to="/community" onClick={() => setShowMore(false)}><GoldIcon name="community" size={18} /> Community</NavLink>

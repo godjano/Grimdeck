@@ -1,6 +1,7 @@
 import { PaintTimer, RandomPicker, ShoppingList, CsvImport, ShareCollection, Glossary } from '../components/Tools';
 import PaintMatcher from '../components/PaintMatcher';
 import ColourWheel from '../components/ColourWheel';
+import GoldIcon from '../components/GoldIcon';
 import { addHachetteCollection } from '../db/hachette-collection';
 import { db } from '../db';
 import { useState } from 'react';
@@ -72,7 +73,29 @@ export default function Tools() {
           <p className="settings-desc">Generate a printable PDF of your full collection and paint inventory.</p>
           <button className="btn btn-sm btn-primary" onClick={exportPdf}>Print / Save as PDF</button>
         </div>
+        <BattleScribeImport />
       </div>
+    </div>
+  );
+}
+
+function BattleScribeImport() {
+  const [status, setStatus] = useState('');
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    setStatus('Importing...');
+    try {
+      const { importBattleScribe } = await import('../db/battlescribe-import');
+      const { count, faction } = await importBattleScribe(file);
+      setStatus(`✅ Imported ${count} units (${faction})`);
+    } catch (err: any) { setStatus(`❌ ${err.message}`); }
+  };
+  return (
+    <div className="tool-card">
+      <h3><GoldIcon name="scroll" size={18} /> Import Army List</h3>
+      <p className="settings-desc">Import from BattleScribe (.ros/.rosz) or a plain text list (one unit per line).</p>
+      <input type="file" accept=".ros,.rosz,.txt,.xml" onChange={handleFile} />
+      {status && <p style={{ marginTop: 8, fontSize: '0.82rem' }}>{status}</p>}
     </div>
   );
 }
