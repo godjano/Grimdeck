@@ -81,7 +81,7 @@ function getRank(painted: number) {
   return { current, next };
 }
 
-type Tab = 'profile' | 'trophies' | 'factions' | 'timeline';
+type Tab = 'profile' | 'trophies' | 'factions' | 'timeline' | 'budget';
 
 export default function Progress() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
@@ -165,6 +165,7 @@ export default function Progress() {
         <button className={`game-tab ${tab === 'trophies' ? 'active' : ''}`} onClick={() => setTab('trophies')}><GoldIcon name="medal" size={16} /> Trophies ({trophiesEarned.length}/{TROPHIES.length})</button>
         <button className={`game-tab ${tab === 'factions' ? 'active' : ''}`} onClick={() => setTab('factions')}><GoldIcon name="models" size={16} /> Factions</button>
         <button className={`game-tab ${tab === 'timeline' ? 'active' : ''}`} onClick={() => setTab('timeline')}><GoldIcon name="guides" size={16} /> Timeline</button>
+        <button className={`game-tab ${tab === 'budget' ? 'active' : ''}`} onClick={() => setTab('budget')}><GoldIcon name="chest" size={16} /> Budget</button>
       </div>
 
       {/* ─── Stats Tab ─── */}
@@ -328,6 +329,41 @@ export default function Progress() {
           </div>
         )
       )}
+
+      {tab === 'budget' && (() => {
+        const totalSpent = models.reduce((s, m) => s + (m.pricePaid || 0), 0);
+        const paintedModels = models.filter(m => m.status === 'painted' || m.status === 'based');
+        const paintedCount = paintedModels.reduce((s, m) => s + m.quantity, 0);
+        const costPerPainted = paintedCount > 0 ? totalSpent / paintedCount : 0;
+        const byFaction: Record<string, number> = {};
+        for (const m of models) byFaction[m.faction] = (byFaction[m.faction] || 0) + (m.pricePaid || 0);
+        const factionList = Object.entries(byFaction).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
+
+        return (
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, marginBottom: 20 }}>
+              <div className="stat"><div className="stat-num">£{totalSpent.toFixed(0)}</div><div className="stat-label">Total Spent</div></div>
+              <div className="stat"><div className="stat-num">£{costPerPainted.toFixed(1)}</div><div className="stat-label">Cost per Painted</div></div>
+              <div className="stat"><div className="stat-num">{models.filter(m => m.pricePaid > 0).length}</div><div className="stat-label">Tracked</div></div>
+            </div>
+            {totalSpent === 0 && <p style={{ color: 'var(--text-dim)', fontSize: '0.82rem', textAlign: 'center' }}>Edit your models and add the price paid to start tracking your hobby budget.</p>}
+            {factionList.length > 0 && (
+              <>
+                <h4 style={{ color: 'var(--gold)', fontFamily: "'Cinzel', serif", marginBottom: 8 }}>Spending by Faction</h4>
+                {factionList.map(([faction, spent]) => (
+                  <div key={faction} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                    <span style={{ width: 100, fontSize: '0.78rem', color: 'var(--text)' }}>{faction}</span>
+                    <div style={{ flex: 1, height: 16, background: 'var(--surface2)', borderRadius: 4, overflow: 'hidden' }}>
+                      <div style={{ width: `${(spent / factionList[0][1]) * 100}%`, height: '100%', background: 'linear-gradient(90deg, var(--gold-dim), var(--gold))', borderRadius: 4 }} />
+                    </div>
+                    <span style={{ width: 50, textAlign: 'right', fontSize: '0.78rem', color: 'var(--gold)' }}>£{spent.toFixed(0)}</span>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -118,7 +118,8 @@ export default function Layout() {
 
   return (
     <div className="site">
-      <header className="site-header">
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <header className="site-header" role="banner">
         <div className="header-inner">
           <NavLink to="/" className="logo" end>GRIMDECK</NavLink>
           <nav className="site-nav desktop-nav">
@@ -152,7 +153,7 @@ export default function Layout() {
           </nav>
         </div>
       </header>
-      <main className="site-main">
+      <main className="site-main" id="main-content" role="main">
         <div className="page-transition" key={pageKey}><Outlet /></div>
       </main>
       <footer className="site-footer">
@@ -162,7 +163,7 @@ export default function Layout() {
         </div>
       </footer>
       {/* Mobile bottom nav */}
-      <nav className="mobile-nav">
+      <nav className="mobile-nav" aria-label="Main navigation">
         <NavLink to="/" end><GoldIcon name="home" size={22} /></NavLink>
         <NavLink to="/models"><GoldIcon name="models" size={22} /></NavLink>
         <NavLink to="/paints"><GoldIcon name="paints" size={22} /></NavLink>
@@ -191,7 +192,7 @@ export default function Layout() {
         </div>
       )}
       <FloatingTimer />
-      <button className="fab" onClick={() => setShowQuickAdd(true)} title="Quick add model">+</button>
+      <button className="fab" onClick={() => setShowQuickAdd(true)} title="Quick add model" aria-label="Quick add model">+</button>
       {showQuickAdd && <QuickAdd onClose={() => setShowQuickAdd(false)} />}
       {showSearch && <CmdPalette onClose={() => setShowSearch(false)} />}
       {showShortcuts && (

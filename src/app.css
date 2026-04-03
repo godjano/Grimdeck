@@ -3376,3 +3376,9 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 .technique-tag { font-size: 0.68rem; padding: 3px 8px; border-radius: 12px; cursor: pointer; transition: var(--transition); border: 1px solid var(--border); color: var(--text-dim); }
 .technique-tag.active { background: rgba(184,134,11,0.15); border-color: var(--gold-dim); color: var(--gold); }
 .technique-tag:hover { border-color: var(--gold-dim); }
+
+/* ═══ ACCESSIBILITY ═══ */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.skip-link { position: absolute; top: -40px; left: 0; background: var(--gold); color: #0a0a0e; padding: 8px 16px; z-index: 10000; font-weight: 700; transition: top 0.2s; }
+.skip-link:focus { top: 0; }

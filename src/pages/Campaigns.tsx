@@ -54,9 +54,9 @@ export default function Campaigns() {
 
 function CreateCampaign({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState('');
+  const [arc, setArc] = useState('default');
   const [playerFaction, setPlayerFaction] = useState(KT_FACTIONS[0] || 'Space Marines');
   const [enemyFaction, setEnemyFaction] = useState(() => {
-    // Random enemy that's different from player
     const options = KT_FACTIONS.filter(f => f !== (KT_FACTIONS[0] || 'Space Marines'));
     return options[Math.floor(Math.random() * options.length)] || 'Orks';
   });
@@ -64,9 +64,10 @@ function CreateCampaign({ onDone }: { onDone: () => void }) {
 
   const start = async () => {
     if (!name.trim()) return;
+    const startNode = arc === 'xenos_hunt' ? 'x1_m1' : 'a1_m1';
     const id = await db.campaigns.add({
       name: name.trim(), playerFaction, enemyFaction,
-      currentNodeId: 'a1_m1', status: 'active', turn: 1,
+      currentNodeId: startNode, status: 'active', turn: 1,
       wins: 0, losses: 0, createdAt: Date.now(),
     });
     const ktRoster = getRoster(playerFaction);
@@ -93,6 +94,14 @@ function CreateCampaign({ onDone }: { onDone: () => void }) {
         <div className="field full-width">
           <label>Campaign Name *</label>
           <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Operation Crimson Dawn" />
+        </div>
+        <div className="field full-width">
+          <label>Campaign Arc</label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className={`btn btn-sm ${arc === 'default' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setArc('default')}>⚔️ Operation Crimson Dawn</button>
+            <button className={`btn btn-sm ${arc === 'xenos_hunt' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setArc('xenos_hunt')}>🔬 Xenos Hunt</button>
+          </div>
+          <p style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginTop: 4 }}>{arc === 'default' ? 'Classic 3-act escalating conflict' : 'Track and eliminate a xenos hive threat'}</p>
         </div>
         <div className="field">
           <label>Your Faction</label>

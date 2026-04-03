@@ -42,23 +42,52 @@ export function RandomPicker() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
   const nav = useNavigate();
   const [picked, setPicked] = useState<typeof models[0] | null>(null);
+  const [reason, setReason] = useState('');
 
-  const unpainted = models.filter(m => !m.wishlist && ['unbuilt', 'built', 'primed'].includes(m.status));
+  const unpainted = models.filter(m => !m.wishlist && ['unbuilt', 'built', 'primed', 'wip'].includes(m.status));
 
   const pick = () => {
     if (unpainted.length === 0) return;
-    setPicked(unpainted[Math.floor(Math.random() * unpainted.length)]);
+    // Weight by: age in pile (older = higher), WIP priority, faction balance
+    const now = Date.now();
+    const factionCounts: Record<string, number> = {};
+    for (const m of models.filter(x => x.status === 'painted' || x.status === 'based')) factionCounts[m.faction] = (factionCounts[m.faction] || 0) + 1;
+
+    const weighted = unpainted.map(m => {
+      const ageDays = Math.max(1, (now - (m.createdAt || now)) / 86400000);
+      const ageWeight = Math.min(ageDays / 30, 5); // up to 5x for 5+ months old
+      const wipBonus = m.status === 'wip' ? 3 : m.status === 'primed' ? 2 : m.status === 'built' ? 1.5 : 1;
+      const factionPainted = factionCounts[m.faction] || 0;
+      const factionBonus = factionPainted < 3 ? 2 : 1; // boost underrepresented factions
+      return { model: m, weight: ageWeight * wipBonus * factionBonus, ageDays: Math.round(ageDays) };
+    }).sort((a, b) => b.weight - a.weight);
+
+    // Pick from top 5 weighted
+    const top = weighted.slice(0, Math.min(5, weighted.length));
+    const totalWeight = top.reduce((s, w) => s + w.weight, 0);
+    let r = Math.random() * totalWeight;
+    let choice = top[0];
+    for (const w of top) { r -= w.weight; if (r <= 0) { choice = w; break; } }
+
+    setPicked(choice.model);
+    const reasons = [];
+    if (choice.model.status === 'wip') reasons.push("it's already in progress");
+    else if (choice.ageDays > 60) reasons.push(`it's been in the pile for ${choice.ageDays} days`);
+    if ((factionCounts[choice.model.faction] || 0) < 3) reasons.push(`your ${choice.model.faction} need more painted models`);
+    if (choice.model.status === 'primed') reasons.push("it's primed and ready to go");
+    setReason(reasons.length > 0 ? reasons.join(' and ') : 'random pick!');
   };
 
   return (
     <div className="tool-card">
       <h3><GoldIcon name="target" size={18} /> What Should I Paint?</h3>
-      <p className="settings-desc">Can't decide? Let fate choose from your {unpainted.length} unpainted models.</p>
+      <p className="settings-desc">Smart pick from your {unpainted.length} unpainted models — weighted by pile age, progress, and faction balance.</p>
       <button className="btn btn-primary" onClick={pick} disabled={unpainted.length === 0}>Pick for me!</button>
       {picked && (
         <div className="picker-result" onClick={() => nav(`/model/${picked.id}`)}>
           <div className="picker-name">{picked.name}</div>
           <div className="picker-meta">{picked.faction} · {picked.quantity} models · {picked.status}</div>
+          {reason && <div style={{ fontSize: '0.72rem', color: 'var(--gold)', marginTop: 4, fontStyle: 'italic' }}>Because {reason}</div>}
           <span className="picker-go">Open →</span>
         </div>
       )}
