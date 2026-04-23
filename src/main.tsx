@@ -24,6 +24,7 @@ import BattleLogPage from './pages/BattleLog';
 import Showcase from './pages/Showcase';
 import HobbyStats from './pages/HobbyStats';
 import Challenges from './pages/Challenges';
+import Wishlist from './pages/Wishlist';
 
 const router = createHashRouter([
   {
@@ -51,6 +52,7 @@ const router = createHashRouter([
       { path: 'showcase', element: <Showcase /> },
       { path: 'hobby-stats', element: <HobbyStats /> },
       { path: 'challenges', element: <Challenges /> },
+      { path: 'wishlist', element: <Wishlist /> },
     ],
   },
 ]);

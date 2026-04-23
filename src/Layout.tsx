@@ -59,6 +59,8 @@ function CmdPalette({ onClose }: { onClose: () => void }) {
     { name: 'Grey Pile', path: '/grey-pile' }, { name: 'Progress', path: '/progress' }, { name: 'Campaigns', path: '/campaigns' },
     { name: 'Community', path: '/community' }, { name: 'Army List', path: '/army-list' }, { name: 'Guides', path: '/suggestions' },
     { name: 'Reference', path: '/inspiration' }, { name: 'Tools', path: '/tools' }, { name: 'Settings', path: '/settings' },
+    { name: 'Wishlist', path: '/wishlist' }, { name: 'Challenges', path: '/challenges' }, { name: 'Hobby Stats', path: '/hobby-stats' },
+    { name: 'Showcase', path: '/showcase' }, { name: 'Battle Log', path: '/battle-log' },
   ];
   const lq = q.toLowerCase();
   const results: { name: string; meta: string; go: () => void }[] = !q ? [] : [
@@ -137,6 +139,7 @@ export default function Layout() {
                 <NavLink to="/showcase"><GoldIcon name="trophy" size={14} /> Showcase</NavLink>
                 <NavLink to="/hobby-stats"><GoldIcon name="winged-hour" size={14} /> Hobby Stats</NavLink>
                 <NavLink to="/challenges"><GoldIcon name="lightning" size={14} /> Challenges</NavLink>
+                <NavLink to="/wishlist"><GoldIcon name="medal" size={14} /> Wishlist</NavLink>
                 <NavLink to="/suggestions"><GoldIcon name="guides" size={14} /> Guides</NavLink>
                 <NavLink to="/inspiration"><GoldIcon name="brushes" size={14} /> Reference</NavLink>
                 <NavLink to="/tools">🧰 Tools</NavLink>
@@ -181,6 +184,7 @@ export default function Layout() {
             <NavLink to="/showcase" onClick={() => setShowMore(false)}><GoldIcon name="trophy" size={18} /> Showcase</NavLink>
             <NavLink to="/hobby-stats" onClick={() => setShowMore(false)}><GoldIcon name="winged-hour" size={18} /> Hobby Stats</NavLink>
             <NavLink to="/challenges" onClick={() => setShowMore(false)}><GoldIcon name="lightning" size={18} /> Challenges</NavLink>
+            <NavLink to="/wishlist" onClick={() => setShowMore(false)}><GoldIcon name="medal" size={18} /> Wishlist</NavLink>
             <NavLink to="/suggestions" onClick={() => setShowMore(false)}><GoldIcon name="guides" size={18} /> Guides</NavLink>
             <NavLink to="/inspiration" onClick={() => setShowMore(false)}><GoldIcon name="inspiration" size={18} /> Reference</NavLink>
             <NavLink to="/community" onClick={() => setShowMore(false)}><GoldIcon name="community" size={18} /> Community</NavLink>
