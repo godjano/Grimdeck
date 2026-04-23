@@ -29,7 +29,9 @@ export default function GreyPile() {
   const estHours = Math.round((totalGrey / 5) * 2);
 
   const updateStatus = async (id: number, status: ModelStatus) => {
-    await db.models.update(id, { status });
+    const update: any = { status };
+    if (status === 'wip' || status === 'painted' || status === 'based') update.lastPaintedAt = Date.now();
+    await db.models.update(id, update);
   };
 
   // Group models

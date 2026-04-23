@@ -61,7 +61,9 @@ export default function Models() {
 
   const toggleSelect = (id: number) => setSelected(s => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const batchStatus = async (status: string) => {
-    for (const id of selected) await db.models.update(id, { status: status as any });
+    const update: any = { status };
+    if (status === 'wip' || status === 'painted' || status === 'based') update.lastPaintedAt = Date.now();
+    for (const id of selected) await db.models.update(id, update);
     setSelected(new Set()); setSelectMode(false);
   };
 
@@ -108,7 +110,9 @@ export default function Models() {
   };
 
   const updateStatus = async (id: number, status: ModelStatus) => {
-    await db.models.update(id, { status });
+    const update: any = { status };
+    if (status === 'wip' || status === 'painted' || status === 'based') update.lastPaintedAt = Date.now();
+    await db.models.update(id, update);
   };
 
   const groups: Record<string, typeof filtered> = {};

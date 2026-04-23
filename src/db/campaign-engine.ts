@@ -130,25 +130,6 @@ export function fillNarrative(text: string, playerFaction: string, enemyFaction:
 // Simple dice roller
 export function rollD6(): number { return Math.floor(Math.random() * 6) + 1; }
 
-// AI combat resolution — returns outcome based on difficulty and luck
-export function resolveCombat(difficulty: number, operativeCount: number): { outcome: 'win' | 'loss' | 'draw'; playerCasualties: number; enemyCasualties: number } {
-  const playerRolls = Array.from({ length: operativeCount }, rollD6);
-  const enemyRolls = Array.from({ length: Math.max(3, operativeCount + difficulty - 1) }, rollD6);
-
-  const playerScore = playerRolls.reduce((a, b) => a + b, 0);
-  const enemyScore = enemyRolls.reduce((a, b) => a + b, 0);
-
-  const margin = playerScore - enemyScore;
-  const playerCasualties = Math.max(0, Math.min(operativeCount - 1, Math.floor(enemyRolls.filter(r => r >= 5).length * (difficulty / 2))));
-  const enemyCasualties = Math.max(1, playerRolls.filter(r => r >= 4).length);
-
-  return {
-    outcome: margin > 2 ? 'win' : margin < -2 ? 'loss' : (rollD6() >= 4 ? 'win' : 'loss'),
-    playerCasualties,
-    enemyCasualties,
-  };
-}
-
 const OPERATIVE_NAMES: Record<string, string[]> = {
   'Space Marines': ['Brother Titus', 'Brother Castiel', 'Brother Varn', 'Sergeant Theron', 'Brother Kael', 'Brother Dorn'],
   'Astra Militarum': ['Sergeant Holt', 'Trooper Vex', 'Trooper Kira', 'Corporal Dane', 'Trooper Marsh', 'Trooper Sully'],
@@ -242,6 +223,3 @@ export const ALL_CAMPAIGNS = [
   { id: 'xenos_hunt', name: 'Xenos Hunt', desc: 'Track and eliminate a xenos hive threat', missions: XENOS_HUNT_MISSIONS },
 ];
 
-export function getMissionFromArc(id: string): MissionNode | undefined {
-  return [...CAMPAIGN_MISSIONS, ...XENOS_HUNT_MISSIONS].find(m => m.id === id);
-}

@@ -17,7 +17,7 @@ export default function CampaignPlay() {
   const nav = useNavigate();
   const campaignId = Number(id);
   const [difficulty, setDifficulty] = useState<AIDifficulty>(() => {
-    try { return (localStorage.getItem(`grimdeck_diff_${campaignId}`) as AIDifficulty) || 'normal'; } catch { return 'normal'; }
+    try { return (localStorage.getItem(`grimdeck_diff_${campaignId}`) as AIDifficulty) || 'normal'; } catch (e) { console.error(e); return 'normal'; }
   });
   const [mode, setMode] = useState<Mode>(() => {
     // Resume game if saved state exists
@@ -27,7 +27,7 @@ export default function CampaignPlay() {
         const k = localStorage.key(i);
         if (k?.startsWith(key)) return 'playing';
       }
-    } catch {}
+    } catch (e) { console.error(e); }
     return 'campaign';
   });
   const [selectedOps, setSelectedOps] = useState<KTOperative[]>([]); void selectedOps;
@@ -50,7 +50,7 @@ export default function CampaignPlay() {
         missionTitle={mission?.title}
         missionObjective={mission?.objectiveText}
         onGameEnd={async (result, pCasualties, eCasualties) => {
-          const outcome = result === 'draw' ? 'loss' : result;
+          const outcome = result;
           const narrative = fillNarrative(
             outcome === 'win' ? (mission?.winNarrative || 'Victory!') : (mission?.lossNarrative || 'Defeat.'),
             campaign.playerFaction, campaign.enemyFaction
@@ -83,7 +83,7 @@ export default function CampaignPlay() {
 
           const nextId = outcome === 'win' ? mission?.winNext : mission?.lossNext;
           const newWins = campaign.wins + (outcome === 'win' ? 1 : 0);
-          const newLosses = campaign.losses + (outcome !== 'win' ? 1 : 0);
+          const newLosses = campaign.losses + (outcome === 'loss' ? 1 : 0);
 
           if (!nextId) {
             await db.campaigns.update(campaignId, { status: outcome === 'win' ? 'won' : 'lost', wins: newWins, losses: newLosses, turn: campaign.turn + 1 });

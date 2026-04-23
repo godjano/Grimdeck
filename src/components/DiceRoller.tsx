@@ -47,7 +47,6 @@ export default function DiceRoller() {
     }, 50);
   }, [diceCount, diceSides, modifier, threshold, rerollOnes, rerollBelow, diceCount]);
 
-  const hits = results.filter(d => d >= threshold).length;
   const total = results.reduce((s, d) => s + d, 0) + modifier;
   const successes = results.filter(d => d >= threshold).length;
   const failures = results.filter(d => d < threshold).length;

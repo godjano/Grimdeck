@@ -42,9 +42,7 @@ export default function Community() {
 
   return (
     <div>
-      <div className="page-header" style={{ paddingTop: 48 }}>
-        <PageBanner title="Community" subtitle="Share your work and get inspired" icon="community" />
-      </div>
+      <PageBanner title="Community" subtitle="Share your work and get inspired" icon="community" />
 
       <div className="game-tabs" style={{ marginBottom: 20 }}>
         <button className={`game-tab ${tab === 'gallery' ? 'active' : ''}`} onClick={() => setTab('gallery')}><GoldIcon name="lens" size={14} /> Gallery</button>

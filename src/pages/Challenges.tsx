@@ -6,7 +6,7 @@ import GoldIcon from '../components/GoldIcon';
 
 interface Challenge {
   id: string; title: string; desc: string; icon: string;
-  check: (models: any[], logs: any[]) => boolean;
+  check: (models: any[], logs: any[], battleLogs?: any[]) => boolean;
   month?: number; // 0=Jan, 11=Dec. undefined = evergreen
 }
 
@@ -21,7 +21,7 @@ const MONTHLY: Challenge[] = [
   { id: 'aug', title: 'Augmented August', desc: 'Paint something with metallics — tag it NMM or use metallic paints', icon: 'chalice', month: 7, check: (m) => m.some(x => (x.techniques || []).includes('NMM')) },
   { id: 'sep', title: 'September Showcase', desc: 'Add photos to 5 painted models', icon: 'lens', month: 8, check: (m) => m.filter(x => (x.status === 'painted' || x.status === 'based') && x.photoUrl).length >= 5 },
   { id: 'oct', title: 'Orktober', desc: 'Paint something green — Orks, Nurgle, Salamanders, anything!', icon: 'skull-bones', month: 9, check: (m) => monthPainted(m) >= 1 },
-  { id: 'nov', title: 'Novembattle', desc: 'Play 3 games and log them in Battle Log', icon: 'campaigns', month: 10, check: () => false }, // checked separately
+  { id: 'nov', title: 'Novembattle', desc: 'Play 3 games and log them in Battle Log', icon: 'campaigns', month: 10, check: (_m, _l, bl) => (bl || []).filter(b => new Date(b.date).getMonth() === 10).length >= 3 },
   { id: 'dec', title: 'Decembuild', desc: 'Build and prime 5 models — get ready for the new year', icon: 'hammer', month: 11, check: (m) => m.filter(x => x.status === 'primed').length >= 5 },
 ];
 
@@ -43,6 +43,7 @@ function monthPainted(models: any[]) {
 export default function Challenges() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
   const logs = useLiveQuery(() => db.paintingLogs.toArray()) ?? [];
+  const battleLogs = useLiveQuery(() => db.battleLogs.toArray()) ?? [];
   const [tab, setTab] = useState<'monthly' | 'evergreen'>('monthly');
   const now = new Date();
   const currentMonth = now.getMonth();
@@ -66,10 +67,10 @@ export default function Challenges() {
               <div style={{ fontWeight: 700, fontSize: '1.05rem', fontFamily: "'Cinzel', serif", color: 'var(--gold)' }}>{currentChallenge.title}</div>
               <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>{currentChallenge.desc}</div>
             </div>
-            {(currentChallenge.check(models, logs) || completed.includes(currentChallenge.id)) ? (
+            {(currentChallenge.check(models, logs, battleLogs) || completed.includes(currentChallenge.id)) ? (
               <span style={{ color: '#2ecc71', fontWeight: 700, fontSize: '0.85rem' }}>✓ Done!</span>
             ) : (
-              <button className="btn btn-sm btn-ghost" onClick={() => { if (currentChallenge.check(models, logs)) markDone(currentChallenge.id); }}>Check</button>
+              <button className="btn btn-sm btn-ghost" onClick={() => { if (currentChallenge.check(models, logs, battleLogs)) markDone(currentChallenge.id); }}>Check</button>
             )}
           </div>
         </div>
@@ -81,7 +82,7 @@ export default function Challenges() {
       </div>
 
       {challenges.map(c => {
-        const done = c.check(models, logs) || completed.includes(c.id);
+        const done = c.check(models, logs, battleLogs) || completed.includes(c.id);
         return (
           <div key={c.id} className="card" style={{ cursor: 'default', opacity: done ? 0.6 : 1 }}>
             <GoldIcon name={c.icon} size={20} />

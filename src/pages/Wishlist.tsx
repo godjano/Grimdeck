@@ -7,11 +7,10 @@ import PageBanner from '../components/PageBanner';
 
 export default function Wishlist() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
-  const paints = useLiveQuery(() => db.paints.toArray()) ?? [];
   const nav = useNavigate();
   const [tab, setTab] = useState<'models' | 'paints'>('models');
   const [newItem, setNewItem] = useState('');
-  const [newType, setNewType] = useState<'model' | 'paint'>('model');
+
   const [newFaction, setNewFaction] = useState('');
   const [newBrand, setNewBrand] = useState('Citadel');
   const [newPriority, setNewPriority] = useState<'low' | 'medium' | 'high'>('medium');
@@ -40,7 +39,6 @@ export default function Wishlist() {
 
   // Prices
   const totalModelPrice = wishModels.reduce((s, m) => s + (m.pricePaid || 0), 0);
-  const totalWishModels = wishModels.reduce((s, m) => s + m.quantity, 0);
 
   const addWishPaint = () => {
     if (!newItem.trim()) return;
@@ -125,7 +123,7 @@ export default function Wishlist() {
                 <label>Name</label>
                 <input value={newItem} onChange={e => setNewItem(e.target.value)} placeholder={tab === 'models' ? 'e.g. Imperial Knight' : 'e.g. Wraithbone'} style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 12px', color: 'var(--text)', fontSize: '0.85rem', fontFamily: 'inherit', width: '100%' }} />
               </div>
-              {tab === 'models' && !newType.startsWith('paint') && (
+              {tab === 'models' && !newItem.startsWith('paint') && (
                 <div className="field">
                   <label>Faction</label>
                   <input value={newFaction} onChange={e => setNewFaction(e.target.value)} placeholder="e.g. Space Marines" style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 6, padding: '8px 12px', color: 'var(--text)', fontSize: '0.85rem', fontFamily: 'inherit', width: '100%' }} />

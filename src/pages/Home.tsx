@@ -20,9 +20,9 @@ export default function Home() {
 
   // Monthly goal
   const now = new Date();
-  const thisMonth = models.filter(m => (m.status === 'painted' || m.status === 'based') && m.createdAt && new Date(m.createdAt).getMonth() === now.getMonth() && new Date(m.createdAt).getFullYear() === now.getFullYear());
+  const thisMonth = models.filter(m => (m.status === 'painted' || m.status === 'based') && m.lastPaintedAt && new Date(m.lastPaintedAt).getMonth() === now.getMonth() && new Date(m.lastPaintedAt).getFullYear() === now.getFullYear());
   const monthlyPainted = thisMonth.reduce((s, m) => s + m.quantity, 0);
-  const monthlyGoal = 5;
+  const monthlyGoal = Number(localStorage.getItem('grimdeck_monthly_goal') || 5);
   const goalPct = Math.min(100, Math.round((monthlyPainted / monthlyGoal) * 100));
 
   const divider = <div className="gold-divider"><img src={`${import.meta.env.BASE_URL}decor/divider-gold.png`} alt="" loading="lazy" /></div>;
@@ -84,7 +84,7 @@ export default function Home() {
               <text x="28" y="32" textAnchor="middle" fill="var(--gold)" fontSize="14" fontWeight="bold">{monthlyPainted}</text>
             </svg>
             <div className="goal-ring-info">
-              <div className="goal-ring-title">Monthly Goal</div>
+              <div className="goal-ring-title" style={{ cursor: 'pointer' }} onClick={() => { const v = prompt('Set monthly painting goal:', String(monthlyGoal)); if (v && !isNaN(Number(v)) && Number(v) > 0) { localStorage.setItem('grimdeck_monthly_goal', v); window.location.reload(); } }}>Monthly Goal</div>
               <div className="goal-ring-sub">{monthlyPainted} of {monthlyGoal} models painted this month</div>
             </div>
           </div>
