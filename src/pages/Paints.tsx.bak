@@ -1,0 +1,271 @@
+import { useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../db';
+import { PAINT_TYPES } from '../types';
+import { BulkAddPaints } from '../components/BulkAdd';
+import { Plus, Package, Search, Filter, Grid3X3, List, LayoutGrid, ChevronDown, ChevronRight, Trash2, X } from 'lucide-react';
+import PageBanner from '../components/PageBanner';
+import PaintRackDashboard from '../components/paints/PaintRackDashboard';
+import PaintAnalytics from '../components/paints/PaintAnalytics';
+import EnhancedAddPaint from '../components/paints/EnhancedAddPaint';
+
+type ViewMode = 'grid' | 'grouped' | 'list' | 'analytics';
+type SortMode = 'name' | 'brand' | 'colour';
+
+function hexToHsl(hex: string): [number, number, number] {
+  const c = hex.replace('#', '');
+  const r = parseInt(c.substring(0, 2), 16) / 255;
+  const g = parseInt(c.substring(2, 4), 16) / 255;
+  const b = parseInt(c.substring(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h = 0;
+  if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+  else if (max === g) h = ((b - r) / d + 2) / 6;
+  else h = ((r - g) / d + 4) / 6;
+  return [h, s, l];
+}
+
+function colourFamily(h: number, s: number, l: number): number {
+  if (l < 0.08) return 0;
+  if (l > 0.92) return 1;
+  if (s < 0.1) return 2;
+  const deg = h * 360;
+  if (deg < 15) return 10;
+  if (deg < 40) return 11;
+  if (deg < 70) return 12;
+  if (deg < 160) return 13;
+  if (deg < 200) return 14;
+  if (deg < 260) return 15;
+  if (deg < 310) return 16;
+  return 10;
+}
+
+export default function Paints() {
+  const [showForm, setShowForm] = useState(false);
+  const [showBulk, setShowBulk] = useState(false);
+  const [filterBrand, setFilterBrand] = useState('');
+  const [filterType, setFilterType] = useState('');
+  const [search, setSearch] = useState('');
+  const [view, setView] = useState<ViewMode>('grid');
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState<SortMode>('name');
+
+  const paints = useLiveQuery(() => db.paints.orderBy('name').toArray()) ?? [];
+  const links = useLiveQuery(() => db.modelPaintLinks.toArray()) ?? [];
+  const brands = [...new Set(paints.map(p => p.brand))].sort();
+
+  // Build paint usage map
+  const usageMap = new Map<number, number>();
+  links.forEach(l => { usageMap.set(l.paintId, (usageMap.get(l.paintId) || 0) + 1); });
+
+  const filtered = paints.filter(p =>
+    (!filterBrand || p.brand === filterBrand) &&
+    (!filterType || p.type === filterType) &&
+    (!search || p.name.toLowerCase().includes(search.toLowerCase()))
+  ).sort((a, b) => {
+    if (sortBy === 'colour') {
+      const [h1, s1, l1] = hexToHsl(a.hexColor || '#000000');
+      const [h2, s2, l2] = hexToHsl(b.hexColor || '#000000');
+      const f1 = colourFamily(h1, s1, l1), f2 = colourFamily(h2, s2, l2);
+      if (f1 !== f2) return f1 - f2;
+      if (Math.abs(h1 - h2) > 0.02) return h1 - h2;
+      return l1 - l2;
+    }
+    if (sortBy === 'brand') return (a.brand + a.name).localeCompare(b.brand + b.name);
+    return a.name.localeCompare(b.name);
+  });
+
+  const deletePaint = async (id: number) => {
+    await db.paints.delete(id);
+    await db.modelPaintLinks.where('paintId').equals(id).delete();
+  };
+
+  const toggleGroup = (key: string) => {
+    const next = new Set(collapsed);
+    next.has(key) ? next.delete(key) : next.add(key);
+    setCollapsed(next);
+  };
+
+  const groups: Record<string, typeof filtered> = {};
+  for (const p of filtered) {
+    const key = `${p.brand} · ${p.type}`;
+    (groups[key] ??= []).push(p);
+  }
+
+  const activeFilters = [filterBrand, filterType].filter(Boolean).length;
+
+  return (
+    <div>
+      <PageBanner title="Paint Rack" subtitle="Catalog paints across all major brands" icon="paints" />
+      <div className="page-header">
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-ghost btn-sm" onClick={() => { setShowBulk(!showBulk); setShowForm(false); }}>
+            <Package size={16} />
+          </button>
+          <button className="btn btn-primary btn-sm" onClick={() => { setShowForm(!showForm); setShowBulk(false); }}>
+            {showForm ? <X size={16} /> : <><Plus size={16} /> Add</>}
+          </button>
+        </div>
+      </div>
+
+      {showBulk && <BulkAddPaints onDone={() => setShowBulk(false)} />}
+      {showForm && <EnhancedAddPaint onDone={() => setShowForm(false)} />}
+
+      {/* Dashboard */}
+      <PaintRackDashboard paints={paints} />
+
+      {/* Brand pills */}
+      <div className="pr-brand-pills">
+        <button className={`pr-brand-pill ${!filterBrand ? 'active' : ''}`} onClick={() => setFilterBrand('')}>
+          All <span>{paints.length}</span>
+        </button>
+        {brands.map(b => (
+          <button key={b} className={`pr-brand-pill ${filterBrand === b ? 'active' : ''}`} onClick={() => setFilterBrand(filterBrand === b ? '' : b)}>
+            {b} <span>{paints.filter(p => p.brand === b).length}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Search + filters */}
+      <div className="ml-search-row">
+        <div className="ml-search-wrap">
+          <Search size={16} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search paints..." />
+        </div>
+        <button className={`btn btn-sm btn-ghost ${activeFilters ? 'ml-filter-active' : ''}`} onClick={() => setShowFilters(!showFilters)}>
+          <Filter size={14} />
+        </button>
+        <div className="ml-view-toggle">
+          <button className={view === 'grid' ? 'active' : ''} onClick={() => setView('grid')}><Grid3X3 size={14} /></button>
+          <button className={view === 'grouped' ? 'active' : ''} onClick={() => setView('grouped')}><LayoutGrid size={14} /></button>
+          <button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')}><List size={14} /></button>
+          <button className={view === 'analytics' ? 'active' : ''} onClick={() => setView('analytics')} title="Analytics">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      {showFilters && (
+        <div className="ml-filters">
+          <select value={filterType} onChange={e => setFilterType(e.target.value)}>
+            <option value="">All types</option>
+            {PAINT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+          {activeFilters > 0 && <button className="btn btn-sm btn-ghost" onClick={() => { setFilterBrand(''); setFilterType(''); }}>Clear</button>}
+        </div>
+      )}
+
+      <div className="ml-results">
+        <span>{filtered.length} paints</span>
+        <select className="pr-sort-select" value={sortBy} onChange={e => setSortBy(e.target.value as SortMode)}>
+          <option value="name">Sort: Name</option>
+          <option value="brand">Sort: Brand</option>
+          <option value="colour">Sort: Colour</option>
+        </select>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="md-empty-tab" style={{ marginTop: 40 }}>
+          <img src={`${import.meta.env.BASE_URL}banners/empty-collection.png`} alt="" style={{ width: 200, height: 'auto', borderRadius: 12, opacity: 0.6, marginBottom: 12 }} />
+          <p>{paints.length === 0 ? 'Add your first paint to start your rack.' : 'No paints match your filters.'}</p>
+        </div>
+      ) : view === 'analytics' ? (
+        <PaintAnalytics paints={paints} />
+      ) : view === 'grid' ? (
+        /* Paint rack — shelves with pots */
+        <div className="pr-rack">
+          {(() => {
+            const maxCols = typeof window !== 'undefined' && window.innerWidth < 600 ? 5 : 8;
+            const cols = Math.min(maxCols, filtered.length) || 1;
+            const rows: typeof filtered[] = [];
+            for (let i = 0; i < filtered.length; i += cols) rows.push(filtered.slice(i, i + cols));
+            return rows.map((row, ri) => (
+              <div key={ri} className="pr-shelf">
+                <div className="pr-shelf-pots">
+                  {row.map(p => {
+                    const modelCount = usageMap.get(p.id!) || 0;
+                    const isLow = p.quantity <= 1;
+                    return (
+                      <div key={p.id} className={`pr-pot ${isLow ? 'pr-pot-low' : ''}`} title={`${p.name}\n${p.brand} · ${p.range} · ${p.type}\nQty: ${p.quantity}${modelCount > 0 ? `\nUsed in ${modelCount} recipe(s)` : ''}`}>
+                        {isLow && <div className="pr-pot-low-badge">!</div>}
+                        <div className="pr-pot-cap" style={{ background: p.hexColor || '#555' }}>
+                          <div className="pr-pot-shine" />
+                        </div>
+                        <div className="pr-pot-body">
+                          <div className="pr-pot-name">{p.name}</div>
+                          <div className="pr-pot-brand">{p.brand}</div>
+                          {modelCount > 0 && <div className="pr-pot-usage">{modelCount} recipes</div>}
+                          <div className="pr-pot-qty">
+                            <button onClick={e => { e.stopPropagation(); if (p.quantity > 0) db.paints.update(p.id!, { quantity: p.quantity - 1 }); }}>−</button>
+                            <span>{p.quantity}</span>
+                            <button onClick={e => { e.stopPropagation(); db.paints.update(p.id!, { quantity: p.quantity + 1 }); }}>+</button>
+                          </div>
+                        </div>
+                        <button className="pr-pot-del" onClick={(e) => { e.stopPropagation(); deletePaint(p.id!); }}><Trash2 size={10} /></button>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="pr-shelf-board" />
+              </div>
+            ));
+          })()}
+        </div>
+      ) : view === 'grouped' ? (
+        Object.entries(groups).sort(([a], [b]) => a.localeCompare(b)).map(([key, items]) => (
+          <div key={key} className="pr-group">
+            <div className="ml-group-header" onClick={() => toggleGroup(key)}>
+              {collapsed.has(key) ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+              <span className="ml-group-title">{key}</span>
+              <span className="ml-group-count">{items.length}</span>
+            </div>
+            {!collapsed.has(key) && (
+              <div className="pr-chips">
+                {items.map(p => (
+                  <div key={p.id} className="pr-chip">
+                    <div className="pr-chip-dot" style={{ background: p.hexColor || '#555' }} />
+                    <span className="pr-chip-name">{p.name}</span>
+                    {(usageMap.get(p.id!) || 0) > 0 && <span className="pr-chip-usage">{usageMap.get(p.id!)}</span>}
+                    {p.quantity <= 1 && <span className="pr-chip-low">!</span>}
+                    <button className="pr-chip-del" onClick={() => deletePaint(p.id!)}><X size={10} /></button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))
+      ) : (
+        <div className="pr-list">
+          {filtered.map(p => {
+            const modelCount = usageMap.get(p.id!) || 0;
+            const isLow = p.quantity <= 1;
+            return (
+              <div key={p.id} className={'pr-list-item' + (isLow ? ' paint-low' : '')}>
+                <div className="pr-list-swatch" style={{ background: p.hexColor || '#555' }} />
+                <div className="pr-list-info">
+                  <div className="pr-list-name">{p.name}{isLow && <span className="paint-low-badge">LOW</span>}</div>
+                  <div className="pr-list-meta">{p.brand}{p.range ? ' · ' + p.range : ''} · {p.type}</div>
+                </div>
+                <div className="pr-list-stats">
+                  {modelCount > 0 && <span className="pr-list-usage">{modelCount} recipes</span>}
+                  <span className="pr-list-qty">Qty: {p.quantity}</span>
+                </div>
+                <div className="pr-list-qty-inline">
+                  <button onClick={() => { if (p.quantity > 0) db.paints.update(p.id!, { quantity: p.quantity - 1 }); }}>-</button>
+                  <span>{p.quantity}</span>
+                  <button onClick={() => db.paints.update(p.id!, { quantity: p.quantity + 1 }); }>+</button>
+                </div>
+                <button className="btn-icon-sm" onClick={() => deletePaint(p.id!)}><Trash2 size={14} /></button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,8 +1,9 @@
 import GoldIcon from '../components/GoldIcon';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import type { Paint } from '../types';
+import PageBanner from '../components/PageBanner';
 
 type HarmonyType = 'complementary' | 'triadic' | 'analogous' | 'split-complementary' | 'tetradic';
 import { PAINTING_GUIDES, ADVANCED_GUIDES, MORE_GUIDES, type PaintingGuide } from '../db/painting-guides';
@@ -90,8 +91,29 @@ export default function PaintSuggestions() {
   const [harmony, setHarmony] = useState<HarmonyType>('triadic');
   const [customScheme, setCustomScheme] = useState<string[]>(['#c62828', '#f5c518', '#1a1a1a']);
   const [schemeName, setSchemeName] = useState('');
+  const [toast, setToast] = useState('');
+  const [copiedHex, setCopiedHex] = useState('');
 
   const harmonyColors = getHarmony(baseColor, harmony);
+
+  // Toast auto-dismiss
+  useEffect(() => { if (toast) { const t = setTimeout(() => setToast(''), 2500); return () => clearTimeout(t); } }, [toast]);
+  // Copied flash auto-dismiss
+  useEffect(() => { if (copiedHex) { const t = setTimeout(() => setCopiedHex(''), 1200); return () => clearTimeout(t); } }, [copiedHex]);
+
+  const copyToClipboard = useCallback((hex: string) => {
+    navigator.clipboard.writeText(hex).catch(() => {});
+    setCopiedHex(hex);
+  }, []);
+
+  const saveScheme = useCallback(() => {
+    try {
+      const saved: { name: string; colors: string[]; savedAt: string }[] = JSON.parse(localStorage.getItem('grimdeck-schemes') || '[]');
+      saved.push({ name: schemeName || `Scheme ${saved.length + 1}`, colors: [...customScheme], savedAt: new Date().toISOString() });
+      localStorage.setItem('grimdeck-schemes', JSON.stringify(saved));
+      setToast('✓ Scheme saved to collection!');
+    } catch { setToast('Failed to save scheme.'); }
+  }, [schemeName, customScheme]);
 
   const addColorToScheme = () => {
     if (customScheme.length < 8) setCustomScheme([...customScheme, '#888888']);
@@ -109,18 +131,23 @@ export default function PaintSuggestions() {
 
   return (
     <div>
-      <div className="page-header" style={{ paddingTop: 48 }}>
-        <h2><GoldIcon name="paints" size={22} /> Paint Suggestions</h2>
-      </div>
+      <PageBanner title="Paint Guides" subtitle="Recipes, colour theory, guides & inspiration" icon="guides" />
 
-      <div className="game-tabs" style={{ marginBottom: 24 }}>
-        {([['creators', 'Creator Recipes', 'star-shield2'], ['guides', 'Guides', 'guides'], ['paintalong', 'Paint Along', 'paints'], ['wheel', 'Colour Wheel', 'settings'], ['builder', 'Builder', 'hammer'], ['auto', 'Auto', 'lightning'], ['inspiration', 'Inspiration', 'lens']] as [Tab, string, string][]).map(([t, label, icon]) => (
-          <button key={t} className={`game-tab ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}><GoldIcon name={icon} size={14} /> {label}</button>
+      {/* ─── Toast ─── */}
+      {toast && <div className="paint-toast">{toast}</div>}
+
+      <div className="paint-suggest-tabs">
+        {([['creators', 'Creator Recipes', 'star-shield2'], ['guides', 'Guides', 'guides'], ['paintalong', 'Paint Along', 'paints'], ['wheel', 'Colour Wheel', 'settings'], ['builder', 'Builder', 'hammer'], ['auto', 'Auto', 'lightning'], ['inspiration', 'Inspiration', 'lens']] as [Tab, string, string][]).map(([t, label, icon], idx) => (
+          <button key={t} className={`paint-suggest-tab ${tab === t ? 'active' : ''} paint-suggest-tab-animated`} onClick={() => setTab(t)} style={{ '--tab-idx': idx } as React.CSSProperties}>
+            <GoldIcon name={icon} size={14} />
+            <span>{label}</span>
+            {tab === t && <span className="paint-suggest-tab-indicator" />}
+          </button>
         ))}
       </div>
 
       {/* ─── Creator Recipes ─── */}
-      {tab === 'creators' && <CreatorRecipesTab paints={paints} />}
+      {tab === 'creators' && <CreatorRecipesTab paints={paints} copiedHex={copiedHex} copyToClipboard={copyToClipboard} />}
 
       {/* ─── Paint Along Mode ─── */}
       {tab === 'paintalong' && <PaintAlongTab />}
@@ -135,30 +162,78 @@ export default function PaintSuggestions() {
             <h3 className="settings-title">Colour Harmony Generator</h3>
             <p className="settings-desc">Pick a base colour and generate harmonious palettes using colour theory.</p>
 
-            <div className="wheel-controls">
-              <div className="wheel-picker">
-                <label className="field-label">Base Colour</label>
-                <div className="color-picker-row">
-                  <input type="color" value={baseColor} onChange={e => setBaseColor(e.target.value)} />
-                  <input value={baseColor} onChange={e => setBaseColor(e.target.value)} style={{ flex: 1, background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', color: 'var(--text)', fontFamily: 'monospace' }} />
-                </div>
+            <div className="wheel-layout">
+              {/* HSL Colour Wheel SVG */}
+              <div className="hsl-wheel-wrapper">
+                <svg viewBox="0 0 200 200" className="hsl-wheel-svg">
+                  {/* Outer ring segments */}
+                  {Array.from({ length: 360 }, (_, deg) => {
+                    const rad1 = ((deg - 91) * Math.PI) / 180;
+                    const rad2 = ((deg - 89) * Math.PI) / 180;
+                    const r1 = 85, r2 = 98;
+                    return (
+                      <line key={deg} x1={100 + r1 * Math.cos(rad1)} y1={100 + r1 * Math.sin(rad1)} x2={100 + r2 * Math.cos(rad2)} y2={100 + r2 * Math.sin(rad2)}
+                        stroke={`hsl(${deg}, 80%, 55%)`} strokeWidth={2} />
+                    );
+                  })}
+                  {/* Inner circle background */}
+                  <circle cx="100" cy="100" r="83" fill="var(--surface)" stroke="var(--border)" strokeWidth="1" />
+                  {/* Harmony type lines connecting colours */}
+                  {harmonyColors.length > 2 && harmonyColors.map((c, i) => {
+                    if (i === 0) return null;
+                    const h = hexToHsl(c)[0];
+                    const rad = ((h - 90) * Math.PI) / 180;
+                    return <line key={`line-${i}`} x1="100" y1="100" x2={100 + 75 * Math.cos(rad)} y2={100 + 75 * Math.sin(rad)} stroke={c} strokeWidth="1.5" strokeDasharray="4 3" opacity="0.35" />;
+                  })}
+                  {/* Base colour marker */}
+                  {(() => {
+                    const h = hexToHsl(baseColor)[0];
+                    const rad = ((h - 90) * Math.PI) / 180;
+                    return <circle cx={100 + 75 * Math.cos(rad)} cy={100 + 75 * Math.sin(rad)} r="8" fill={baseColor} stroke="#fff" strokeWidth="2.5" className="hsl-wheel-marker" />;
+                  })()}
+                  {/* Harmony colour markers */}
+                  {harmonyColors.slice(1).map((c, i) => {
+                    const h = hexToHsl(c)[0];
+                    const rad = ((h - 90) * Math.PI) / 180;
+                    return <circle key={i} cx={100 + 75 * Math.cos(rad)} cy={100 + 75 * Math.sin(rad)} r="6" fill={c} stroke="rgba(255,255,255,0.7)" strokeWidth="2" className="hsl-wheel-marker-sm" />;
+                  })}
+                  {/* Center label */}
+                  <text x="100" y="96" textAnchor="middle" fill="var(--text-dim)" fontSize="8" fontFamily="Cinzel">HSL</text>
+                  <text x="100" y="108" textAnchor="middle" fill="var(--gold-dim)" fontSize="7">{harmony}</text>
+                </svg>
               </div>
-              <div className="harmony-select">
-                <label className="field-label">Harmony Type</label>
-                <div className="harmony-buttons">
-                  {(['complementary', 'triadic', 'analogous', 'split-complementary', 'tetradic'] as HarmonyType[]).map(h => (
-                    <button key={h} className={`btn btn-sm ${harmony === h ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHarmony(h)}>{h}</button>
-                  ))}
+
+              {/* Controls */}
+              <div className="wheel-controls-col">
+                <div className="wheel-picker">
+                  <label className="field-label">Base Colour</label>
+                  <div className="color-picker-row">
+                    <input type="color" value={baseColor} onChange={e => setBaseColor(e.target.value)} />
+                    <input value={baseColor} onChange={e => setBaseColor(e.target.value)} style={{ flex: 1, background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', color: 'var(--text)', fontFamily: 'monospace' }} />
+                  </div>
+                </div>
+                <div className="harmony-select">
+                  <label className="field-label">Harmony Type</label>
+                  <div className="harmony-buttons">
+                    {(['complementary', 'triadic', 'analogous', 'split-complementary', 'tetradic'] as HarmonyType[]).map(h => (
+                      <button key={h} className={`btn btn-sm ${harmony === h ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setHarmony(h)}>{h}</button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="harmony-result">
-              <div className="harmony-swatches">
+              <div className="harmony-swatches harmony-swatches-enhanced">
                 {harmonyColors.map((c, i) => (
-                  <div key={i} className="harmony-swatch-card">
-                    <div className="harmony-swatch-big" style={{ background: c }} />
-                    <div className="harmony-swatch-hex">{c}</div>
+                  <div key={i} className="harmony-swatch-card harmony-swatch-card-enhanced">
+                    <div className="harmony-swatch-big-enhanced" style={{ background: c }} />
+                    <div className="harmony-swatch-info">
+                      <div className="harmony-swatch-hex">{c}</div>
+                      <button className="harmony-copy-btn" onClick={(e) => { e.stopPropagation(); copyToClipboard(c); }}>
+                        {copiedHex === c ? '✓ Copied' : 'Copy Hex'}
+                      </button>
+                    </div>
                     {paints.length > 0 && (
                       <div className="harmony-match">
                         Closest: <strong>{findClosestPaint(paints, c)?.name || 'N/A'}</strong>
@@ -186,13 +261,13 @@ export default function PaintSuggestions() {
 
             <div className="scheme-builder-grid">
               {customScheme.map((c, i) => (
-                <div key={i} className="builder-swatch-card">
+                <div key={i} className="builder-swatch-card builder-swatch-card-enhanced">
+                  <div className="builder-drag-hint" title="Drag to reorder (coming soon)">⠿</div>
                   <input type="color" value={c} onChange={e => updateSchemeColor(i, e.target.value)} className="builder-color-input" />
                   <div className="builder-swatch-info">
                     <div className="builder-swatch-hex">{c}</div>
-                    {paints.length > 0 && (
-                      <div className="builder-match">→ {findClosestPaint(paints, c)?.name || 'No match'}</div>
-                    )}
+                    <div className="builder-match">→ {findClosestPaint(paints, c)?.name || 'No match'}</div>
+                    <div className="builder-pct">{Math.round(100 / customScheme.length)}%</div>
                   </div>
                   {customScheme.length > 2 && (
                     <button className="builder-remove" onClick={() => removeColor(i)}>✕</button>
@@ -204,13 +279,28 @@ export default function PaintSuggestions() {
               )}
             </div>
 
-            <div className="scheme-preview">
+            {/* Gradient Preview Bar */}
+            <div className="scheme-preview scheme-preview-enhanced">
               <div className="scheme-preview-label">{schemeName || 'Preview'}</div>
-              <div className="scheme-preview-bar">
-                {customScheme.map((c, i) => (
-                  <div key={i} style={{ flex: 1, background: c, height: 48 }} />
-                ))}
-              </div>
+              <div className="scheme-preview-bar-gradient" style={{
+                background: `linear-gradient(90deg, ${customScheme.join(', ')})`,
+              }} />
+            </div>
+
+            {/* Percentage Breakdown */}
+            <div className="scheme-pct-breakdown">
+              {customScheme.map((c, i) => (
+                <div key={i} className="scheme-pct-item">
+                  <div className="scheme-pct-swatch" style={{ background: c }} />
+                  <span className="scheme-pct-text">{c} — {Math.round(100 / customScheme.length)}%</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Save Scheme Button */}
+            <div style={{ marginTop: 16, display: 'flex', gap: 10, alignItems: 'center' }}>
+              <button className="btn btn-primary" onClick={saveScheme}>💾 Save Scheme</button>
+              <span className="scheme-save-hint">Saves to your browser for later reference</span>
             </div>
           </div>
         </div>
@@ -233,13 +323,14 @@ export default function PaintSuggestions() {
 
       {/* ─── Inspiration ─── */}
       {tab === 'inspiration' && (
-        <div>
+        <div className="inspiration-shake">
           <div className="settings-section">
             <h3 className="settings-title"><GoldIcon name="lens" size={18} /> Instagram Inspiration</h3>
             <p className="settings-desc">Browse the best miniature painting on Instagram. Click a tag to open it in a new tab.</p>
-            <div className="insta-grid">
+            <div className="insta-grid insta-grid-enhanced">
               {INSTA_TAGS.map(t => (
-                <a key={t.tag} href={`https://www.instagram.com/explore/tags/${t.tag}/`} target="_blank" rel="noreferrer" className="insta-card">
+                <a key={t.tag} href={`https://www.instagram.com/explore/tags/${t.tag}/`} target="_blank" rel="noreferrer" className="insta-card insta-card-enhanced">
+                  <div className="insta-card-gradient-overlay" />
                   <div className="insta-tag">#{t.tag}</div>
                   <div className="insta-label">{t.label}</div>
                 </a>
@@ -250,7 +341,7 @@ export default function PaintSuggestions() {
           <div className="settings-section">
             <h3 className="settings-title">🎥 Recommended Painters</h3>
             <p className="settings-desc">Top miniature painting accounts to follow for inspiration and tutorials.</p>
-            <div className="insta-grid">
+            <div className="insta-grid insta-grid-enhanced">
               {[
                 { handle: 'warhammer', label: 'Official Warhammer' },
                 { handle: 'darren_latham_miniature_painting', label: 'Darren Latham' },
@@ -265,7 +356,8 @@ export default function PaintSuggestions() {
                 { handle: 'plasticcraic', label: 'Plastic Craic' },
                 { handle: 'thearmypainter', label: 'Army Painter' },
               ].map(p => (
-                <a key={p.handle} href={`https://www.instagram.com/${p.handle}/`} target="_blank" rel="noreferrer" className="insta-card painter-card">
+                <a key={p.handle} href={`https://www.instagram.com/${p.handle}/`} target="_blank" rel="noreferrer" className="insta-card insta-card-enhanced painter-card">
+                  <div className="insta-card-gradient-overlay" />
                   <div className="insta-tag">@{p.handle}</div>
                   <div className="insta-label">{p.label}</div>
                 </a>
@@ -478,7 +570,7 @@ function GuidesTab({ paints }: { paints: Paint[] }) {
   );
 }
 
-function CreatorRecipesTab({ paints }: { paints: Paint[] }) {
+function CreatorRecipesTab({ paints }: { paints: Paint[]; copiedHex?: string; copyToClipboard?: (hex: string) => void }) {
   const [expanded, setExpanded] = useState<number | null>(null);
   const [creatorFilter, setCreatorFilter] = useState('');
   const ownedNames = new Set(paints.map(p => p.name.toLowerCase()));
@@ -499,7 +591,7 @@ function CreatorRecipesTab({ paints }: { paints: Paint[] }) {
         </div>
 
         {filtered.map((r, i) => (
-          <div key={i} className="creator-recipe-card" onClick={() => setExpanded(expanded === i ? null : i)}>
+          <div key={i} className="creator-recipe-card creator-recipe-card-enhanced" style={{ animationDelay: `${i * 0.06}s` }} onClick={() => setExpanded(expanded === i ? null : i)}>
             <div className="scheme-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ display: 'flex', gap: 2 }}>
@@ -515,17 +607,19 @@ function CreatorRecipesTab({ paints }: { paints: Paint[] }) {
               <span className="scheme-toggle">{expanded === i ? '▲' : '▼'}</span>
             </div>
             {expanded === i && (
-              <div className="ref-card-detail">
+              <div className="ref-card-detail creator-detail-enhanced">
+                <div className="creator-detail-steps-label">Recipe Steps</div>
                 {r.paints.map((p, j) => (
-                  <div key={j} className="recipe-item" style={{ marginBottom: 4 }}>
-                    <div className="swatch" style={{ width: 24, height: 24, background: p.hex }} />
+                  <div key={j} className="recipe-item creator-recipe-item-enhanced">
+                    <span className="creator-step-num">{j + 1}</span>
+                    <div className="swatch" style={{ width: 28, height: 28, background: p.hex }} />
                     <div className="recipe-item-info">
                       <div className="recipe-paint-name">{p.name} {ownedNames.has(p.name.toLowerCase()) ? <span style={{ color: '#4ade80', fontSize: '0.65rem' }}>✓ OWNED</span> : <span style={{ color: '#ef4444', fontSize: '0.65rem' }}>✕</span>}</div>
                       <div className="recipe-usage">{p.step}</div>
                     </div>
                   </div>
                 ))}
-                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                <div className="creator-detail-actions">
                   <a href={r.videoUrl} target="_blank" rel="noreferrer" className="btn btn-sm btn-primary">▶ Watch on YouTube</a>
                   <a href={r.creatorChannel} target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost">📺 {r.creator}'s Channel</a>
                 </div>
@@ -589,16 +683,33 @@ function PaintAlongTab() {
     <div className="paintalong">
       <div className="paintalong-header">
         <button className="btn btn-sm btn-ghost" onClick={() => { setSelectedId(''); setActiveStep(0); setSeconds(0); setTimerRunning(false); }}>✕ Exit</button>
-        <div className="paintalong-timer">{fmt(seconds)}</div>
+        {/* Circular Timer */}
+        <div className="paintalong-timer-circle">
+          <svg viewBox="0 0 100 100" className="paintalong-timer-svg">
+            <circle cx="50" cy="50" r="44" fill="none" stroke="var(--surface3)" strokeWidth="3" />
+            <circle cx="50" cy="50" r="44" fill="none" stroke="var(--gold)" strokeWidth="3"
+              strokeDasharray={2 * Math.PI * 44}
+              strokeDashoffset={2 * Math.PI * 44 * (1 - (activeStep + 1) / guide.steps.length)}
+              strokeLinecap="round"
+              transform="rotate(-90 50 50)"
+              className="paintalong-timer-ring" />
+            <text x="50" y="54" textAnchor="middle" fill="var(--gold)" fontSize="20" fontFamily="Cinzel,serif" fontWeight="700">{fmt(seconds)}</text>
+          </svg>
+        </div>
         <button className={`btn btn-sm ${timerRunning ? 'btn-danger' : 'btn-primary'}`} onClick={() => setTimerRunning(!timerRunning)}>{timerRunning ? '⏸' : '▶'}</button>
       </div>
 
       <div className="paintalong-progress">
         <div className="guide-progress-bar"><div className="guide-progress-fill" style={{ width: `${((activeStep + 1) / guide.steps.length) * 100}%` }} /></div>
-        <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', marginTop: 4 }}>Step {activeStep + 1} / {guide.steps.length} · {guide.title}</div>
+        <div className="paintalong-progress-info">
+          <span>Step {activeStep + 1} / {guide.steps.length}</span>
+          <span className="paintalong-progress-pct">{Math.round(((activeStep + 1) / guide.steps.length) * 100)}%</span>
+          <span>· {guide.title}</span>
+        </div>
       </div>
 
       <div className="paintalong-step">
+        <div className="paintalong-step-badge paintalong-pulse">{activeStep + 1}</div>
         <div className="paintalong-technique">{step.technique}</div>
         <h2 className="paintalong-step-title">{step.title}</h2>
         <div className="paintalong-area">📍 {step.area}</div>
