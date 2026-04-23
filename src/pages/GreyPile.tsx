@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../db';
@@ -6,15 +6,27 @@ import type { ModelStatus } from '../types';
 import GoldIcon from '../components/GoldIcon';
 import ProjectGenerator from '../components/ProjectGenerator';
 import PageBanner from '../components/PageBanner';
+import PileOverview from '../components/grey-pile/PileOverview';
+import PipelineKanban from '../components/grey-pile/PipelineKanban';
+import ActiveWorkbench from '../components/grey-pile/ActiveWorkbench';
+import GalleryView from '../components/grey-pile/GalleryView';
+import TimelineView from '../components/grey-pile/TimelineView';
+import { LevelBadge, StreakCounter, AchievementGrid, XPPopup, useGamification } from '../components/grey-pile/GamificationSystem';
 
 const GREY_STATUSES: ModelStatus[] = ['unbuilt', 'built', 'primed'];
+
+type ViewMode = 'pipeline' | 'compact' | 'cards' | 'gallery' | 'timeline';
 
 export default function GreyPile() {
   const models = useLiveQuery(() => db.models.toArray()) ?? [];
   const nav = useNavigate();
+  const { addXP, recordPaint, checkAchievements } = useGamification();
+
   const [sortBy, setSortBy] = useState<'status' | 'faction' | 'date'>('status');
-  const [view, setView] = useState<'cards' | 'compact' | 'kanban'>('compact');
+  const [view, setView] = useState<ViewMode>('pipeline');
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+  const [xpPopup, setXpPopup] = useState<{ xp: number; reason: string } | null>(null);
+  const [showAchievements, setShowAchievements] = useState(false);
 
   const allModels = models.filter(m => !m.wishlist);
   const greyModels = allModels.filter(m => GREY_STATUSES.includes(m.status));
@@ -23,18 +35,42 @@ export default function GreyPile() {
   const totalWip = wipModels.reduce((s, m) => s + m.quantity, 0);
   const totalPainted = allModels.filter(m => m.status === 'painted' || m.status === 'based').reduce((s, m) => s + m.quantity, 0);
   const totalAll = allModels.reduce((s, m) => s + m.quantity, 0);
-  const pctDone = totalAll > 0 ? Math.round((totalPainted / totalAll) * 100) : 0;
 
-  // Estimated time (rough: 2hrs per 5 minis)
-  const estHours = Math.round((totalGrey / 5) * 2);
+  // Oldest model in pile
+  const oldestModel = greyModels.length > 0 ? [...greyModels].sort((a, b) => a.createdAt - b.createdAt)[0] : null;
 
-  const updateStatus = async (id: number, status: ModelStatus) => {
+  // Recent paint count (this month)
+  const recentPaintCount = allModels.filter(m => {
+    if (m.status !== 'painted' && m.status !== 'based') return false;
+    if (!m.lastPaintedAt) return false;
+    const d = new Date(m.lastPaintedAt);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).reduce((s, m) => s + m.quantity, 0);
+
+  const updateStatus = useCallback(async (id: number, status: ModelStatus) => {
+    const model = await db.models.get(id);
+    if (!model) return;
     const update: any = { status };
     if (status === 'wip' || status === 'painted' || status === 'based') update.lastPaintedAt = Date.now();
     await db.models.update(id, update);
-  };
 
-  // Group models
+    // Gamification
+    if (status === 'painted' || status === 'based') {
+      recordPaint(model.createdAt);
+      const newXp = status === 'based' ? 50 : 30;
+      addXP(newXp, status === 'based' ? 'Model completed & based!' : 'Model painted!');
+      setXpPopup({ xp: newXp, reason: status === 'based' ? 'Model completed & based!' : 'Model painted!' });
+      // Check achievements after a tick
+      setTimeout(() => {
+        checkAchievements();
+      }, 100);
+    } else if (status === 'wip') {
+      addXP(5, 'Started painting!');
+    }
+  }, [addXP, recordPaint, checkAchievements]);
+
+  // Group models for compact/cards view
   const getGroups = () => {
     if (sortBy === 'faction') {
       const factions: Record<string, typeof greyModels> = {};
@@ -52,126 +88,118 @@ export default function GreyPile() {
 
   const groups = getGroups();
 
+  const isEmpty = totalGrey === 0 && totalWip === 0;
+
+  const viewModes: { id: ViewMode; label: string; icon: string }[] = [
+    { id: 'pipeline', label: 'Pipeline', icon: 'swords2' },
+    { id: 'gallery', label: 'Gallery', icon: 'eagle-shield' },
+    { id: 'timeline', label: 'Timeline', icon: 'winged-hour' },
+    { id: 'compact', label: 'List', icon: 'scroll' },
+    { id: 'cards', label: 'Cards', icon: 'tome' },
+  ];
+
   return (
     <div>
       <PageBanner title="The Pile of Grey" subtitle="Face your shame — promote through the pipeline" icon="skull" />
 
-      {totalGrey === 0 && totalWip === 0 ? (
+      {isEmpty ? (
         <div className="empty">
           <span className="empty-icon"><GoldIcon name="medal" size={48} /></span>
           <p className="empty-text">Your pile is empty! You absolute legend.</p>
         </div>
       ) : (
         <>
-          {/* Shame Dashboard */}
-          <div className="shame-dashboard">
-            <div className="shame-main">
-              <div className="shame-number">{totalGrey}</div>
-              <div className="shame-label">unpainted minis</div>
-              {estHours > 0 && <div className="shame-estimate">~{estHours} hours of painting ahead</div>}
-            </div>
-            <div className="shame-ring">
-              <svg viewBox="0 0 120 120" className="shame-svg">
-                <circle cx="60" cy="60" r="52" fill="none" stroke="var(--surface3)" strokeWidth="8" />
-                <circle cx="60" cy="60" r="52" fill="none" stroke="var(--success)" strokeWidth="8"
-                  strokeDasharray={`${pctDone * 3.27} ${327 - pctDone * 3.27}`}
-                  strokeDashoffset="82" strokeLinecap="round" />
-              </svg>
-              <div className="shame-ring-text">
-                <div className="shame-ring-pct">{pctDone}%</div>
-                <div className="shame-ring-label">painted</div>
-              </div>
-            </div>
+          {/* Level badge + streak */}
+          <div className="pile-top-bar">
+            <LevelBadge />
+            <StreakCounter />
+            <button className="btn btn-sm btn-ghost" onClick={() => setShowAchievements(!showAchievements)}>
+              <GoldIcon name="crown" size={14} /> Achievements
+            </button>
           </div>
 
-          {/* Quick Stats */}
-          <div className="grey-stats">
-            <div className="grey-stat">
-              <div className="grey-stat-icon"><GoldIcon name="models" size={20} /></div>
-              <div className="grey-stat-num">{greyModels.filter(m => m.status === 'unbuilt').reduce((s, m) => s + m.quantity, 0)}</div>
-              <div className="grey-stat-label" data-tip="Still on the sprue — not yet assembled">Unbuilt</div>
-            </div>
-            <div className="grey-stat">
-              <div className="grey-stat-icon"><GoldIcon name="campaigns" size={20} /></div>
-              <div className="grey-stat-num">{greyModels.filter(m => m.status === 'built').reduce((s, m) => s + m.quantity, 0)}</div>
-              <div className="grey-stat-label" data-tip="Assembled and glued, ready for primer">Built</div>
-            </div>
-            <div className="grey-stat">
-              <div className="grey-stat-icon"><GoldIcon name="skull" size={20} /></div>
-              <div className="grey-stat-num">{greyModels.filter(m => m.status === 'primed').reduce((s, m) => s + m.quantity, 0)}</div>
-              <div className="grey-stat-label" data-tip="Base coat of primer applied, ready to paint">Primed</div>
-            </div>
-            <div className="grey-stat grey-stat-wip">
-              <div className="grey-stat-icon"><GoldIcon name="paints" size={20} /></div>
-              <div className="grey-stat-num">{totalWip}</div>
-              <div className="grey-stat-label" data-tip="Work In Progress — currently being painted">WIP</div>
-            </div>
-            <div className="grey-stat grey-stat-done">
-              <div className="grey-stat-icon"><GoldIcon name="medal" size={20} /></div>
-              <div className="grey-stat-num">{totalPainted}</div>
-              <div className="grey-stat-label">Done</div>
-            </div>
-          </div>
+          {/* XP Popup */}
+          {xpPopup && <XPPopup xp={xpPopup.xp} reason={xpPopup.reason} onDismiss={() => setXpPopup(null)} />}
 
-          {/* Currently on the desk */}
+          {/* Pile Overview (cinematic hero) */}
+          <PileOverview
+            totalGrey={totalGrey}
+            totalWip={totalWip}
+            totalPainted={totalPainted}
+            totalAll={totalAll}
+            greyModels={greyModels}
+            oldestModel={oldestModel}
+            recentPaintCount={recentPaintCount}
+          />
+
+          {/* Achievements panel */}
+          {showAchievements && <AchievementGrid />}
+
+          {/* Active Workbench */}
           {wipModels.length > 0 && (
-            <div className="grey-section">
-              <h3 className="section-title"><GoldIcon name="paints" size={18} /> Currently Painting</h3>
-              <div className="wip-strip">
-                {wipModels.map(m => (
-                  <div key={m.id} className="wip-mini" onClick={() => nav(`/model/${m.id}`)}>
-                    {m.photoUrl ? <img src={m.photoUrl} alt={m.name} /> : <GoldIcon name="paints" size={20} />}
-                    <div className="wip-mini-name">{m.name}</div>
-                    <button className="btn btn-sm btn-ghost" onClick={e => { e.stopPropagation(); updateStatus(m.id!, 'painted'); }}>✓ Done</button>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ActiveWorkbench
+              wipModels={wipModels}
+              onUpdateStatus={updateStatus}
+            />
           )}
+
+          {/* Art divider */}
+          <div className="art-divider">
+            <div className="art-divider-line" />
+            <GoldIcon name="skull-cog" size={18} />
+            <div className="art-divider-line" />
+          </div>
 
           {/* Project Generator */}
           <ProjectGenerator />
 
-          {/* Sort & View controls */}
+          {/* View controls */}
           <div className="grey-controls">
             <div className="grey-sort">
-              <span className="grey-sort-label">Sort by:</span>
-              <button className={`btn btn-sm ${sortBy === 'status' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSortBy('status')}>Status</button>
-              <button className={`btn btn-sm ${sortBy === 'faction' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSortBy('faction')}>Faction</button>
-              <button className={`btn btn-sm ${sortBy === 'date' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSortBy('date')}>Oldest</button>
+              <span className="grey-sort-label">View:</span>
+              {viewModes.map(v => (
+                <button
+                  key={v.id}
+                  className={`btn btn-sm ${view === v.id ? 'btn-primary' : 'btn-ghost'}`}
+                  onClick={() => setView(v.id)}
+                >
+                  <GoldIcon name={v.icon} size={12} /> {v.label}
+                </button>
+              ))}
             </div>
-            <div className="view-toggle">
-              <button className={`view-btn ${view === 'cards' ? 'active' : ''}`} onClick={() => setView('cards')}>☰</button>
-              <button className={`view-btn ${view === 'compact' ? 'active' : ''}`} onClick={() => setView('compact')}>▤</button>
-              <button className={`view-btn ${view === 'kanban' ? 'active' : ''}`} onClick={() => setView('kanban')}>▥</button>
-            </div>
+            {(view === 'compact' || view === 'cards') && (
+              <div className="grey-sort">
+                <span className="grey-sort-label">Sort:</span>
+                <button className={`btn btn-sm ${sortBy === 'status' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSortBy('status')}>Status</button>
+                <button className={`btn btn-sm ${sortBy === 'faction' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSortBy('faction')}>Faction</button>
+                <button className={`btn btn-sm ${sortBy === 'date' ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setSortBy('date')}>Oldest</button>
+              </div>
+            )}
           </div>
 
-          {/* Model Groups */}
-          {view === 'kanban' ? (
-            <div className="kanban">
-              {(['unbuilt', 'built', 'primed', 'wip'] as const).map(status => {
-                const col = models.filter(m => m.status === status);
-                return (
-                  <div key={status} className="kanban-col">
-                    <div className="kanban-col-title">{status} ({col.length})</div>
-                    {col.map(m => (
-                      <div key={m.id} className="kanban-card" onClick={() => nav(`/model/${m.id}`)}>
-                        <div className="kanban-card-name">{m.name}</div>
-                        <div className="kanban-card-faction">{m.faction}</div>
-                        <button className="btn btn-sm btn-ghost" style={{ width: '100%', marginTop: 4, fontSize: '0.7rem' }} onClick={e => {
-                          e.stopPropagation();
-                          const next = status === 'unbuilt' ? 'built' : status === 'built' ? 'primed' : 'wip';
-                          updateStatus(m.id!, next);
-                        }}>→ {status === 'unbuilt' ? 'built' : status === 'built' ? 'primed' : status === 'primed' ? 'wip' : 'painted'}</button>
-                      </div>
-                    ))}
-                    {col.length === 0 && <div className="kanban-count">Empty</div>}
-                  </div>
-                );
-              })}
-            </div>
-          ) : groups.map(group => group.models.length > 0 && (
+          {/* View content */}
+          {view === 'pipeline' && (
+            <PipelineKanban
+              models={allModels}
+              onUpdateStatus={updateStatus}
+            />
+          )}
+
+          {view === 'gallery' && (
+            <GalleryView
+              models={allModels}
+              onUpdateStatus={updateStatus}
+            />
+          )}
+
+          {view === 'timeline' && (
+            <TimelineView
+              models={allModels}
+              onUpdateStatus={updateStatus}
+            />
+          )}
+
+          {(view === 'compact' || view === 'cards') && groups.map(group => group.models.length > 0 && (
             <div key={group.label} className="grey-section">
               <div className="group-header" onClick={() => setExpandedGroup(expandedGroup === group.label ? null : group.label)} style={{ cursor: 'pointer' }}>
                 <span style={{ color: 'var(--text-dim)', fontSize: '0.7rem', marginRight: 6 }}>{expandedGroup === group.label ? '▾' : '▸'}</span>
@@ -210,10 +238,10 @@ export default function GreyPile() {
 
           {/* Motivational footer */}
           <div className="grey-motivation">
-            {totalGrey <= 10 ? "Almost there! You can see the finish line! 🏁" :
-             totalGrey <= 30 ? "Solid progress. Keep the momentum going! " :
-             totalGrey <= 100 ? "A worthy challenge. One model at a time. " :
-             "The pile is vast... but so is your determination. "}
+            {totalGrey <= 10 ? "Almost there! You can see the finish line!" :
+             totalGrey <= 30 ? "Solid progress. Keep the momentum going." :
+             totalGrey <= 100 ? "A worthy challenge. One model at a time." :
+             "The pile is vast... but so is your determination."}
           </div>
         </>
       )}
