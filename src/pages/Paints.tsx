@@ -161,7 +161,7 @@ export default function Paints() {
 
       {filtered.length === 0 ? (
         <div className="md-empty-tab" style={{ marginTop: 40 }}>
-          <img src={`${import.meta.env.BASE_URL}decor/empty-workstation.jpg`} alt="" style={{ width: 200, height: 'auto', borderRadius: 12, opacity: 0.6, marginBottom: 12 }} />
+          <img src={`${import.meta.env.BASE_URL}banners/empty-collection.png`} alt="" style={{ width: 200, height: 'auto', borderRadius: 12, opacity: 0.6, marginBottom: 12 }} />
           <p>{paints.length === 0 ? 'Add your first paint to start your rack.' : 'No paints match your filters.'}</p>
         </div>
       ) : view === 'grid' ? (

@@ -69,7 +69,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
    HERO
    ═══════════════════════════════════════ */
 .hero { text-align:center; padding:100px 0 80px; max-width:680px; margin:0 auto; position:relative; }
-.hero::before { content:''; position:absolute; inset:0; background:url('/hero-bg.jpg') center/cover no-repeat; opacity:0.35; pointer-events:none; z-index:0; }
+.hero::before { content:''; position:absolute; inset:0; background:url('/banners/hero-workshop.png') center/cover no-repeat; opacity:0.35; pointer-events:none; z-index:0; }
 .hero > * { position:relative; z-index:1; }
 .hero-eyebrow { font-size:0.7rem; text-transform:uppercase; letter-spacing:4px; color:var(--gold); margin-bottom:24px; font-weight:600; }
 .hero-title { font-family:'Cinzel',serif; font-size:4rem; font-weight:900; line-height:1.05; margin-bottom:24px; letter-spacing:1px; }
@@ -1601,7 +1601,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
   --gold-bright: #a07820;
 }
 [data-theme="light"] .site { background: #f0ece4 !important; background-image: none !important; }
-[data-theme="light"] .hero { background: linear-gradient(rgba(240,236,228,0.8), rgba(240,236,228,0.9)), url('/decor/empty-workstation.jpg') center/cover no-repeat !important; }
+[data-theme="light"] .hero { background: linear-gradient(rgba(240,236,228,0.8), rgba(240,236,228,0.9)), url('/banners/hero-workshop.png') center/cover no-repeat !important; }
 [data-theme="light"] .page-banner { background: linear-gradient(135deg, #e8e0d0, #d8d0c0) !important; }
 [data-theme="light"] .pr-rack { background: linear-gradient(180deg, #e8e0d0, #d8d0c0) !important; border-color: #c0a870; }
 [data-theme="light"] .gold-divider img, [data-theme="light"] .md-divider img { opacity: 0.5; }
@@ -1626,7 +1626,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
   padding: 120px 0 100px !important;
   position: relative;
   text-align: center;
-  background: linear-gradient(rgba(10,10,14,0.7), rgba(10,10,14,0.85)), url('/decor/empty-workstation.jpg') center/cover no-repeat;
+  background: linear-gradient(rgba(10,10,14,0.7), rgba(10,10,14,0.85)), url('/banners/hero-workshop.png') center/cover no-repeat;
   border-radius: 16px;
   margin-bottom: 24px;
 }
@@ -1989,7 +1989,7 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 }
 .hero::before {
   content: '' !important; position: absolute; inset: 0;
-  background: url('/hero-bg.jpg') no-repeat center center !important;
+  background: url('/banners/hero-workshop.png') no-repeat center center !important;
   background-size: cover !important;
   opacity: 0.35 !important;
   filter: none !important;
@@ -2963,30 +2963,42 @@ body { font-family:'Inter',system-ui,sans-serif; background: linear-gradient(rgb
 /* ═══ PAGE BANNER ═══ */
 .page-banner {
   position: relative; margin: -20px -40px 24px; overflow: hidden;
-  height: 140px; display: flex; align-items: flex-end;
+  height: 160px; display: flex; align-items: flex-end;
+  border-bottom: 1px solid rgba(196,149,42,0.15);
+  transition: height 0.3s ease;
 }
 .page-banner-bg {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; object-position: center 40%;
+  animation: bannerZoom 20s ease-in-out infinite alternate;
+  filter: brightness(0.7) saturate(1.1);
+}
+@keyframes bannerZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
 }
 .page-banner-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(10,10,14,0.95) 0%, rgba(10,10,14,0.4) 50%, rgba(10,10,14,0.2) 100%);
+  background: linear-gradient(to top, rgba(10,10,14,0.97) 0%, rgba(10,10,14,0.5) 40%, rgba(10,10,14,0.15) 100%);
 }
 .page-banner-content {
-  position: relative; z-index: 1; padding: 0 40px 16px;
+  position: relative; z-index: 1; padding: 0 40px 18px;
   display: flex; align-items: center; gap: 14px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 .page-banner-content h1 {
-  font-family: 'Cinzel', serif; font-size: 1.6rem; font-weight: 700;
-  background: linear-gradient(135deg, #f5d78e, #c4962a); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  margin: 0; line-height: 1.2;
+  font-family: 'Cinzel', serif; font-size: 1.7rem; font-weight: 800;
+  background: linear-gradient(135deg, #f5d78e 0%, #c4962a 40%, #f5d78e 80%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin: 0; line-height: 1.2;
+  letter-spacing: 0.5px;
 }
 .page-banner-content p {
-  font-size: 0.75rem; color: rgba(255,255,255,0.45); margin: 4px 0 0;
+  font-size: 0.75rem; color: rgba(255,255,255,0.5); margin: 4px 0 0;
+  letter-spacing: 0.3px;
 }
 @media (max-width: 600px) {
-  .page-banner { margin: -12px -16px 16px; height: 120px; }
+  .page-banner { margin: -12px -16px 16px; height: 130px; }
   .page-banner-bg { object-position: center 30%; }
   .page-banner-content { padding: 0 16px 12px; }
   .page-banner-content h1 { font-size: 1.2rem; }

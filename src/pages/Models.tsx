@@ -217,7 +217,7 @@ export default function Models() {
         <div style={{ padding: '20px 0' }}>{Array.from({ length: 5 }, (_, i) => <div key={i} className="skeleton skeleton-card" />)}</div>
       ) : filtered.length === 0 ? (
         <div className="md-empty-tab" style={{ marginTop: 40 }}>
-          <img src={`${import.meta.env.BASE_URL}decor/empty-workstation.jpg`} alt="" className="md-empty-icon" style={{ width: 200, height: 'auto', borderRadius: 12, opacity: 0.6 }} />
+          <img src={`${import.meta.env.BASE_URL}banners/empty-collection.png`} alt="" className="md-empty-icon" style={{ width: 200, height: 'auto', borderRadius: 12, opacity: 0.6 }} />
           <p>{models.length === 0 ? 'Add your first model to begin.' : 'No models match your filters.'}</p>
         </div>
       ) : view === 'grid' ? (
